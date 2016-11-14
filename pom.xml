@@ -28,6 +28,8 @@
 		<javolution.version>5.5.1</javolution.version>
 
 		<ch.smpp.version>5.0.4</ch.smpp.version>
+		<ch-commons-util.version>6.0.1</ch-commons-util.version>
+		<ch-commons-charset.version>3.0.2</ch-commons-charset.version>
 		<jss7.restcomm.version>7.1.1385</jss7.restcomm.version>
 	</properties>
 

@@ -16,7 +16,8 @@
 		<module>smpp-extensions</module>
 <!--
         <module>oam/clismpp</module>
-		<module>bootstrap</module>
 -->
+
+		<module>bootstrap</module>
 	</modules>
 </project>

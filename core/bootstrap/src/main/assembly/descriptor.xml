@@ -1,0 +1,37 @@
+<assembly>
+	<id>server</id>
+	<formats>
+		<format>zip</format>
+	</formats>
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<files>
+
+	</files>
+	<dependencySets>
+		<dependencySet>
+			<outputDirectory>/lib</outputDirectory>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<include>org.restcomm.smpp:smpp-extensions</include>
+
+				<include>org.mobicents.protocols.ss7.scheduler:scheduler</include>
+				<include>org.mobicents.protocols.ss7.management:shell-transport	</include>
+				<include>org.mobicents.protocols.ss7.management:shell-server-api</include>
+				<include>org.mobicents.protocols.ss7.management:shell-server-impl</include>
+
+				<include>org.restcomm.smpp:ch-smpp</include>
+				<include>com.cloudhopper:ch-commons-charset</include>
+				<include>com.cloudhopper:ch-commons-util</include>
+
+				<include>javolution:javolution</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+	<componentDescriptors>
+		<componentDescriptor>
+			src/main/assembly/common.xml
+		</componentDescriptor>
+	</componentDescriptors>
+</assembly>
