@@ -26,6 +26,7 @@
 				<include>com.cloudhopper:ch-commons-util</include>
 
 				<include>javolution:javolution</include>
+				<include>io.netty:netty</include>
 			</includes>
 		</dependencySet>
 	</dependencySets>

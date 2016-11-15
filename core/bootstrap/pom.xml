@@ -60,6 +60,13 @@
 			<artifactId>javolution</artifactId>
 			<version>${javolution.version}</version>
 		</dependency>
+
+		<!-- javolution -->
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>${netty.version}</version>
+		</dependency>
 	</dependencies>
 
 	<!-- -->
