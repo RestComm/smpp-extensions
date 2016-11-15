@@ -36,6 +36,8 @@
 
 	<modules>
 		<module>core</module>
+
+		<module>management/ui-management</module>
 	</modules>
 
 	<profiles>
