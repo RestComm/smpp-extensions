@@ -1,0 +1,196 @@
+<?xml version="1.0"?>
+<project name="smpp.release.sf" default="release" basedir=".">
+	<property environment="sys"/>
+	<property name="release.dir" location="${ant.file.smpp.release.sf}/../target" />
+	<property name="base.dir" location="${ant.file.smpp.release.sf}/.." />
+	<property name="restcomm.smpp.dist" value="${release.dir}" />
+	<property name="smpp.dir" value="${base.dir}/.." />
+	<property name="docs.dir" location="${restcomm.smpp.dist}/_docs" />
+
+	<!--Versions -->
+	<property name="restcomm.jss7.version" value="7.1.1385" />
+	<property name="release.version" value="${smpp.release.version}"/>
+
+	<property name="github.url" value="https://github.com/RestComm" />
+	<property name="checkout.dir" value="${base.dir}/checkout" />
+
+	<property name="checkout.restcomm-jss7.dir" value="${checkout.dir}/restcomm-jss7" />
+	<property name="restcomm-jss7.build-number" value="1385" />
+	<property name="restcomm-jss7.version" value="7.1.${restcomm-jss7.build-number}" />
+	<property name="restcomm-jss7.release" value="7.1.1385" />
+
+	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
+	<property name="restcomm-jss7.download.url" value="${github.url}/jss7/releases/download/${restcomm-jss7.release}/${restcomm-jss7.download.distro.file}" />
+	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
+
+
+	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
+		<os family="windows"/>
+	</condition>
+	
+	<taskdef onerror="fail" resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${ant.file.smpp.release.sf}/../ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+
+	<target name="release" depends="clean,get-restcomm-jss7,extract-restcomm-jss7,build-smpp,copy-smpp,make-final-zip" />
+
+  	<target name="release-restcomm" depends="clean,get-restcomm-jss7,extract-restcomm-jss7,copy-smpp,make-final-zip" />
+
+
+	<available file="${restcomm-jss7.distro.zip.path}" property="got.restcomm-jss7" />
+	<target name="get-restcomm-jss7" unless="got.restcomm-jss7">
+		<echo>Downloading RestComm JSS7 version: ${restcomm-jss7.version}</echo>
+		<exec failonerror="true" executable="wget">
+			<arg value="${restcomm-jss7.download.url}" />
+		    <arg value="--output-document=${restcomm-jss7.download.distro.file}" />
+		    <arg value="--no-check-certificate" />
+		</exec>
+		<move file="${base.dir}/${restcomm-jss7.download.distro.file}" todir="${checkout.dir}"/>
+	</target>
+
+	<target name="extract-restcomm-jss7" depends="get-restcomm-jss7">
+		<delete dir="${checkout.restcomm-jss7.dir}" failonerror="false" />
+		<unzip src="${restcomm-jss7.distro.zip.path}" dest="${checkout.restcomm-jss7.dir}"/>
+		<move file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}-restcomm" tofile="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}" failonerror="false"/>
+	</target>
+
+    <target name="copy-smpp">
+		<echo>Copy SMPP Server</echo>
+		<copy todir="${restcomm.smpp.dist}/restcomm-smpp-server" failonerror="true">
+			<fileset dir="${smpp.dir}/core/bootstrap/target/restcomm-smpp-server">
+				<include name="**" />
+			</fileset>
+		</copy>
+
+    	<echo>Copy Shell</echo>
+    	<copy todir="${restcomm.smpp.dist}/shell/lib" failonerror="true">
+			<fileset dir="${smpp.dir}/core/oam/clismpp/target">
+				<include name="smpp-cli-*.jar" />
+			</fileset>
+		</copy>
+    	<copy todir="${restcomm.smpp.dist}/shell/bin" failonerror="true">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell/bin">
+				<include name="**/*" />
+			</fileset>
+		</copy>
+		<copy todir="${restcomm.smpp.dist}/shell/lib" failonerror="true">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell/lib">
+				<include name="jansi-*.jar" />
+				<include name="javolution-*.jar" />
+				<include name="jreadline-*.jar" />
+				<include name="restcomm-ss7-shell.jar" />
+				<include name="shell-transport-*.jar" />
+			</fileset>
+		</copy>
+
+		<!-- oam/new-ui - jolokia war & smpp-management.war -->
+		<copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
+		<copy file="${smpp.dir}/management/ui-management/target/smpp-management.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
+    </target>
+
+	<target name="build-smpp">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.dir}/../">
+			<arg line="clean install -Dmaven.test.skip=true" />
+		</exec>
+	</target>
+
+<!--
+	<target name="build-docs">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.dir}/../docs">
+			<arg line="clean install -Prestcomm -Pall" />
+		</exec>
+	</target>
+-->
+
+
+	<target name="make-final-zip" depends="set-time-stamp">
+		<zip destfile="${base.dir}/restcomm-smpp-${release.version}.zip" filesonly="false">
+			<zipfileset dir="${restcomm.smpp.dist}" prefix="restcomm-smpp-${release.version}">
+				<include name="**" />
+			</zipfileset>
+		</zip>
+	</target>
+	
+	<target name="set-time-stamp" unless="skip.timestamp">
+		<tstamp>
+			<format property="time.stamp" pattern="yyMMddHHmm" />
+		</tstamp>
+	</target>
+
+<!--
+	<target name="copy-documentation" >
+		<echo>copying documentation</echo>
+		<mkdir dir="${docs.dir}"/>
+
+		<mkdir dir="${docs.dir}/ASNLibrary"/>
+		<mkdir dir="${docs.dir}/ASNLibrary/html-book"/>
+		<copy todir="${docs.dir}/ASNLibrary/html-book" failonerror="true">
+			<fileset dir="${checkout.asn.dir}/docs/sources-asciidoc/target/generated-docs/html-book/">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<mkdir dir="${docs.dir}/ASNLibrary/pdf"/>
+		<copy todir="${docs.dir}/ASNLibrary/pdf" failonerror="true">
+			<fileset dir="${checkout.asn.dir}/docs/sources-asciidoc/target/generated-docs/pdf/">
+				<include name="**.pdf" />
+			</fileset>
+		</copy>
+
+		<mkdir dir="${docs.dir}/SCTPLibrary"/>
+		<mkdir dir="${docs.dir}/SCTPLibrary/html-book"/>
+		<copy todir="${docs.dir}/SCTPLibrary/html-book" failonerror="true">
+			<fileset dir="${checkout.sctp.dir}/docs/sources-asciidoc/target/generated-docs/html-book/">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<mkdir dir="${docs.dir}/SCTPLibrary/pdf"/>
+		<copy todir="${docs.dir}/SCTPLibrary/pdf" failonerror="true">
+			<fileset dir="${checkout.sctp.dir}/docs/sources-asciidoc/target/generated-docs/pdf/">
+				<include name="**.pdf" />
+			</fileset>
+		</copy>
+
+		<mkdir dir="${docs.dir}/userguide"/>
+		<mkdir dir="${docs.dir}/installationguide"/>
+		<mkdir dir="${docs.dir}/userguide/html-book"/>
+		<copy todir="${docs.dir}/userguide/html-book" failonerror="true">
+			<fileset dir="${jss7.dir}/docs/userguide/sources-asciidoc/target/generated-docs/html-book/">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<mkdir dir="${docs.dir}/installationguide/html-book"/>
+		<copy todir="${docs.dir}/installationguide/html-book" failonerror="true">
+			<fileset dir="${jss7.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/html-book/">
+			<include name="**" />
+		</fileset>
+		</copy>
+		<mkdir dir="${docs.dir}/userguide/pdf"/>
+		<copy todir="${docs.dir}/userguide/pdf" failonerror="true">
+			<fileset dir="${jss7.dir}/docs/userguide/sources-asciidoc/target/generated-docs/pdf/">
+				<include name="**.pdf" />
+			</fileset>
+		</copy>
+		<mkdir dir="${docs.dir}/installationguide/pdf"/>
+		<copy todir="${docs.dir}/installationguide/pdf" failonerror="true">
+			<fileset dir="${jss7.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/pdf/">
+				<include name="**.pdf" />
+			</fileset>
+		</copy>
+	</target>
+-->
+
+
+
+	<target name="clean">
+		<delete dir="${release.dir}"/>
+		<delete dir="${base.dir}/checkout"/>
+		<delete>
+			<fileset dir="${base.dir}">
+				<include name="restcomm-smpp-*.zip" />
+			</fileset>
+		</delete>
+	</target>
+	
+</project>
