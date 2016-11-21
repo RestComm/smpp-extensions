@@ -39,17 +39,17 @@
 
 		<!-- cloudhopper smpp -->
 		<dependency>
-			<groupId>org.restcomm.smpp</groupId>
+			<groupId>org.restcomm.smpp</groupId> <!-- com.cloudhopper -->
 			<artifactId>ch-smpp</artifactId>
 			<version>${ch.smpp.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.cloudhopper</groupId>
+			<groupId>org.restcomm.smpp</groupId>
 			<artifactId>ch-commons-util</artifactId>
 			<version>${ch-commons-util.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.cloudhopper</groupId>
+			<groupId>org.restcomm.smpp</groupId> <!-- com.cloudhopper -->
 			<artifactId>ch-commons-charset</artifactId>
 			<version>${ch-commons-charset.version}</version>
 		</dependency>
