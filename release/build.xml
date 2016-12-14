@@ -68,6 +68,8 @@
     	<copy todir="${restcomm.smpp.dist}/shell/lib" failonerror="true">
 			<fileset dir="${smpp.dir}/core/oam/clismpp/target">
 				<include name="smpp-cli-*.jar" />
+				<exclude name="smpp-cli-*-javadoc.jar" />
+				<exclude name="smpp-cli-*-sources.jar" />
 			</fileset>
 		</copy>
     	<copy todir="${restcomm.smpp.dist}/shell/bin" failonerror="true">
