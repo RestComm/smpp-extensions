@@ -200,15 +200,14 @@ PARAMETERS
 
 				  0 means disabled. SMSC will not send ENQUIRE_LINK.
 
-	link-drop-server - Default value is 0 milli seconds means disabled. 
-				  When SMSC connects to a remote server as SERVER, if it 
-				  isn't received any data after configured link-drop-server,
-				  it will drop the esme session.
-
-				  0 means disabled, SMSC will not drop smpp session.
-
+	link-drop-server - Time in milliseconds after which if ESME plays a SERVER role 
+				  and this option is enabled (> 0) SMSC GW will drop the esme
+				  session if for this time there is no traffic in the ESME
+				  (no incoming SMPP messages).
+				  Values 0 or <0 disable the option.
 				  If enquire-link-delay-server is enabled then link-drop-server
-				  always disabled.
+				  option value is not taken into account (it is always disabled.)
+				  Default value is 0 (that means that the option is disabled).
 
 	charging-enabled	- Flag to enable or disable charging for every SMS 
 				  arriving from SIP.
