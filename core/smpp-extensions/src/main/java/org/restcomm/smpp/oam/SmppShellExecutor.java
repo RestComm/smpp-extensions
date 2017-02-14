@@ -67,7 +67,7 @@ public class SmppShellExecutor implements ShellExecutor {
     }
 
     /**
-     * @param SmppManagement
+     * @param smppManagement
      *            the SmppManagement to set
      */
     public void setSmppManagement(SmppManagement smppManagement) {

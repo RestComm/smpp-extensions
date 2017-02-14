@@ -118,14 +118,22 @@ public class SmppManagement implements SmppManagementMBean {
         this.smppSessionHandlerInterface = smppSessionHandlerInterface;
     }
 
+    public void setMbeanServer(MBeanServer mbeanServer) {
+        this.mbeanServer = mbeanServer;
+    }
 
     public void startSmppManagement() throws Exception {
 
         // Step 1 Get the MBeanServer
-        this.mbeanServer = MBeanServerLocator.locateJBoss();
+        if (this.mbeanServer == null) {
+            this.mbeanServer = MBeanServerLocator.locateJBoss();
+        }
 
         // Step 2 Setup ESME
         this.esmeManagement.setPersistDir(this.persistDir);
+        if (this.mbeanServer != null) {
+            this.esmeManagement.setMbeanServer(this.mbeanServer);
+        }
         this.esmeManagement.start();
 
         ObjectName esmeObjNname = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT

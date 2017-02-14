@@ -130,6 +130,10 @@ public class EsmeManagement implements EsmeManagementMBean {
 		this.persistDir = persistDir;
 	}
 
+	public void setMbeanServer(MBeanServer mbeanServer) {
+		this.mbeanServer = mbeanServer;
+	}
+
 	/**
 	 * @param smppClient
 	 *            the smppClient to set
@@ -407,7 +411,9 @@ public class EsmeManagement implements EsmeManagementMBean {
 	public void start() throws Exception {
 
         try {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+					if (this.mbeanServer == null) {
+						this.mbeanServer = MBeanServerLocator.locateJBoss();
+					}
         } catch (Exception e) {
         }
 
