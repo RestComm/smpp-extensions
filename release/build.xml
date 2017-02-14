@@ -8,19 +8,25 @@
 	<property name="docs.dir" location="${restcomm.smpp.dist}/_docs" />
 
 	<!--Versions -->
-	<property name="restcomm.jss7.version" value="7.1.1385" />
+	<property name="restcomm.jss7.version" value="8.0.73" /> <!-- 7.1.1385 -->
 	<property name="release.version" value="${smpp.release.version}"/>
 
-	<property name="github.url" value="https://github.com/RestComm" />
+	<!--<property name="github.url" value="https://github.com/RestComm" />-->
+	<property name="cloudbees.url" value="https://mobicents.ci.cloudbees.com/job/Restcomm-jSS7" />
 	<property name="checkout.dir" value="${base.dir}/checkout" />
 
 	<property name="checkout.restcomm-jss7.dir" value="${checkout.dir}/restcomm-jss7" />
-	<property name="restcomm-jss7.build-number" value="1385" />
-	<property name="restcomm-jss7.version" value="7.1.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.release" value="7.1.1385" />
+	<property name="restcomm-jss7.build-number" value="73" />
+	<property name="restcomm-jss7.version" value="8.0.${restcomm-jss7.build-number}" />
+	<property name="restcomm-jss7.release" value="8.0.73" />
 
 	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
-	<property name="restcomm-jss7.download.url" value="${github.url}/jss7/releases/download/${restcomm-jss7.release}/${restcomm-jss7.download.distro.file}" />
+	<!--
+	<property name="restcomm-jss7.download.url"
+			  value="${github.url}/jss7/releases/download/${restcomm-jss7.release}/${restcomm-jss7.download.distro.file}" />
+	-->
+	<property name="restcomm-jss7.download.url"
+			  value="${cloudbees.url}/${restcomm-jss7.build-number}/artifact/release/${restcomm-jss7.download.distro.file}" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
 
 
@@ -58,8 +64,13 @@
 
     <target name="copy-smpp">
 		<echo>Copy SMPP Server</echo>
-		<copy todir="${restcomm.smpp.dist}/restcomm-smpp-server" failonerror="true">
+		<copy todir="${restcomm.smpp.dist}/jboss5/restcomm-smpp-server" failonerror="true">
 			<fileset dir="${smpp.dir}/core/bootstrap/target/restcomm-smpp-server">
+				<include name="**" />
+			</fileset>
+		</copy>
+		<copy todir="${restcomm.smpp.dist}/wildfly/restcomm-smpp-server" failonerror="true">
+			<fileset dir="${smpp.dir}/core/bootstrap-wildfly/target/module">
 				<include name="**" />
 			</fileset>
 		</copy>
