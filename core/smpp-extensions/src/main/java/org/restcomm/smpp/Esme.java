@@ -223,6 +223,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean started = false;
 	private boolean serverBound = false;
 	private int enquireLinkFailCnt = 0;
+	private int rxEnquireLinkCounter = 0;
 
     private String state = SmppSession.STATES[SmppSession.STATE_CLOSED];
 
@@ -992,6 +993,12 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	}
 
 	public boolean checkLinkRecvMessage() {
+        int currentEnqLinkCounter = this.defaultSmppSession.getCounters().getRxEnquireLink().getRequest();
+        if (this.rxEnquireLinkCounter < currentEnqLinkCounter) {
+            this.linkRecvMessCheck = true;
+        }
+
+        this.rxEnquireLinkCounter = currentEnqLinkCounter;
         return this.linkRecvMessCheck;
 	}
 
@@ -1517,6 +1524,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		if (this.defaultSmppSession != null) {
 			this.defaultSmppSession.resetCounters();
 		}
+
+        this.rxEnquireLinkCounter = 0;
 	}
 
 	@Override

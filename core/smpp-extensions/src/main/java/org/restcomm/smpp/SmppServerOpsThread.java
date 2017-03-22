@@ -195,7 +195,7 @@ public class SmppServerOpsThread implements Runnable {
 		}
 
 		if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
-			logger.info("Esme Server destroy due to Enquire for ESME SystemId=" + esme.getSystemId());
+			logger.warn("Can't send ENQUIRE_LINK for ESME SystemId=" + esme.getSystemId());
 			try {
 				smppSession.close();
 			} catch (Exception e) {
@@ -221,7 +221,7 @@ public class SmppServerOpsThread implements Runnable {
 
 		if (!esme.getLinkStartFirstTime()) {
 			if (!esme.checkLinkRecvMessage()) {
-				logger.info("Esme Server destroy due to Link Dropped for ESME SystemId=" + esme.getSystemId());
+				logger.warn("linkDropServer dropped connection because no packet received for ESME SystemId=" + esme.getSystemId());
 				try {
 					smppSession.close();
 				} catch (Exception e) {
