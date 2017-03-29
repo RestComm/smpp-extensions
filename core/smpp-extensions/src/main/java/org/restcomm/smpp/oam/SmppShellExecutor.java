@@ -488,6 +488,9 @@ public class SmppShellExecutor implements ShellExecutor {
         } else if (parName.equals("bindtimeout")) {
             int val = Integer.parseInt(options[4]);
             smppServerManagement.setBindTimeout(val);
+        } else if (parName.equals("writetimeout")) {
+            int val = Integer.parseInt(options[4]);
+            smppServerManagement.setWriteTimeout(val);
         } else if (parName.equals("systemid")) {
             smppServerManagement.setSystemId(options[4]);
         } else if (parName.equals("autonegotiateversion")) {
@@ -542,6 +545,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 sb.append(smppServerManagement.getBindPort());
             } else if (parName.equals("bindtimeout")) {
                 sb.append(smppServerManagement.getBindTimeout());
+            } else if (parName.equals("writetimeout")) {
+                sb.append(smppServerManagement.getWriteTimeout());
             } else if (parName.equals("systemid")) {
                 sb.append(smppServerManagement.getSystemId());
             } else if (parName.equals("autonegotiateversion")) {
@@ -573,6 +578,10 @@ public class SmppShellExecutor implements ShellExecutor {
 
             sb.append("bind-timeout = ");
             sb.append(smppServerManagement.getBindTimeout());
+            sb.append("\n");
+
+            sb.append("write-timeout = ");
+            sb.append(smppServerManagement.getWriteTimeout());
             sb.append("\n");
 
             sb.append("system-id = ");

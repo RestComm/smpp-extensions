@@ -256,7 +256,8 @@ public class SmppClientOpsThread implements Runnable {
 			config0.setRequestExpiryTimeout(esme.getRequestExpiryTimeout());
 			config0.setWindowMonitorInterval(esme.getWindowMonitorInterval());
 			config0.setCountersEnabled(esme.isCountersEnabled());
-			
+			config0.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
+
 			int addressTon = esme.getEsmeTon();
 			int addressNpi = esme.getEsmeNpi();
 			String addressRange = esme.getEsmeAddressRange();

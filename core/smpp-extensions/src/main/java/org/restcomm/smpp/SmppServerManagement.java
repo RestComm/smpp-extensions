@@ -59,7 +59,8 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	private static final Logger logger = Logger.getLogger(SmppServerManagement.class);
 
 	private static final String PORT = "port";
-	private static final String BIND_TIMEOUT = "bindTimeout";
+    private static final String BIND_TIMEOUT = "bindTimeout";
+    private static final String WRITE_TIMEOUT = "writeTimeout";
 	private static final String SYSTEM_ID = "systemId";
 	private static final String AUTO_NEGOTIATION_VERSION = "autoNegotiateInterfaceVersion";
 	private static final String INTERFACE_VERSION = "interfaceVersion";
@@ -85,8 +86,10 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	private final EsmeManagement esmeManagement;
 
 	private int port = 2776;
-	// length of time to wait for a bind request
-	private long bindTimeout = 5000;
+    // length of time to wait for a bind request
+    private long bindTimeout = 5000;
+    // length of time to wait for a writing to a channel
+    private long writeTimeout = 0;
 	private String systemId = "RestCommSMSC";
 	// if true, <= 3.3 for interface version normalizes to version 3.3
 	// if true, >= 3.4 for interface version normalizes to version 3.4 and
@@ -95,7 +98,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	// smpp version the server supports
 	private double interfaceVersion = 3.4;
 	// max number of connections/sessions this server will expect to handle
-	// this number corrosponds to the number of worker threads handling reading
+	// this number corresponds to the number of worker threads handling reading
 	// data from sockets and the thread things will be processed under
 	private int maxConnectionSize = SmppConstants.DEFAULT_SERVER_MAX_CONNECTION_SIZE;
 
@@ -134,10 +137,15 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		this.persistDir = persistDir;
 	}
 
-	public void setBindTimeout(long bindTimeout) {
-		this.bindTimeout = bindTimeout;
-		this.store();
-	}
+    public void setBindTimeout(long bindTimeout) {
+        this.bindTimeout = bindTimeout;
+        this.store();
+    }
+
+    public void setWriteTimeout(long writeTimeout) {
+        this.writeTimeout = writeTimeout;
+        this.store();
+    }
 
 	public void setSystemId(String systemId) {
 		this.systemId = systemId;
@@ -214,7 +222,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		SmppServerConfiguration configuration = new SmppServerConfiguration();
 		configuration.setName(this.name);
 		configuration.setPort(this.port);
-		configuration.setBindTimeout(this.bindTimeout);
+        configuration.setBindTimeout(this.bindTimeout);
 		configuration.setSystemId(this.systemId);
 		configuration.setAutoNegotiateInterfaceVersion(this.autoNegotiateInterfaceVersion);
 		if (this.interfaceVersion == 3.4) {
@@ -322,10 +330,15 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		this.store();
 	}
 
-	@Override
-	public long getBindTimeout() {
-		return this.bindTimeout;
-	}
+    @Override
+    public long getBindTimeout() {
+        return this.bindTimeout;
+    }
+
+    @Override
+    public long getWriteTimeout() {
+        return this.writeTimeout;
+    }
 
 	@Override
 	public String getSystemId() {
@@ -503,7 +516,8 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			writer.setIndentation(TAB_INDENT);
 
 			writer.write(this.port, PORT, Integer.class);
-			writer.write(this.bindTimeout, BIND_TIMEOUT, Long.class);
+            writer.write(this.bindTimeout, BIND_TIMEOUT, Long.class);
+            writer.write(this.writeTimeout, WRITE_TIMEOUT, Long.class);
 			writer.write(this.systemId, SYSTEM_ID, String.class);
 			writer.write(this.autoNegotiateInterfaceVersion, AUTO_NEGOTIATION_VERSION, Boolean.class);
 			writer.write(this.interfaceVersion, INTERFACE_VERSION, Double.class);
@@ -584,7 +598,10 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 
 			reader.setBinding(binding);
 			this.port = reader.read(PORT, Integer.class);
-			this.bindTimeout = reader.read(BIND_TIMEOUT, Long.class);
+            this.bindTimeout = reader.read(BIND_TIMEOUT, Long.class);
+            Long vall = reader.read(WRITE_TIMEOUT, Long.class);
+            if (vall != null)
+                this.writeTimeout = vall;
 			this.systemId = reader.read(SYSTEM_ID, String.class);
 			this.autoNegotiateInterfaceVersion = reader.read(AUTO_NEGOTIATION_VERSION, Boolean.class);
 			this.interfaceVersion = reader.read(INTERFACE_VERSION, Double.class);

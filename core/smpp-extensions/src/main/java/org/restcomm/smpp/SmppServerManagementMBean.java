@@ -51,9 +51,13 @@ public interface SmppServerManagementMBean extends SslConfigurationWrapperMBean 
 	 * 
 	 * @return
 	 */
-	public long getBindTimeout();
+    public long getBindTimeout();
 
-	public void setBindTimeout(long bindTimeOut);
+    public void setBindTimeout(long bindTimeOut);
+
+    public long getWriteTimeout();
+
+    public void setWriteTimeout(long writeTimeOut);
 
 	/**
 	 * Set the system id that will be returned in a bind response.
@@ -170,9 +174,9 @@ public interface SmppServerManagementMBean extends SslConfigurationWrapperMBean 
 
 	public int getChannelDisconnects();
 
-	public int getBindTimeouts();
+    public int getBindTimeouts();
 
-	public int getBindRequested();
+    public int getBindRequested();
 
 	public int getSessionCreated();
 

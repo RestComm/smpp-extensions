@@ -1,0 +1,18 @@
+Name
+	smpp smppserver get writetimeout
+
+SYNOPSIS
+	smpp smppserver get writetimeout <bind-timeout>
+
+DESCRIPTION
+	This command is used to get a value for write-timeout in milli-seconds.
+	This parameter sets a timeout which occurs when we can not properly sent
+	a message into TCP channel.
+
+	If unspecified, the default value is 0 (no timeout).
+
+EXAMPLE
+	smpp smppserver get
+
+SEE ALSO
+	smpp esme create, smsc get bindtimeout, smsc get writetimeout

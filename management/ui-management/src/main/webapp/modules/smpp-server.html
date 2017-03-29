@@ -66,6 +66,7 @@
 												var systremId = response.value.SystemId;
 												var port = response.value.BindPort;
 												var bindTimeout  = response.value.BindTimeout;
+												var writeTimeout  = response.value.WriteTimeout;
 												var autoNegotiateInterfaceVersion = response.value.AutoNegotiateInterfaceVersion;
 												var interfaceVersion = response.value.InterfaceVersion;
 												var maxConnectionSize = response.value.MaxConnectionSize;
@@ -144,6 +145,7 @@
 																'<dl class="dl-horizontal" style="width:360px;font-size: 0.8em;">' +
 																	'<dt>Port</dt> <dd>' + port + ' </dd>' + 
 																	'<dt>BindTimeout</dt> <dd>' + bindTimeout + ' </dd>' + 
+																	'<dt>WriteTimeout</dt> <dd>' + writeTimeout + ' </dd>' + 
 																	'<dt>SystemId</dt> <dd>' + systremId + ' </dd>' + 
 																	'<dt>AutoNegotiateInterfaceVersion</dt> <dd>' + autoNegotiateInterfaceVersion + ' </dd>' + 
 																	'<dt>InterfaceVersion</dt> <dd>' + interfaceVersion + ' </dd>' + 
@@ -308,6 +310,22 @@
 																							'<span id="' +name+ 'BindTimeout-text">' + bindTimeout + '</span>'+
 																						'</td>'+
 																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindTimeout"+']\').toggle(); $(\'input[id^='+name+"BindTimeout"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="A timeout (in ms) which occurs when we can not properly sent a message into TCP channel">'+
+																						'<td style="font-size: 0.9em;">WriteTimeout</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'WriteTimeout-input" class="control-group">'+
+																							'<span id="' +name + 'WriteTimeout-input" style="display: none;" >'+
+																								'<input type="text" class="input-small" value="' + writeTimeout + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'WriteTimeout\', \'' + name+"WriteTimeout" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"WriteTimeout"+']\').toggle(); $(\'input[id^='+name+"WriteTimeout"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'WriteTimeout-text">' + writeTimeout + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"WriteTimeout"+']\').toggle(); $(\'input[id^='+name+"WriteTimeout"+']\').focus();"></i>' +
 																						'</td>'+
 																					'</tr>'+
 																					

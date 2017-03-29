@@ -145,6 +145,8 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			// this name actually shows up as thread context....
 			sessionConfiguration.setName(esme.getName());
 
+            sessionConfiguration.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
+
 			esme.setStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
 
 			// throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL,
