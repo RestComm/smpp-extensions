@@ -1002,6 +1002,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         return this.linkRecvMessCheck;
 	}
 
+	public void resetLinkRecvMessage() {
+		this.rxEnquireLinkCounter = 0;
+	}
+
 	public void setLinkRecvMessage(boolean recveivedMessage) {
 		this.linkRecvMessCheck = recveivedMessage;
 	}

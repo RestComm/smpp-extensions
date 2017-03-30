@@ -367,6 +367,11 @@ public class EsmeManagement implements EsmeManagementMBean {
 		}
 
 		esme.setStarted(false);
+
+		if (esme.getLinkDropServerEnabled()) {
+			esme.resetLinkRecvMessage();
+		}
+
 		this.store();
 
 		this.stopWrappedSession(esme);
