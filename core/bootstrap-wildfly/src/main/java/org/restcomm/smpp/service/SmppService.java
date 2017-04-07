@@ -1,7 +1,7 @@
 package org.restcomm.smpp.service;
 
 import javolution.util.FastList;
-import javolution.util.FastMap;
+
 import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
@@ -10,13 +10,13 @@ import org.mobicents.protocols.ss7.scheduler.DefaultClock;
 import org.mobicents.protocols.ss7.scheduler.Scheduler;
 import org.mobicents.ss7.management.console.ShellExecutor;
 import org.mobicents.ss7.management.console.ShellServer;
+import org.mobicents.ss7.management.console.ShellServerWildFly;
 import org.restcomm.smpp.SmppManagement;
 import org.restcomm.smpp.oam.SmppShellExecutor;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.management.StandardMBean;
-import java.util.Map;
 
 public class SmppService implements Service<SmppService> {
 
@@ -38,6 +38,11 @@ public class SmppService implements Service<SmppService> {
     //private Map<String, Object> beanObjects = new FastMap<String, Object>();
     private static final String DATA_DIR = "jboss.server.data.dir";
 
+    private Scheduler schedulerMBean = null;
+    private SmppManagement smppManagementMBean = null;
+    private SmppShellExecutor smppShellExecutor = null;
+    private ShellServer shellExecutorMBean = null;
+
     @Override
     public SmppService getValue() throws IllegalStateException, IllegalArgumentException {
         return this;
@@ -49,81 +54,76 @@ public class SmppService implements Service<SmppService> {
 
         String dataDir = pathManagerInjector.getValue().getPathEntry(DATA_DIR).resolvePath();
 
-        // no props
+        // ss7Clock
         DefaultClock ss7Clock = null;
-        StandardMBean ss7ClockMBean = null;
         try {
             ss7Clock = new DefaultClock();
-
-            ss7ClockMBean = new StandardMBean(ss7Clock, org.mobicents.protocols.ss7.scheduler.Clock.class);
         } catch (Exception e) {
-            log.warn("SS7Clock MBean creating is failed: "+e);
+            log.warn("SS7Clock MBean creating is failed: " + e);
         }
 
-        //this.beanObjects.put("SS7Clock", ss7Clock);
-        registerMBean(ss7ClockMBean, "org.restcomm.smpp:name=SS7Clock");
-
-        // no props
-        Scheduler schedulerMBean = null;
+        // schedulerMBean
+        schedulerMBean = null;
         try {
             schedulerMBean = new Scheduler();
             schedulerMBean.setClock(ss7Clock);
-            schedulerMBean.start();
         } catch (Exception e) {
-            log.warn("SS7Scheduler MBean creating is failed: "+e);
+            log.warn("SS7Scheduler MBean creating is failed: " + e);
         }
 
-        //this.beanObjects.put("SS7Scheduler", schedulerMBean);
-        registerMBean(schedulerMBean, "org.restcomm.smpp:name=SS7Scheduler");
-
-        //
-        SmppManagement smppManagementMBean = null;
+        // smppManagementMBean
         smppManagementMBean = SmppManagement.getInstance("SmppManagement");
         smppManagementMBean.setMbeanServer(getMbeanServer().getValue());
         smppManagementMBean.setPersistDir(dataDir);
-        //try {
-        //    smppManagementMBean.startSmppManagement();
-        //} catch (Exception e) {
-        //    e.printStackTrace();
-        //}
 
-        registerMBean(smppManagementMBean, "org.restcomm.smpp:name=SmppManagement");
-
-        SmppShellExecutor smppShellExecutor = null;
-        StandardMBean smppShellExecutorMBean = null;
+        smppShellExecutor = null;
         try {
             smppShellExecutor = new SmppShellExecutor();
             smppShellExecutor.setSmppManagement(smppManagementMBean);
-            smppShellExecutor.start();
-
-            smppShellExecutorMBean = new StandardMBean(smppShellExecutor, org.mobicents.ss7.management.console.ShellExecutor.class);
         } catch (Exception e) {
-            log.warn("SccpExecutor MBean creating is failed: "+e);
+            log.warn("SccpExecutor MBean creating is failed: " + e);
         }
 
-        registerMBean(smppShellExecutorMBean, "org.restcomm.smpp:name=SmppShellExecutor");
-
-        // constructor: shellExecutors?
-        ShellServer shellExecutorMBean = null;
+        shellExecutorMBean = null;
         try {
             FastList<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
             shellExecutors.add(smppShellExecutor);
 
-            shellExecutorMBean = new ShellServer(schedulerMBean, shellExecutors);
-            shellExecutorMBean.setAddress("127.0.0.1");
-            shellExecutorMBean.setPort(3435);
-            //shellExecutorMBean.setSecurityDomain("java:/jaas/jmx-console");
-            shellExecutorMBean.start();
+            String address = getPropertyString("ShellExecutor", "address", "127.0.0.1");
+            int port = getPropertyInt("ShellExecutor", "port", 3435);
+            String securityDomain = getPropertyString("ShellExecutor", "securityDomain", "jmx-console");
+
+            shellExecutorMBean = new ShellServerWildFly(schedulerMBean, shellExecutors);
+            shellExecutorMBean.setAddress(address);
+            shellExecutorMBean.setPort(port);
+            shellExecutorMBean.setSecurityDomain(securityDomain);
         } catch (Exception e) {
-            log.warn("ShellExecutor MBean creating is failed: "+e);
+            throw new StartException("ShellExecutor MBean creating is failed: " + e.getMessage(), e);
         }
 
-        registerMBean(shellExecutorMBean, "org.restcomm.smpp:name=ShellExecutor");
+        // starting
+        try {
+            schedulerMBean.start();
+            smppShellExecutor.start();
+            shellExecutorMBean.start();
+        } catch (Exception e) {
+            throw new StartException("MBeans starting is failed: " + e.getMessage(), e);
+        }
     }
 
     @Override
     public void stop(StopContext context) {
         log.info("Stopping SmppExtension Service");
+
+        // scheduler - stop
+        try {
+            if (shellExecutorMBean != null)
+                shellExecutorMBean.stop();
+            if (schedulerMBean != null)
+                schedulerMBean.stop();
+        } catch (Exception e) {
+            log.warn("MBean stopping is failed: " + e);
+        }
     }
 
     private void registerMBean(Object mBean, String name) throws StartException {
