@@ -14,7 +14,7 @@
     <properties>
         <version.wildfly.as>10.1.0.Final</version.wildfly.as>
         <version.wildfly.core>2.2.0.Final</version.wildfly.core>
-        <jss7.restcomm.version>8.0.73</jss7.restcomm.version>
+        <jss7.restcomm.version>8.0.84</jss7.restcomm.version>
 
         <module.name>org.restcomm.smpp.bootstrap</module.name>
         <module.path>org/restcomm/smpp/bootstrap</module.path>

@@ -54,5 +54,8 @@ public class SmppExtension implements Extension {
     registration.registerOperationHandler(describeOp, GenericSubsystemDescribeHandler.INSTANCE, false);
 
     subsystem.registerXMLElementWriter(SmppSubsystemParser.getInstance());
+
+    // here we can register submodels
+    final ManagementResourceRegistration mbeans = registration.registerSubModel(SmppMbeanDefinition.INSTANCE);
   }
 }

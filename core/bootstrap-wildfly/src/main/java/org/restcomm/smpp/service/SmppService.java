@@ -3,6 +3,7 @@ package org.restcomm.smpp.service;
 import javolution.util.FastList;
 
 import org.jboss.as.controller.services.path.PathManager;
+import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
@@ -16,9 +17,10 @@ import org.restcomm.smpp.oam.SmppShellExecutor;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.management.StandardMBean;
 
 public class SmppService implements Service<SmppService> {
+
+    public static final SmppService INSTANCE = new SmppService();
 
     private final Logger log = Logger.getLogger(SmppService.class);
 
@@ -35,13 +37,59 @@ public class SmppService implements Service<SmppService> {
         return mbeanServer;
     }
 
-    //private Map<String, Object> beanObjects = new FastMap<String, Object>();
     private static final String DATA_DIR = "jboss.server.data.dir";
+
+    private ModelNode fullModel;
 
     private Scheduler schedulerMBean = null;
     private SmppManagement smppManagementMBean = null;
     private SmppShellExecutor smppShellExecutor = null;
     private ShellServer shellExecutorMBean = null;
+
+    public void setModel(ModelNode model) {
+        this.fullModel = model;
+    }
+
+    private ModelNode peek(ModelNode node, String... args) {
+        for (String arg : args) {
+            if (!node.hasDefined(arg)) {
+                return null;
+            }
+            node = node.get(arg);
+        }
+        return node;
+    }
+
+    private String getPropertyString(String mbeanName, String propertyName, String defaultValue) {
+        String result = defaultValue;
+        ModelNode propertyNode = peek(fullModel, "mbean", mbeanName, "property", propertyName);
+        if (propertyNode != null && propertyNode.isDefined()) {
+            // log.debug("propertyNode: "+propertyNode);
+            // todo: test TYPE?
+            result = propertyNode.get("value").asString();
+        }
+        return (result == null) ? defaultValue : result;
+    }
+
+    private int getPropertyInt(String mbeanName, String propertyName, int defaultValue) {
+        int result = defaultValue;
+        ModelNode propertyNode = peek(fullModel, "mbean", mbeanName, "property", propertyName);
+        if (propertyNode != null && propertyNode.isDefined()) {
+            // log.debug("propertyNode: "+propertyNode);
+            // todo: test TYPE?
+            result = propertyNode.get("value").asInt();
+        }
+        return result;
+    }
+
+    private boolean getPropertyBoolean(String mbeanName, String propertyName, boolean defaultValue) {
+        boolean result = defaultValue;
+        ModelNode propertyNode = peek(fullModel, "mbean", mbeanName, "property", propertyName);
+        if (propertyNode != null && propertyNode.isDefined()) {
+            result = propertyNode.get("value").asBoolean();
+        }
+        return result;
+    }
 
     @Override
     public SmppService getValue() throws IllegalStateException, IllegalArgumentException {

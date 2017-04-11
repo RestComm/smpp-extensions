@@ -3,7 +3,9 @@ package org.restcomm.smpp.extension;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.as.controller.services.path.PathManagerService;
 import org.jboss.as.jmx.MBeanServerService;
@@ -43,9 +45,11 @@ class SubsystemAdd extends AbstractBoottimeAddStepHandler {
             ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
             throws OperationFailedException {
 
-        // Install service with MBean SleeConnectionTest
+        ModelNode fullModel = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
 
-        SmppService service = new SmppService();
+        SmppService service = SmppService.INSTANCE;
+        service.setModel(fullModel);
+
         ServiceName name = SmppService.getServiceName();
         ServiceController<SmppService> controller = context.getServiceTarget()
                 .addService(name, service)
