@@ -101,6 +101,17 @@
 		<!-- oam/new-ui - jolokia war & smpp-management.war -->
 		<copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
 		<copy file="${smpp.dir}/management/ui-management/target/smpp-management.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
+
+		<!-- Copy files for deploying/undeployng jSS7 to JBoss 5 and WildFly -->
+		<copy file="${smpp.dir}/release/release-build-jboss5.xml" tofile="${restcomm.smpp.dist}/jboss5/build.xml"
+			  failonerror="true"/>
+
+		<copy file="${smpp.dir}/release/release-build-wildfly.xml" tofile="${restcomm.smpp.dist}/wildfly/build.xml"
+			  failonerror="true"/>
+		<copy file="${smpp.dir}/release/wildfly-smpp-subsystem.txt" tofile="${restcomm.smpp.dist}/wildfly/template/wildfly-smpp-subsystem.txt"
+			  failonerror="true"/>
+		<copy file="${smpp.dir}/release/xmltask.jar" tofile="${restcomm.smpp.dist}/wildfly/xmltask.jar"
+			  failonerror="true"/>
     </target>
 
 	<target name="build-smpp">
