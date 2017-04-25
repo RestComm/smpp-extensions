@@ -31,8 +31,6 @@ import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.restcomm.smpp.CheckMessageLimitResult.Domain;
-import org.restcomm.smpp.CheckMessageLimitResult.Result;
 import org.restcomm.smpp.oam.SmppOamMessages;
 
 import com.cloudhopper.smpp.SmppBindType;
@@ -223,7 +221,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean started = false;
 	private boolean serverBound = false;
 	private int enquireLinkFailCnt = 0;
-	private int rxEnquireLinkCounter = 0;
+	private int rxEnquireLinkCounter = -1;
+	private int rxDlrRespCounter = -1;
+	private int rxDataSmRespCounter = -1;
+	private int rxSubmitSmRespCount = -1;
 
     private String state = SmppSession.STATES[SmppSession.STATE_CLOSED];
 
@@ -994,16 +995,31 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
 	public boolean checkLinkRecvMessage() {
         int currentEnqLinkCounter = this.defaultSmppSession.getCounters().getRxEnquireLink().getRequest();
-        if (this.rxEnquireLinkCounter < currentEnqLinkCounter) {
+        int currentDlrRespCounter = this.defaultSmppSession.getCounters().getTxDeliverSM().getResponse();
+        int currentDataSmRespCounter = this.defaultSmppSession.getCounters().getTxDataSM().getResponse();
+        int currentSubmitSmRespCounter = this.defaultSmppSession.getCounters().getTxSubmitSM().getResponse();
+
+        if (this.rxEnquireLinkCounter < currentEnqLinkCounter
+                || this.rxSubmitSmRespCount < currentSubmitSmRespCounter
+                || this.rxDlrRespCounter < currentDlrRespCounter
+                || this.rxDataSmRespCounter < currentDataSmRespCounter) {
+
             this.linkRecvMessCheck = true;
         }
 
         this.rxEnquireLinkCounter = currentEnqLinkCounter;
+        this.rxDlrRespCounter = currentDlrRespCounter;
+        this.rxDataSmRespCounter = currentDataSmRespCounter;
+        this.rxSubmitSmRespCount = currentSubmitSmRespCounter;
+
         return this.linkRecvMessCheck;
 	}
 
 	public void resetLinkRecvMessage() {
-		this.rxEnquireLinkCounter = 0;
+		this.rxEnquireLinkCounter = -1;
+		this.rxDlrRespCounter = -1;
+		this.rxDataSmRespCounter = -1;
+		this.rxSubmitSmRespCount = -1;
 	}
 
 	public void setLinkRecvMessage(boolean recveivedMessage) {
