@@ -31,8 +31,6 @@ import javolution.xml.XMLSerializable;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.restcomm.smpp.CheckMessageLimitResult.Domain;
-import org.restcomm.smpp.CheckMessageLimitResult.Result;
 import org.restcomm.smpp.oam.SmppOamMessages;
 
 import com.cloudhopper.smpp.SmppBindType;
