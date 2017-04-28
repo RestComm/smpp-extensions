@@ -26,10 +26,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javolution.xml.XMLFormat;
-import javolution.xml.XMLSerializable;
-import javolution.xml.stream.XMLStreamException;
-
 import org.apache.log4j.Logger;
 import org.restcomm.smpp.oam.SmppOamMessages;
 
@@ -39,6 +35,10 @@ import com.cloudhopper.smpp.SmppSession;
 import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.impl.DefaultSmppSession;
 import com.cloudhopper.smpp.type.Address;
+
+import javolution.xml.XMLFormat;
+import javolution.xml.XMLSerializable;
+import javolution.xml.stream.XMLStreamException;
 
 /**
  * @author amit bhayani
@@ -1491,7 +1491,71 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		return null;
 	}
 
-	@Override
+    @Override
+    public String getRxDataSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxDataSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxDeliverSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxDeliverSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxEnquireLinkCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxEnquireLinkCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxSubmitSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxSubmitSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxDataSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxDataSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxDeliverSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxDeliverSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxEnquireLinkCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxEnquireLinkCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxSubmitSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxSubmitSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
 	public boolean isBinding() {
 		if (this.defaultSmppSession != null) {
 			return this.defaultSmppSession.isBinding();
