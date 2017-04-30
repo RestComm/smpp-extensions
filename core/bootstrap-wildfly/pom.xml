@@ -141,6 +141,13 @@
             <artifactId>netty</artifactId>
             <version>${netty.version}</version>
         </dependency>
+
+        <!-- joda-time -->
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>${joda-time.version}</version>
+        </dependency>
     </dependencies>
 
     <profiles>

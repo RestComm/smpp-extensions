@@ -16,6 +16,7 @@
 
         <resource-root path="javolution-${javolution.version}.jar"/>
         <resource-root path="netty-${netty.version}.jar"/>
+        <resource-root path="joda-time-${joda-time.version}.jar"/>
     </resources>
 
     <dependencies>
