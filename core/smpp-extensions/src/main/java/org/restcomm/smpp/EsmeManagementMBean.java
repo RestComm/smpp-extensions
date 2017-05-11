@@ -52,5 +52,13 @@ public interface EsmeManagementMBean {
 	void startEsme(String esmeName) throws Exception;
 
 	void stopEsme(String esmeName) throws Exception;
+	
+    /**
+     * Checks for cluster.
+     *
+     * @param aClusterName the cluster name
+     * @return true, if successful
+     */
+	boolean hasCluster(String aClusterName);
 
 }

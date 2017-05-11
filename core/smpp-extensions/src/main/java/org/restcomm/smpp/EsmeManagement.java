@@ -31,6 +31,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -74,6 +75,9 @@ public class EsmeManagement implements EsmeManagementMBean {
 	private static final String CLASS_ATTRIBUTE = "type";
 	private static final XMLBinding binding = new XMLBinding();
 	private static final String PERSIST_FILE_NAME = "esme.xml";
+	
+	private static final String ESME_CLUSTERS_SEPARATOR = ",";
+	private static final int NETWORK_ID_NOT_SET = -1;
 
 	private final String name;
 
@@ -161,6 +165,11 @@ public class EsmeManagement implements EsmeManagementMBean {
 			return esmeCluster.getNextEsme();
 		}
 		return null;
+	}
+
+	@Override
+	public boolean hasCluster(final String aClusterName) {
+	    return esmeClusters.containsKey(aClusterName);
 	}
 
 	protected Esme getEsmeByPrimaryKey(String SystemId, String host, int port, SmppBindType smppBindType) {
@@ -277,14 +286,14 @@ public class EsmeManagement implements EsmeManagementMBean {
 //			}
 		}// for loop
 
-		EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
+        EsmeCluster esmeCluster = this.esmeClusters.get(getFirstClusterName(clusterName));
         if (esmeCluster != null) {
             if (esmeCluster.getNetworkId() != networkId) {
                 throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_WRONG_NETWORKID_IN_ESMECLUSTER, esmeCluster.getNetworkId(), networkId));
             }
         }
 
-		if (clusterName == null) {
+        if (clusterName == null) {
 			clusterName = name;
 		}
 
@@ -299,12 +308,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 		esmes.add(esme);
 
-		if (esmeCluster == null) {
-			esmeCluster = new EsmeCluster(clusterName, networkId);
-			this.esmeClusters.put(clusterName, esmeCluster);
-		}
-
-		esmeCluster.addEsme(esme);
+		addEsmeToClusters(esmeClusters, esme);
 
 		this.store();
 
@@ -529,15 +533,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 				
 				esme.esmeManagement = this;
 				
-				String esmeClusterName = esme.getClusterName();
-				EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
-				if (esmeCluster == null) {
-					esmeCluster = new EsmeCluster(esmeClusterName, esme.getNetworkId());
-					this.esmeClusters.put(esmeClusterName, esmeCluster);
-                } else {
-                    esme.setNetworkId(esmeCluster.getNetworkId());
-                }
-                esmeCluster.addEsme(esme);
+				addEsmeToClusters(esmeClusters, esme);
 			}
 
 			reader.close();
@@ -545,6 +541,40 @@ public class EsmeManagement implements EsmeManagementMBean {
 			// this.logger.info(
 			// "Error while re-creating Linksets from persisted file", ex);
 		}
+	}
+	
+	private static String getFirstClusterName(final String aName) {
+	    if (aName == null) {
+	        return null;
+	    }
+	    return aName.split(ESME_CLUSTERS_SEPARATOR)[0];
+	}
+	
+	private static void addEsmeToClusters(final Map<String, EsmeCluster> aClusters, final Esme anEsme) {
+	    final String[] clusterNames = anEsme.getClusterName().split(ESME_CLUSTERS_SEPARATOR);
+	    for (int i = 0; i < clusterNames.length; i++) {
+	        if (i == 0) {
+	            addEsmeToCluster(aClusters, anEsme, clusterNames[i].trim(), anEsme.getNetworkId());
+	        } else {
+	            addEsmeToCluster(aClusters, anEsme, clusterNames[i].trim(), NETWORK_ID_NOT_SET);
+	        }
+	    }
+	}
+	
+	private static void addEsmeToCluster(final Map<String, EsmeCluster> aClusters, final Esme anEsme,
+	        final String aClusterName, final int aNetworkId) {
+	    getEsmeCluster(aClusters, aClusterName, aNetworkId).addEsme(anEsme);
+	}
+	
+	private static EsmeCluster getEsmeCluster(final Map<String, EsmeCluster> aClusters, final String aName,
+	        final int aNetworkId) {
+	    final EsmeCluster ec = aClusters.get(aName);
+	    if (ec == null) {
+	        final EsmeCluster nec = new EsmeCluster(aName, aNetworkId);
+	        aClusters.put(aName, nec);
+	        return nec;
+	    }
+	    return ec;
 	}
 
 	private void registerEsmeMbean(Esme esme) {
