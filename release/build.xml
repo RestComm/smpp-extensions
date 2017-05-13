@@ -8,7 +8,7 @@
 	<property name="docs.dir" location="${restcomm.smpp.dist}/_docs" />
 
 	<!--Versions -->
-	<property name="restcomm.jss7.version" value="7.3.1392" /> <!-- 7.1.1385 -->
+	<property name="restcomm.jss7.version" value="7.3.1398" />
 	<property name="release.version" value="${smpp.release.version}"/>
 
 	<!--<property name="github.url" value="https://github.com/RestComm" />-->
@@ -16,9 +16,9 @@
 	<property name="checkout.dir" value="${base.dir}/checkout" />
 
 	<property name="checkout.restcomm-jss7.dir" value="${checkout.dir}/restcomm-jss7" />
-	<property name="restcomm-jss7.build-number" value="1392" />
+	<property name="restcomm-jss7.build-number" value="1398" />
 	<property name="restcomm-jss7.version" value="7.3.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.release" value="7.3.1392" />
+	<property name="restcomm-jss7.release" value="7.3.1398" />
 
 	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
 	<!--
