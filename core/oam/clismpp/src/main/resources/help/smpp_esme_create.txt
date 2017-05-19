@@ -19,6 +19,7 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-single-shift <national-language-single-shift>
 	national-language-locking-shift <national-language-locking-shift> 
+	dest-addr-send-limit <dest-addr-send-limit>
 	min-message-length <min-message-length value>
 	max-message-length <max-message-length value>
 
@@ -369,6 +370,14 @@ PARAMETERS
                               obtained from the option national-language-locking-shift 
                               that is defined at SMSC GW general level.
 					
+	
+	dest-addr-send-limit - This command is used to set the value of Destination
+					Address Sending Limit table. destaddrsendlimit will be
+					used to limit the sent unconfirmed messages for a 
+					destination address per an ESME. This is SMSC Gw level
+					and can be overwritten for each ESME created.
+					Possible values: 
+	  				 = 0  : no limitations
 							  
 	min-message-length    - This paramter is used to specify the minimum
 					message length (in characters) acceptable to

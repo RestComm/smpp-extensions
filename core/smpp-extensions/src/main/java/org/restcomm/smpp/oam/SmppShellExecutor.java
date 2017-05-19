@@ -67,7 +67,7 @@ public class SmppShellExecutor implements ShellExecutor {
     }
 
     /**
-     * @param SmppManagement
+     * @param smppManagement
      *            the SmppManagement to set
      */
     public void setSmppManagement(SmppManagement smppManagement) {
@@ -84,7 +84,8 @@ public class SmppShellExecutor implements ShellExecutor {
      * ton> routing-npi <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond>
      * ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
      * national-language-locking-shift <national-language-locking-shift> national-language-single-shift
-     * <national-language-single-shift> min-message-length <min-message-length> max-message-length <max-message-length>
+     * <national-language-single-shift> dest-addr-send-limit <dest-addr-send-limit> 
+     * min-message-length <min-message-length> max-message-length <max-message-length>
      * 
      * @param args
      * @return
@@ -202,6 +203,9 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("national-language-single-shift")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setNationalLanguageSingleShift(val);
+            } else if(key.equals("dest-addr-send-limit")) {
+            	int val = Integer.parseInt(args[count++]);
+            	esme.setDestAddrSendLimit(val);
             } else if (key.equals("min-message-length")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setMinMessageLength(val);
@@ -316,6 +320,7 @@ public class SmppShellExecutor implements ShellExecutor {
 
         int nationalLanguageSingleShift = -1;
         int nationalLanguageLockingShift = -1;
+        int destAddrSendLimit = 0;
         int minMessageLength = -1;
         int maxMessageLength = -1;
 
@@ -392,6 +397,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 nationalLanguageSingleShift = Integer.parseInt(args[count++]);
             } else if (key.equals("national-language-locking-shift")) {
                 nationalLanguageLockingShift = Integer.parseInt(args[count++]);
+            } else if (key.equals("dest-addr-send-limit")) {
+            	destAddrSendLimit = Integer.parseInt(args[count++]);
             } else if (key.equals("min-message-length")) {
                 minMessageLength = Integer.parseInt(args[count++]);
             } else if (key.equals("max-message-length")) {
@@ -408,7 +415,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, linkDropServer,
                 sourceTon, sourceNpi, sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId,
                 splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay,
-                nationalLanguageSingleShift, nationalLanguageLockingShift, minMessageLength, maxMessageLength);
+                nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 
