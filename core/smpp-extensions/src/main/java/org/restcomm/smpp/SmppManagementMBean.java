@@ -30,6 +30,8 @@ package org.restcomm.smpp;
  */
 public interface SmppManagementMBean {
 
+    public Object getSmppManagementInstance();
+
     public void setSmppSessionHandlerInterface(SmppSessionHandlerInterface smppSessionHandlerInterface);
 
     public String getName();

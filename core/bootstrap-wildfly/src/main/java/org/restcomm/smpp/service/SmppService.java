@@ -123,6 +123,8 @@ public class SmppService implements Service<SmppService> {
         smppManagementMBean = SmppManagement.getInstance("SmppManagement");
         smppManagementMBean.setMbeanServer(getMbeanServer().getValue());
         smppManagementMBean.setPersistDir(dataDir);
+        smppManagementMBean.start();
+        registerMBean(smppManagementMBean, "org.restcomm.smpp:name=SmppManagement");
 
         smppShellExecutor = null;
         try {

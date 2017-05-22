@@ -87,7 +87,11 @@ public class SmppManagement implements SmppManagementMBean {
 
     public static SmppManagement getInstance() {
         return instance;
-    }    
+    }
+
+    public Object getSmppManagementInstance() {
+        return instance;
+    }
 
     public String getName() {
         return name;
@@ -120,6 +124,10 @@ public class SmppManagement implements SmppManagementMBean {
 
     public void setMbeanServer(MBeanServer mbeanServer) {
         this.mbeanServer = mbeanServer;
+    }
+
+    public void start() {
+        this.isStarted = true;
     }
 
     public void startSmppManagement() throws Exception {
