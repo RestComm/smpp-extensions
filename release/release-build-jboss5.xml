@@ -21,7 +21,7 @@
 
 	<target name="deploy">
 
-		<copy overwrite="true" todir="${jboss.deploy}/restcomm-smpp-server.har">
+		<copy overwrite="true" todir="${jboss.deploy}/restcomm-smpp-server">
 			<fileset dir="./restcomm-smpp-server">
 				<include name="**" />
 			</fileset>			
@@ -48,7 +48,7 @@
 	</target>
 
 	<target name="undeploy">
-		<delete dir="${jboss.deploy}/restcomm-smpp-server.har" />
+		<delete dir="${jboss.deploy}/restcomm-smpp-server" />
 		<delete file="${jboss.deploy}/smpp-management-console.war" />
 		<delete file="${jboss.deploy}/jolokia.war" />
 		<delete file="${jboss.home}/bin/ss7-cli.sh" />
