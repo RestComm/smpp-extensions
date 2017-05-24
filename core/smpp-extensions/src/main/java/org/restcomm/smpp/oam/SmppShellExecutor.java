@@ -502,6 +502,9 @@ public class SmppShellExecutor implements ShellExecutor {
         } else if (parName.equals("maxconnectionsize")) {
             int val = Integer.parseInt(options[4]);
             smppServerManagement.setMaxConnectionSize(val);
+        } else if(parName.equals("smppactivitytimeout")) {
+        	int val = Integer.parseInt(options[4]);
+        	smppServerManagement.setSmppActivityTimeout(val);
         } else if (parName.equals("defaultwindowsize")) {
             int val = Integer.parseInt(options[4]);
             smppServerManagement.setDefaultWindowSize(val);
@@ -555,6 +558,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 sb.append(smppServerManagement.getInterfaceVersion());
             } else if (parName.equals("maxconnectionsize")) {
                 sb.append(smppServerManagement.getMaxConnectionSize());
+            } else if (parName.equals("smppactivitytimeout")) {
+            	sb.append(smppServerManagement.getSmppActivityTimeout());
             } else if (parName.equals("defaultwindowsize")) {
                 sb.append(smppServerManagement.getDefaultWindowSize());
             } else if (parName.equals("defaultwindowwaittimeout")) {
@@ -600,6 +605,10 @@ public class SmppShellExecutor implements ShellExecutor {
             sb.append(smppServerManagement.getMaxConnectionSize());
             sb.append("\n");
 
+            sb.append("smpp-activity-timeout = ");
+            sb.append(smppServerManagement.getSmppActivityTimeout());
+            sb.append("\n");
+            
             sb.append("default-window-size = ");
             sb.append(smppServerManagement.getDefaultWindowSize());
             sb.append("\n");

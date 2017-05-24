@@ -65,6 +65,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	private static final String AUTO_NEGOTIATION_VERSION = "autoNegotiateInterfaceVersion";
 	private static final String INTERFACE_VERSION = "interfaceVersion";
 	private static final String MAX_CONNECTION_SIZE = "maxConnectionSize";
+	private static final String SMPP_ACTIVITY_TIMEOUT = "smppActivityTimeout";
 	private static final String DEFAULT_WINDOW_SIZE = "defaultWindowSize";
 	private static final String DEFAULT_WINDOW_WAIT_TIMEOUT = "defaultWindowWaitTimeout";
 	private static final String DEFAULT_REQUEST_EXPIRY_TIMEOUT = "defaultRequestExpiryTimeout";
@@ -101,7 +102,9 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	// this number corresponds to the number of worker threads handling reading
 	// data from sockets and the thread things will be processed under
 	private int maxConnectionSize = SmppConstants.DEFAULT_SERVER_MAX_CONNECTION_SIZE;
-
+	// delay value in seconds used by timer task after witch the smpp activity will be ended
+	private int smppActivityTimeout = 120;
+	
 	private int defaultWindowSize = 100;
 	private long defaultWindowWaitTimeout = 30000;
 	private long defaultRequestExpiryTimeout = 30000;
@@ -167,6 +170,11 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		this.store();
 	}
 
+	public void setSmppActivityTimeout(int smppActivityTimeout) {
+		this.smppActivityTimeout = smppActivityTimeout;
+		this.store();
+	}
+	
 	public void setDefaultWindowSize(int defaultWindowSize) {
 		this.defaultWindowSize = defaultWindowSize;
 		this.store();
@@ -361,6 +369,11 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	}
 
 	@Override
+	public int getSmppActivityTimeout() {
+		return this.smppActivityTimeout;
+	}
+	
+	@Override
 	public int getDefaultWindowSize() {
 		return this.defaultWindowSize;
 	}
@@ -522,6 +535,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			writer.write(this.autoNegotiateInterfaceVersion, AUTO_NEGOTIATION_VERSION, Boolean.class);
 			writer.write(this.interfaceVersion, INTERFACE_VERSION, Double.class);
 			writer.write(this.maxConnectionSize, MAX_CONNECTION_SIZE, Integer.class);
+			writer.write(this.smppActivityTimeout, SMPP_ACTIVITY_TIMEOUT, Integer.class);
 			writer.write(this.defaultWindowSize, DEFAULT_WINDOW_SIZE, Integer.class);
 			writer.write(this.defaultWindowWaitTimeout, DEFAULT_WINDOW_WAIT_TIMEOUT, Long.class);
 			writer.write(this.defaultRequestExpiryTimeout, DEFAULT_REQUEST_EXPIRY_TIMEOUT, Long.class);
@@ -606,6 +620,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			this.autoNegotiateInterfaceVersion = reader.read(AUTO_NEGOTIATION_VERSION, Boolean.class);
 			this.interfaceVersion = reader.read(INTERFACE_VERSION, Double.class);
 			this.maxConnectionSize = reader.read(MAX_CONNECTION_SIZE, Integer.class);
+			this.smppActivityTimeout = reader.read(SMPP_ACTIVITY_TIMEOUT, Integer.class);
 			this.defaultWindowSize = reader.read(DEFAULT_WINDOW_SIZE, Integer.class);
 			this.defaultWindowWaitTimeout = reader.read(DEFAULT_WINDOW_WAIT_TIMEOUT, Integer.class);
 			this.defaultRequestExpiryTimeout = reader.read(DEFAULT_REQUEST_EXPIRY_TIMEOUT, Integer.class);
