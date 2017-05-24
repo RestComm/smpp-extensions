@@ -1,0 +1,13 @@
+Name
+	smpp smppserver set smppactivitytimeout
+
+SYNOPSIS
+	smpp smppserver set smppactivitytimeout <smpp-activity-timeout>
+
+DESCRIPTION
+	This command is used to specify the timeout(in seconds) after witch an activity
+	will be ended automatically.
+	
+	The default value is 120 seconds.
+
+	You must restart the SMPP Server for the new value to take effect.
