@@ -620,7 +620,11 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			this.autoNegotiateInterfaceVersion = reader.read(AUTO_NEGOTIATION_VERSION, Boolean.class);
 			this.interfaceVersion = reader.read(INTERFACE_VERSION, Double.class);
 			this.maxConnectionSize = reader.read(MAX_CONNECTION_SIZE, Integer.class);
-			this.smppActivityTimeout = reader.read(SMPP_ACTIVITY_TIMEOUT, Integer.class);
+
+            Integer valI = reader.read(SMPP_ACTIVITY_TIMEOUT, Integer.class);
+            if (valI != null)
+                this.smppActivityTimeout = valI;
+
 			this.defaultWindowSize = reader.read(DEFAULT_WINDOW_SIZE, Integer.class);
 			this.defaultWindowWaitTimeout = reader.read(DEFAULT_WINDOW_WAIT_TIMEOUT, Integer.class);
 			this.defaultRequestExpiryTimeout = reader.read(DEFAULT_REQUEST_EXPIRY_TIMEOUT, Integer.class);
