@@ -396,7 +396,7 @@
 				</div>
 				
 				<div id="div-destAddrSendLimit" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address per an ESME. This is SMSC Gw level and can be overwritten for each ESME created. Possible values:  = 0  : no limitations">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address for an ESME. Value 0 means no limitations.">
 						<span class="add-on">Destination Address Send Limit</span>
 						<input id="destAddrSendLimit" type="text" class="input-mini" style="width: 160px; margin-right: 12px; text-align: center;" value="0" />
 					</span>
@@ -1323,7 +1323,7 @@
 											'</td>'+
 										'</tr>'+
 
-										'<tr data-toggle="tooltip" title="destination address sending limit will be used to limit the sent unconfirmed messages for a  destination address per an ESME. This is SMSC Gw level and can be overwritten for each ESME created. Possible values:  = 0  : no limitations">' +
+										'<tr data-toggle="tooltip" title="destination address sending limit will be used to limit the sent unconfirmed messages for a destination address for an ESME. Value 0 means no limitations.">' +
 											'<td style="font-size: 0.9em;">Destination Address Send Limit</td>' +
 											'<td style="font-size: 0.9em; padding: 0;">' +
 												'<div id="div-' + name + 'DestAddrSendLimit-input" class="control-group">' +
