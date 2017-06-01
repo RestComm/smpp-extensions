@@ -1508,6 +1508,70 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		return null;
 	}
 
+    @Override
+    public String getRxDataSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxDataSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxDeliverSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxDeliverSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxEnquireLinkCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxEnquireLinkCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxSubmitSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxSubmitSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxDataSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxDataSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxDeliverSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxDeliverSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxEnquireLinkCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxEnquireLinkCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxSubmitSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxSubmitSMCounterAndReset();
+        }
+        return null;
+    }
+
 	@Override
 	public boolean isBinding() {
 		if (this.defaultSmppSession != null) {

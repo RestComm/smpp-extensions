@@ -28,7 +28,7 @@
 		<javolution.version>5.5.1</javolution.version>
 		<netty.version>3.9.0.Final</netty.version>
 
-		<ch.smpp.version>5.0.5</ch.smpp.version>
+		<ch.smpp.version>5.0.9</ch.smpp.version>
 		<ch-commons-util.version>7.0.6</ch-commons-util.version> <!-- 7.0.5 -->
 		<ch-commons-charset.version>7.0.6</ch-commons-charset.version> <!-- 3.0.2 -->
 		<jss7.restcomm.version>7.1.1385</jss7.restcomm.version>
