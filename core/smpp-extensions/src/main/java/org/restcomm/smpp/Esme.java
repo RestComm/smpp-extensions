@@ -103,6 +103,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
     private static final String NATIONAL_LANGUAGE_SINGLE_SHIFT = "nationalLanguageSingleShift";
     private static final String NATIONAL_LANGUAGE_LOCKING_SHIFT = "nationalLanguageLockingShift";
+    private static final String DEST_ADDR_SEND_LIMIT = "destAddrSendLimit";
     private static final String MIN_MESSAGE_LENGTH = "minMessageLength";
     private static final String MAX_MESSAGE_LENGTH = "maxMessageLength";
 
@@ -167,6 +168,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private int nationalLanguageSingleShift = -1;
     private int nationalLanguageLockingShift = -1;
 
+    private int destAddrSendLimit = 0;
+    
     // min and max side of an incoming message from SMPP connector.
     // If an incoming message size (in characters) less the the min value or more the max value, it will be rejected
     // -1 (default value) means no limitations
@@ -273,6 +276,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
      * @param rateLimitPerDay
      * @param nationalLanguageSingleShift
      * @param nationalLanguageLockingShift
+     * @param destAddrSendLimit
      * @param minMessageLength
      * @param maxMessageLength
      */
@@ -283,7 +287,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             boolean countersEnabled, int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon,
             int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
             int networkId, boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
-            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
             int maxMessageLength
 
     ) {
@@ -347,6 +351,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
         this.nationalLanguageSingleShift = nationalLanguageSingleShift;
         this.nationalLanguageLockingShift = nationalLanguageLockingShift;
+        this.destAddrSendLimit = destAddrSendLimit;
         this.minMessageLength = minMessageLength;
         this.maxMessageLength = maxMessageLength;
 	}
@@ -634,6 +639,15 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         this.store();
     }
 
+    public int getDestAddrSendLimit() {
+    	return destAddrSendLimit;
+    }
+    
+    public void setDestAddrSendLimit(int destAddrSendLimit) {
+    	this.destAddrSendLimit = destAddrSendLimit;
+    	store();
+    }
+    
     public int getMinMessageLength() {
         return minMessageLength;
     }
@@ -1108,6 +1122,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
             esme.nationalLanguageSingleShift = xml.getAttribute(NATIONAL_LANGUAGE_SINGLE_SHIFT, -1);
             esme.nationalLanguageLockingShift = xml.getAttribute(NATIONAL_LANGUAGE_LOCKING_SHIFT, -1);
+            esme.destAddrSendLimit = xml.getAttribute(DEST_ADDR_SEND_LIMIT, 0);
             esme.minMessageLength = xml.getAttribute(MIN_MESSAGE_LENGTH, -1);
             esme.maxMessageLength = xml.getAttribute(MAX_MESSAGE_LENGTH, -1);
 
@@ -1177,6 +1192,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
             xml.setAttribute(NATIONAL_LANGUAGE_SINGLE_SHIFT, esme.nationalLanguageSingleShift);
             xml.setAttribute(NATIONAL_LANGUAGE_LOCKING_SHIFT, esme.nationalLanguageLockingShift);
+            xml.setAttribute(DEST_ADDR_SEND_LIMIT, esme.destAddrSendLimit);
             xml.setAttribute(MIN_MESSAGE_LENGTH, esme.minMessageLength);
             xml.setAttribute(MAX_MESSAGE_LENGTH, esme.maxMessageLength);
 
@@ -1263,6 +1279,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 .append(SmppOamMessages.SHOW_DAY_RECEIVED_MSG_COUNT).append(this.getDayReceivedMsgCount())
                 .append(SmppOamMessages.SHOW_NATIONAL_LANGUAGE_SINGLE_SHIFT).append(this.getNationalLanguageSingleShift())
                 .append(SmppOamMessages.SHOW_NATIONAL_LANGUAGE_LOCKING_SHIFT).append(this.getNationalLanguageLockingShift())
+                .append(SmppOamMessages.SHOW_DEST_ADDR_SEND_LIMIT).append(this.destAddrSendLimit)
                 .append(SmppOamMessages.MIN_MESSAGE_LENGTH).append(this.getMinMessageLength())
                 .append(SmppOamMessages.MAX_MESSAGE_LENGTH).append(this.getMaxMessageLength())
                 .append(SmppOamMessages.SPLIT_LONG_MESSAGES).append(this.splitLongMessages);
@@ -1490,6 +1507,70 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		}
 		return null;
 	}
+
+    @Override
+    public String getRxDataSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxDataSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxDeliverSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxDeliverSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxEnquireLinkCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxEnquireLinkCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getRxSubmitSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getRxSubmitSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxDataSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxDataSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxDeliverSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxDeliverSMCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxEnquireLinkCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxEnquireLinkCounterAndReset();
+        }
+        return null;
+    }
+
+    @Override
+    public String getTxSubmitSMCounterAndReset() {
+        if (this.defaultSmppSession != null) {
+            return this.defaultSmppSession.getTxSubmitSMCounterAndReset();
+        }
+        return null;
+    }
 
 	@Override
 	public boolean isBinding() {

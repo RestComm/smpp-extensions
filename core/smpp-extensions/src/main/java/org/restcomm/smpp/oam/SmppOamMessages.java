@@ -139,6 +139,8 @@ public interface SmppOamMessages {
 
     public static final String SHOW_NATIONAL_LANGUAGE_LOCKING_SHIFT = " nationalLanguageLockingShift=";
 
+    public static final String SHOW_DEST_ADDR_SEND_LIMIT = " destAddrSendLimit=";
+    
     public static final String MIN_MESSAGE_LENGTH = " minMessageLength=";
 
     public static final String MAX_MESSAGE_LENGTH = " maxMessageLength=";

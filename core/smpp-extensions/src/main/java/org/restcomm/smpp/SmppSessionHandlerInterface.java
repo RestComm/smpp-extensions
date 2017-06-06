@@ -31,5 +31,6 @@ import com.cloudhopper.smpp.SmppSessionHandler;
 public interface SmppSessionHandlerInterface {
 
 	public SmppSessionHandler createNewSmppSessionHandler(Esme esme);
-
+	
+	public void destroySmppSessionHandler(Esme esme);
 }

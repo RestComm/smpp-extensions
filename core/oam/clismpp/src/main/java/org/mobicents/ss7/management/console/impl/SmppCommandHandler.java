@@ -55,6 +55,7 @@ public class SmppCommandHandler extends CommandHandlerWithHelp {
 		smppServerSet.addChild("autonegotiateversion");
 		smppServerSet.addChild("interfaceversion");
 		smppServerSet.addChild("maxconnectionsize");
+		smppServerSet.addChild("smppactivitytimeout");
 		smppServerSet.addChild("defaultwindowsize");
 		smppServerSet.addChild("defaultwindowwaittimeout");
 		smppServerSet.addChild("defaultrequestexpirytimeout");
@@ -68,6 +69,7 @@ public class SmppCommandHandler extends CommandHandlerWithHelp {
 		smppServerGet.addChild("autonegotiateversion");
 		smppServerGet.addChild("interfaceversion");
 		smppServerGet.addChild("maxconnectionsize");
+		smppServerGet.addChild("smppactivitytimeout");
 		smppServerGet.addChild("defaultwindowsize");
 		smppServerGet.addChild("defaultwindowwaittimeout");
 		smppServerGet.addChild("defaultrequestexpirytimeout");

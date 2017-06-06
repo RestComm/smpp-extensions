@@ -70,6 +70,7 @@
 												var autoNegotiateInterfaceVersion = response.value.AutoNegotiateInterfaceVersion;
 												var interfaceVersion = response.value.InterfaceVersion;
 												var maxConnectionSize = response.value.MaxConnectionSize;
+												var smppActivityTimeout = response.value.SmppActivityTimeout;
 												var defaultWindowSize = response.value.DefaultWindowSize;
 												var defaultWindowWaitTimeout = response.value.DefaultWindowWaitTimeout;
 												var defaultRequestExpiryTimeout = response.value.DefaultRequestExpiryTimeout;
@@ -150,6 +151,7 @@
 																	'<dt>AutoNegotiateInterfaceVersion</dt> <dd>' + autoNegotiateInterfaceVersion + ' </dd>' + 
 																	'<dt>InterfaceVersion</dt> <dd>' + interfaceVersion + ' </dd>' + 
 																	'<dt>MaxConnectionSize</dt> <dd>' + maxConnectionSize + ' </dd>' +
+																	'<dt>SmppActivityTimeout</dt> <dd>' + smppActivityTimeout + ' </dd>'+
 																	'<dt>DefaultWindowSize</dt> <dd>' + defaultWindowSize + ' </dd>' +
 																	'<dt>DefaultWindowWaitTimeout</dt> <dd>' + defaultWindowWaitTimeout + ' </dd>' +
 																	'<dt>DefaultRequestExpiryTimeout</dt> <dd>' + defaultRequestExpiryTimeout + ' </dd>' +
@@ -376,6 +378,22 @@
 																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxConnSize"+']\').toggle(); $(\'input[id^='+name+"MaxConnSize"+']\').focus();"></i>' +
 																						'</td>'+
 																					'</tr>'+
+																					
+																					'<tr data-toggle="tooltip" title="timeout in seconds after witch activity will be ended automatically">' +
+																						'<td style="font-size: 0.9em;">SmppActivityTimeout</td>' +
+																					 	'<td style="font-size: 0.9em; padding: 0;">' +
+																					    	'<div id="div-' + name + 'smppActivityTimeout-input" class="control-group">' +
+																					        '<span id="' + name + 'smppActivityTimeout-input" style="display: none;">' +
+																					        	'<input type="text" class="input-small" value="' + smppActivityTimeout + '" /> ' +
+																					            '<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name + '\', \'SmppActivityTimeout\', \'' + name + "smppActivityTimeout" + '\')"></i> ' +
+																					            '<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^=' + name + "smppActivityTimeout" + ']\').toggle(); $(\'input[id^=' + name + "smppActivityTimeout" + ']\').focus();"></i>' +
+																					        '</span>' +
+																					        '</div>' +
+																					        '<span id="' + name + 'smppActivityTimeout-text">' + smppActivityTimeout + '</span>' +
+																					    '</td>' +
+																					    '<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^=' + name + "smppActivityTimeout" + ']\').toggle(); $(\'input[id^=' + name + "smppActivityTimeout" + ']\').focus();"></i>' +
+																					    '</td>' +
+																					'</tr>' +
 																					
 																					'<tr data-toggle="tooltip" title="window size is the amount of unacknowledged requests that are permitted to be outstanding/unacknowledged at any given time">'+
 																						'<td style="font-size: 0.9em;">DefaultWindowSize</td>'+
