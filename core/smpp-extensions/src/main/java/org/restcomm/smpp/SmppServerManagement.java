@@ -71,6 +71,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	private static final String DEFAULT_REQUEST_EXPIRY_TIMEOUT = "defaultRequestExpiryTimeout";
 	private static final String DEFAULT_WINDOW_MONITOR_INTERVAL = "defaultWindowMonitorInterval";
 	private static final String DEFAULT_SESSION_COUNTERS_ENABLED = "defaultSessionCountersEnabled";
+	private static final String BIND_IP_ADDRESS = "bindIpAddress";
 
 	private static final String TAB_INDENT = "\t";
 	private static final String CLASS_ATTRIBUTE = "type";
@@ -110,6 +111,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 	private long defaultRequestExpiryTimeout = 30000;
 	private long defaultWindowMonitorInterval = 15000;
 	private boolean defaultSessionCountersEnabled = true;
+	private String bindIpAddress = "0.0.0.0";
 
 	private DefaultSmppServer defaultSmppServer = null;
 
@@ -200,6 +202,11 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		this.store();
 	}
 
+	public void setBindIpAddress(String bindIpAddress) {
+		this.bindIpAddress = bindIpAddress;
+		this.store();
+	}
+
 	public void start() throws Exception {
 
 		if (this.smppSessionHandlerInterface == null) {
@@ -240,6 +247,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		}
 		configuration.setMaxConnectionSize(this.maxConnectionSize);
 		configuration.setNonBlockingSocketsEnabled(true);
+		configuration.setHost(this.bindIpAddress);
 
 		// SMPP Request sent would wait for 30000 milli seconds before throwing
 		// exception
@@ -514,6 +522,10 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 		return 0;
 	}
 
+	public String getBindIpAddress() {
+		return this.bindIpAddress;
+	}
+
 	/**
 	 * Persist
 	 */
@@ -541,6 +553,7 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			writer.write(this.defaultRequestExpiryTimeout, DEFAULT_REQUEST_EXPIRY_TIMEOUT, Long.class);
 			writer.write(this.defaultWindowMonitorInterval, DEFAULT_WINDOW_MONITOR_INTERVAL, Long.class);
 			writer.write(this.defaultSessionCountersEnabled, DEFAULT_SESSION_COUNTERS_ENABLED, Boolean.class);
+			writer.write(this.bindIpAddress, BIND_IP_ADDRESS, String.class);
 
 			// SSL
 			writer.write(this.useSsl, USE_SSL, Boolean.class);
@@ -613,7 +626,9 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			reader.setBinding(binding);
 			this.port = reader.read(PORT, Integer.class);
             this.bindTimeout = reader.read(BIND_TIMEOUT, Long.class);
-            Long vall = reader.read(WRITE_TIMEOUT, Long.class);
+			this.bindIpAddress = reader.read(BIND_IP_ADDRESS, String.class);
+
+			Long vall = reader.read(WRITE_TIMEOUT, Long.class);
             if (vall != null)
                 this.writeTimeout = vall;
 			this.systemId = reader.read(SYSTEM_ID, String.class);

@@ -61,6 +61,7 @@ public class SmppCommandHandler extends CommandHandlerWithHelp {
 		smppServerSet.addChild("defaultrequestexpirytimeout");
 		smppServerSet.addChild("defaultwindowmonitorinterval");
 		smppServerSet.addChild("defaultsessioncountersenabled");
+		smppServerSet.addChild("bindipaddress");
 
 		Node smppServerGet = smppServer.addChild("get");
 		smppServerGet.addChild("port");
@@ -75,6 +76,7 @@ public class SmppCommandHandler extends CommandHandlerWithHelp {
 		smppServerGet.addChild("defaultrequestexpirytimeout");
 		smppServerGet.addChild("defaultwindowmonitorinterval");
 		smppServerGet.addChild("defaultsessioncountersenabled");
+		smppServerGet.addChild("bindipaddress");
 
 	};
 

@@ -67,7 +67,7 @@ public class SmppShellExecutor implements ShellExecutor {
     }
 
     /**
-     * @param SmppManagement
+     * @param smppManagement
      *            the SmppManagement to set
      */
     public void setSmppManagement(SmppManagement smppManagement) {
@@ -527,7 +527,10 @@ public class SmppShellExecutor implements ShellExecutor {
         } else if (parName.equals("defaultsessioncountersenabled")) {
             boolean val = Boolean.parseBoolean(options[4]);
             smppServerManagement.setDefaultSessionCountersEnabled(val);
-        } else {
+        }  else if (parName.equals("bindipaddress")) {
+			String val = options[4];
+			smppServerManagement.setBindIpAddress(val);
+		} else {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
@@ -577,7 +580,9 @@ public class SmppShellExecutor implements ShellExecutor {
                 sb.append(smppServerManagement.getDefaultWindowMonitorInterval());
             } else if (parName.equals("defaultsessioncountersenabled")) {
                 sb.append(smppServerManagement.isDefaultSessionCountersEnabled());
-            } else {
+            } else if (parName.equals("bindipaddress")) {
+				sb.append(smppServerManagement.getBindIpAddress());
+			}else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
 
@@ -587,6 +592,10 @@ public class SmppShellExecutor implements ShellExecutor {
             sb.append("port = ");
             sb.append(smppServerManagement.getBindPort());
             sb.append("\n");
+
+			sb.append("bind-ip-address = ");
+			sb.append(smppServerManagement.getBindIpAddress());
+			sb.append("\n");
 
             sb.append("bind-timeout = ");
             sb.append(smppServerManagement.getBindTimeout());
