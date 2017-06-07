@@ -66,6 +66,7 @@
 												var systremId = response.value.SystemId;
 												var port = response.value.BindPort;
 												var bindTimeout  = response.value.BindTimeout;
+												var bindIpAddress  = response.value.BindIpAddress;
 												var writeTimeout  = response.value.WriteTimeout;
 												var autoNegotiateInterfaceVersion = response.value.AutoNegotiateInterfaceVersion;
 												var interfaceVersion = response.value.InterfaceVersion;
@@ -145,6 +146,7 @@
 												        '      <p class="muted">Properties</p>'+
 																'<dl class="dl-horizontal" style="width:360px;font-size: 0.8em;">' +
 																	'<dt>Port</dt> <dd>' + port + ' </dd>' + 
+																	'<dt>BindIpAddress</dt> <dd>' + bindIpAddress + ' </dd>' + 
 																	'<dt>BindTimeout</dt> <dd>' + bindTimeout + ' </dd>' + 
 																	'<dt>WriteTimeout</dt> <dd>' + writeTimeout + ' </dd>' + 
 																	'<dt>SystemId</dt> <dd>' + systremId + ' </dd>' + 
@@ -315,6 +317,22 @@
 																						'</td>'+
 																					'</tr>'+
 																					
+																					'<tr data-toggle="tooltip" title="The SMSC server will use this ip for listening incoming bind request from SMPP client.">'+
+																						'<td style="font-size: 0.9em;">BindIpAddress</td>'+
+																						'<td style="font-size: 0.9em; padding: 0;">'+
+																							'<div id="div-' + name +'BindIpAddress-input" class="control-group">'+
+																							'<span id="' +name + 'BindIpAddress-input" style="display: none;" >'+
+																								'<input type="text" class="input-small" value="' + bindIpAddress + '" /> ' +
+																								'<i class="icon-ok" style="cursor: pointer;" onclick="onSmppServrConfigOk(\'' + name+ '\', \'BindIpAddress\', \'' + name+"BindIpAddress" + '\')"></i> ' +
+																								'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindIpAddress"+']\').toggle(); $(\'input[id^='+name+"BindIpAddress"+']\').focus();"></i>' + 
+																							'</span>'+
+																							'</div>' +
+																							'<span id="' +name+ 'BindIpAddress-text">' + bindIpAddress + '</span>'+
+																						'</td>'+
+																						'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"BindIpAddress"+']\').toggle(); $(\'input[id^='+name+"BindIpAddress"+']\').focus();"></i>' +
+																						'</td>'+
+																					'</tr>'+
+
 																					'<tr data-toggle="tooltip" title="A timeout (in ms) which occurs when we can not properly sent a message into TCP channel">'+
 																						'<td style="font-size: 0.9em;">WriteTimeout</td>'+
 																						'<td style="font-size: 0.9em; padding: 0;">'+
