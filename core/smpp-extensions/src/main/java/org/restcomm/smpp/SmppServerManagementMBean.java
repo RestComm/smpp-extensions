@@ -191,4 +191,8 @@ public interface SmppServerManagementMBean extends SslConfigurationWrapperMBean 
 
 	public int getSessionDestroyed();
 
+	public String getBindIpAddress();
+
+	public void setBindIpAddress(String bindIpAddress);
+
 }

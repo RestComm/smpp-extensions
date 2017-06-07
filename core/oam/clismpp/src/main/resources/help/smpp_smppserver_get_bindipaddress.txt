@@ -1,0 +1,14 @@
+Name
+	smpp smppserver get bindipaddress
+
+SYNOPSIS
+	smpp smppserver get bindipaddress
+
+DESCRIPTION
+	This command is used to get the IP that SMSC GW used to bind SMPP server.
+
+EXAMPLE
+	smpp smppserver get bindipaddress
+
+SEE ALSO
+	smpp esme create, smsc get bindtimeout, smsc get writetimeout
