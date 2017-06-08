@@ -626,7 +626,6 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			reader.setBinding(binding);
 			this.port = reader.read(PORT, Integer.class);
             this.bindTimeout = reader.read(BIND_TIMEOUT, Long.class);
-			this.bindIpAddress = reader.read(BIND_IP_ADDRESS, String.class);
 
 			Long vall = reader.read(WRITE_TIMEOUT, Long.class);
             if (vall != null)
@@ -645,6 +644,9 @@ public class SmppServerManagement extends SslConfigurationWrapper implements Smp
 			this.defaultRequestExpiryTimeout = reader.read(DEFAULT_REQUEST_EXPIRY_TIMEOUT, Integer.class);
 			this.defaultWindowMonitorInterval = reader.read(DEFAULT_WINDOW_MONITOR_INTERVAL, Integer.class);
 			this.defaultSessionCountersEnabled = reader.read(DEFAULT_SESSION_COUNTERS_ENABLED, Boolean.class);
+            String val = reader.read(BIND_IP_ADDRESS, String.class);
+            if (val != null)
+                this.bindIpAddress = val;
 
 			// SSL
 			this.useSsl = reader.read(USE_SSL, Boolean.class);
