@@ -24,11 +24,13 @@ package org.restcomm.smpp;
 import java.util.Iterator;
 
 import javolution.util.FastList;
+import javolution.util.FastMap;
 
 import org.apache.log4j.Logger;
 
 import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppSession;
+import com.cloudhopper.smpp.SmppSession.Type;
 import com.cloudhopper.smpp.SmppSessionConfiguration;
 import com.cloudhopper.smpp.SmppSessionHandler;
 import com.cloudhopper.smpp.impl.DefaultSmppClient;
@@ -59,14 +61,16 @@ public class SmppClientOpsThread implements Runnable {
 
 	private final DefaultSmppClient clientBootstrap;
 	private final SmppSessionHandlerInterface smppSessionHandlerInterface;
+	private final EsmeManagement esmeManagement;
 
 	/**
 	 * 
 	 */
 	public SmppClientOpsThread(DefaultSmppClient clientBootstrap,
-			SmppSessionHandlerInterface smppSessionHandlerInterface) {
+			SmppSessionHandlerInterface smppSessionHandlerInterface, EsmeManagement esmeManagement) {
 		this.clientBootstrap = clientBootstrap;
-		this.smppSessionHandlerInterface = smppSessionHandlerInterface;
+        this.smppSessionHandlerInterface = smppSessionHandlerInterface;
+        this.esmeManagement = esmeManagement;
 	}
 
 	/**
@@ -82,6 +86,9 @@ public class SmppClientOpsThread implements Runnable {
 	}
 
 	protected void scheduleConnect(Esme esme) {
+
+        logger.info("Initiating a Client SMPP connection for ESME: " + esme.getName());
+
 		synchronized (this.pendingChanges) {
 			this.pendingChanges.add(new ChangeRequest(esme, ChangeRequest.CONNECT, System.currentTimeMillis()
 					+ SCHEDULE_CONNECT_DELAY));
@@ -106,6 +113,8 @@ public class SmppClientOpsThread implements Runnable {
 
 	@Override
 	public void run() {
+        FastMap<String, Long> startedClosedTime = new FastMap<String, Long>();
+
 		if (logger.isInfoEnabled()) {
 			logger.info("SmppClientOpsThread started.");
 		}
@@ -158,6 +167,33 @@ public class SmppClientOpsThread implements Runnable {
 					this.waitObject.wait(5000);
 				}
 
+				// checking of ESME CLOSED state - TODO: we need to refactor it after finding a reason of ESME not connecting
+                try {
+                    long curTimeStamp = System.currentTimeMillis();
+                    for (FastList.Node<Esme> n = this.esmeManagement.esmes.head(), end = this.esmeManagement.esmes.tail(); (n = n
+                            .getNext()) != end;) {
+                        Esme esme = n.getValue();
+                        if (esme.getSmppSessionType() == Type.CLIENT) {
+                            if (esme.isStarted() && esme.isClosed()) {
+                                Long stTime = startedClosedTime.get(esme.getName());
+                                if (stTime == null) {
+                                    startedClosedTime.put(esme.getName(), curTimeStamp);
+                                } else {
+                                    long stTimeV = stTime;
+                                    // checking if a disconnection time > 5 min == 300 sec
+                                    if (curTimeStamp - stTimeV > 300000) {
+                                        startedClosedTime.remove(esme.getName());
+                                        logger.warn("Client ESME is not connected for 5 minutes :" + esme.getName());
+                                    }
+                                }
+                            } else {
+                                startedClosedTime.remove(esme.getName());
+                            }
+                        }
+                    }
+                } catch (Throwable e) {
+                }
+				
 			} catch (InterruptedException e) {
 				logger.error("Error while looping SmppClientOpsThread thread", e);
 			}
