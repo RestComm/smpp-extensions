@@ -44,7 +44,7 @@ public interface EsmeManagementMBean {
             int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi,
             String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, String networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
-            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int minMessageLength,
+            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
             int maxMessageLength) throws Exception;
 
 	Esme destroyEsme(String esmeName) throws Exception;

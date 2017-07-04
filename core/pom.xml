@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>smpp-extensions-parent</artifactId>
 		<groupId>org.restcomm.smpp</groupId>
-		<version>1.0.20-SNAPSHOT</version>
+		<version>7.1.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>core</artifactId>
@@ -16,5 +16,30 @@
 		<module>smpp-extensions</module>
         <module>oam/clismpp</module>
 		<module>bootstrap</module>
+		<module>bootstrap-wildfly</module>
 	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<!-- WildFly Core modules  -->
+			<dependency>
+				<groupId>org.wildfly.core</groupId>
+				<artifactId>wildfly-controller</artifactId>
+				<version>${version.wildfly.core}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly.core</groupId>
+				<artifactId>wildfly-jmx</artifactId>
+				<version>${version.wildfly.core}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.wildfly</groupId>
+				<artifactId>wildfly-system-jmx</artifactId>
+				<version>${version.wildfly.as}</version>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>

@@ -55,11 +55,13 @@ public class SmppCommandHandler extends CommandHandlerWithHelp {
 		smppServerSet.addChild("autonegotiateversion");
 		smppServerSet.addChild("interfaceversion");
 		smppServerSet.addChild("maxconnectionsize");
+		smppServerSet.addChild("smppactivitytimeout");
 		smppServerSet.addChild("defaultwindowsize");
 		smppServerSet.addChild("defaultwindowwaittimeout");
 		smppServerSet.addChild("defaultrequestexpirytimeout");
 		smppServerSet.addChild("defaultwindowmonitorinterval");
 		smppServerSet.addChild("defaultsessioncountersenabled");
+		smppServerSet.addChild("bindipaddress");
 
 		Node smppServerGet = smppServer.addChild("get");
 		smppServerGet.addChild("port");
@@ -68,11 +70,13 @@ public class SmppCommandHandler extends CommandHandlerWithHelp {
 		smppServerGet.addChild("autonegotiateversion");
 		smppServerGet.addChild("interfaceversion");
 		smppServerGet.addChild("maxconnectionsize");
+		smppServerGet.addChild("smppactivitytimeout");
 		smppServerGet.addChild("defaultwindowsize");
 		smppServerGet.addChild("defaultwindowwaittimeout");
 		smppServerGet.addChild("defaultrequestexpirytimeout");
 		smppServerGet.addChild("defaultwindowmonitorinterval");
 		smppServerGet.addChild("defaultsessioncountersenabled");
+		smppServerGet.addChild("bindipaddress");
 
 	};
 

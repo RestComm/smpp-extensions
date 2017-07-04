@@ -112,7 +112,7 @@ public class SmppClientManagement implements SmppClientManagementMBean {
 		// configurable?
 		this.clientBootstrap = new DefaultSmppClient(this.executor, 25, monitorExecutor);
 
-		this.smppClientOpsThread = new SmppClientOpsThread(this.clientBootstrap, this.smppSessionHandlerInterface);
+		this.smppClientOpsThread = new SmppClientOpsThread(this.clientBootstrap, this.smppSessionHandlerInterface, this.esmeManagement);
 
 		(new Thread(this.smppClientOpsThread)).start();
 

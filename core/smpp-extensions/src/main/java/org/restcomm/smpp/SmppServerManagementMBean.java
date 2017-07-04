@@ -101,6 +101,15 @@ public interface SmppServerManagementMBean extends SslConfigurationWrapperMBean 
 	public void setMaxConnectionSize(int maxConnectionSize);
 
 	/**
+	 * Set the value of the smpp activity timeout .
+	 * 
+	 * @return
+	 */
+	public int getSmppActivityTimeout();
+	
+	public void setSmppActivityTimeout(int smppActivityTimeout);
+	
+	/**
 	 * The window "size" is the amount of unacknowledged requests that are
 	 * permitted to be outstanding/unacknowledged at any given time.
 	 * 
@@ -181,5 +190,9 @@ public interface SmppServerManagementMBean extends SslConfigurationWrapperMBean 
 	public int getSessionCreated();
 
 	public int getSessionDestroyed();
+
+	public String getBindIpAddress();
+
+	public void setBindIpAddress(String bindIpAddress);
 
 }

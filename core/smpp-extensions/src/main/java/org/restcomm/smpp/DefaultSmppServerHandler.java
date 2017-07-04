@@ -220,11 +220,12 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
 			// remove esmeServer out of enquire list
 			String esmeName = session.getConfiguration().getName();
-			Esme esmeServer = this.esmeManagement.getEsmeByName(esmeName);
+			Esme esmeServer = this.esmeManagement.getEsmeByName(esmeName);			
 			esmeServer.setServerBound(false);
 			esmeServer.resetEnquireLinkFail();
 			this.smppServerOpsThread.removeEnquireList(esmeName);
-
+			this.smppSessionHandlerInterface.destroySmppSessionHandler(esmeServer);
+			
             DefaultSmppSession defaultSession = (DefaultSmppSession) session;
 
             // firing of onPduRequestTimeout() for sent messages for which we do not have responses

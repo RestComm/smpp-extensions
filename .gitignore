@@ -4,9 +4,14 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.ear
+
+# IDE Files
+.idea
+*.iml
+
 
 # Maven
 target/
@@ -24,3 +29,6 @@ buildNumber.properties
 .classpath
 .settings
 .checkstyle 
+
+# JBoss
+${env.JBOSS_HOME}

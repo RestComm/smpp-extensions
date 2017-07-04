@@ -343,6 +343,10 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     void setNationalLanguageLockingShift(int nationalLanguageLockingShift);
 
+    int getDestAddrSendLimit();
+    
+    void setDestAddrSendLimit(int destAddrSendLimit);
+    
     int getMinMessageLength();
 
     void setMinMessageLength(int minMessageLength);
