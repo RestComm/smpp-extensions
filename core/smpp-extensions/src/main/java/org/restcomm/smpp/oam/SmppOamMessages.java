@@ -89,6 +89,8 @@ public interface SmppOamMessages {
 
     public static final String SHOW_NETWORK_ID = " networkId=";
 
+    public static final String SHOW_NETWORK_IDS = " networkIds=";
+
     public static final String SPLIT_LONG_MESSAGES = " split-long-messages=";
 
     public static final String CHARGING_ENABLED = " chargingEnabled=";

@@ -48,6 +48,7 @@ public class SmppShellExecutor implements ShellExecutor {
 
     private static final String LINE_SEPARATOR = System.getProperty("line.separator");
     private static final String MAP_CACHE_KEY_VALUE_SEPARATOR = " : ";
+    private static final String NETWORK_ID_DEFAULT = "0";
 
     public SmppShellExecutor() {
 
@@ -284,7 +285,7 @@ public class SmppShellExecutor implements ShellExecutor {
         String esmeAddrRange = null;
         String clusterName = name;
         String password = null;
-        int networkId = 0;
+        String networkId = NETWORK_ID_DEFAULT;
         boolean splitLongMessages = false;
         long rateLimitPerSecond = 0;
         long rateLimitPerMinute = 0;
@@ -329,7 +330,7 @@ public class SmppShellExecutor implements ShellExecutor {
             if (key.equals("password")) {
                 password = args[count++];
             } else if (key.equals("networkid")) {
-                networkId = Integer.parseInt(args[count++]);
+                networkId = args[count++];
             } else if (key.equals("split-long-messages")) {
                 splitLongMessages = Boolean.parseBoolean(args[count++]);
             } else if (key.equals("system-type")) {
