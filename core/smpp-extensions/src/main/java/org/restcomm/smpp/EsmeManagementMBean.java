@@ -42,7 +42,7 @@ public interface EsmeManagementMBean {
             String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long clientBindTimeout,
             long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
             int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi,
-            String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
+            String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, String networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
             int maxMessageLength) throws Exception;
@@ -52,5 +52,13 @@ public interface EsmeManagementMBean {
 	void startEsme(String esmeName) throws Exception;
 
 	void stopEsme(String esmeName) throws Exception;
+	
+    /**
+     * Checks for cluster.
+     *
+     * @param aClusterName the cluster name
+     * @return true, if successful
+     */
+	boolean hasCluster(String aClusterName);
 
 }
