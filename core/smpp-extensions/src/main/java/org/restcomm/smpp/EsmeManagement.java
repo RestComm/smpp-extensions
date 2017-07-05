@@ -170,11 +170,6 @@ public class EsmeManagement implements EsmeManagementMBean {
 		return null;
 	}
 
-	@Override
-	public boolean hasCluster(final String aClusterName) {
-	    return esmeClusters.containsKey(aClusterName);
-	}
-
 	protected Esme getEsmeByPrimaryKey(String SystemId, String host, int port, SmppBindType smppBindType) {
 
 		// Check for actual SystemId, host and port
