@@ -547,31 +547,6 @@ public class EsmeManagement implements EsmeManagementMBean {
         return esmeClusterByNetworkId.get(aNetworkId);
     }
 	
-	private void addEsmeToClusters(final Esme anEsme) {
-	    final int[] networkIds = anEsme.getNetworkIds();
-	    final String[] clusterNames = anEsme.getClusterName().split(ESME_CLUSTERS_SEPARATOR);
-	    for (int i = 0; i < clusterNames.length; i++) {
-	        addEsmeToCluster(anEsme, clusterNames[i].trim(), networkIds[i]);
-	    }
-	}
-	
-	private void addEsmeToCluster(final Esme anEsme,
-	        final String aClusterName, final int aNetworkId) {
-	    getEsmeCluster(aClusterName, aNetworkId).addEsme(anEsme);
-	}
-	
-	private EsmeCluster getEsmeCluster(final String aName,
-	        final int aNetworkId) {
-	    final EsmeCluster ec = esmeClusters.get(aName);
-	    if (ec == null) {
-	        final EsmeCluster nec = new EsmeCluster(aName, aNetworkId);
-	        esmeClusters.put(aName, nec);
-	        esmeClusterByNetworkId.put(aNetworkId, nec);
-	        return nec;
-	    }
-	    return ec;
-	}
-
 	private void registerEsmeMbean(Esme esme) {
 		try {
 			ObjectName esmeObjNname = new ObjectName(SmppManagement.JMX_DOMAIN + ":layer=Esme,name=" + esme.getName());
@@ -604,6 +579,31 @@ public class EsmeManagement implements EsmeManagementMBean {
 			logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
 		}
 	}
+
+    private void addEsmeToClusters(final Esme anEsme) {
+        final int[] networkIds = anEsme.getNetworkIds();
+        final String[] clusterNames = anEsme.getClusterName().split(ESME_CLUSTERS_SEPARATOR);
+        for (int i = 0; i < clusterNames.length; i++) {
+            addEsmeToCluster(anEsme, clusterNames[i].trim(), networkIds[i]);
+        }
+    }
+    
+    private void addEsmeToCluster(final Esme anEsme,
+            final String aClusterName, final int aNetworkId) {
+        getEsmeCluster(aClusterName, aNetworkId).addEsme(anEsme);
+    }
+    
+    private EsmeCluster getEsmeCluster(final String aName,
+            final int aNetworkId) {
+        final EsmeCluster ec = esmeClusters.get(aName);
+        if (ec == null) {
+            final EsmeCluster nec = new EsmeCluster(aName, aNetworkId);
+            esmeClusters.put(aName, nec);
+            esmeClusterByNetworkId.put(aNetworkId, nec);
+            return nec;
+        }
+        return ec;
+    }
 
     private static String correctClusterName(final String aClusterName, final String anEsmeName) throws EsmeManagementException {
         if (aClusterName == null) {
