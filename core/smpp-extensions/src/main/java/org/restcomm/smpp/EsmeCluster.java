@@ -125,4 +125,19 @@ public class EsmeCluster {
         }
         return false;
     }
+
+    @Override
+    public String toString() {
+        final int count = esmes.size();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(clusterName).append("[");
+        for (int i = 0; i < count; i++) {
+            sb.append(esmes.get(i).getName());
+            if (i < count - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

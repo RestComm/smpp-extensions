@@ -55,7 +55,6 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private static final Logger logger = Logger.getLogger(Esme.class);
     
     private static final String SEPARATOR = ",";
-    private static final String EMPTY = "";
 
 	private static final String ESME_NAME = "name";
 
@@ -359,8 +358,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         this.destAddrSendLimit = destAddrSendLimit;
         this.minMessageLength = minMessageLength;
         this.maxMessageLength = maxMessageLength;
-        networkIds = new int[1];
-        networkIds[0] = networkId;
+        networkIds = convert(networkId);
 	}
 
 	/**
@@ -463,16 +461,6 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.networkId = networkId;
 		this.store();
 	}
-
-    @Override
-    public int[] getNetworkIds() {
-        return networkIds;
-    }
-
-    public void setNetworkIds(int[] networkIds) {
-        this.networkIds = networkIds;
-        this.store();
-    }
 
     @Override
     public boolean getSplitLongMessages() {
@@ -1079,7 +1067,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.host = xml.getAttribute(REMOTE_HOST_IP, "");
 			esme.port = xml.getAttribute(REMOTE_HOST_PORT, -1);
             esme.networkId = xml.getAttribute(NETWORK_ID, 0);
-            esme.networkIds = convert(xml.getAttribute(NETWORK_IDS, EMPTY));
+            esme.networkIds = convert(xml.getAttribute(NETWORK_IDS, String.valueOf(esme.networkId)), esme.networkId);
             esme.splitLongMessages = xml.getAttribute(SPLIT_LONG_MESSAGES, false);
 
             esme.rateLimitPerSecond = xml.getAttribute(RATE_LIMIT_PER_SECOND, 0L);
@@ -1188,7 +1176,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(REMOTE_HOST_IP, esme.host);
 			xml.setAttribute(REMOTE_HOST_PORT, esme.port);
             xml.setAttribute(NETWORK_ID, esme.networkId);
-            xml.setAttribute(NETWORK_IDS, convert(esme.networkIds));
+            xml.setAttribute(NETWORK_IDS, convert(esme.networkIds, esme.networkId));
             xml.setAttribute(SPLIT_LONG_MESSAGES, esme.splitLongMessages);
 
             xml.setAttribute(RATE_LIMIT_PER_SECOND, esme.rateLimitPerSecond);
@@ -1275,7 +1263,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 .append(this.systemId).append(SmppOamMessages.SHOW_ESME_STATE).append(this.getStateName())
                 .append(SmppOamMessages.SHOW_ESME_PASSWORD).append(this.password).append(SmppOamMessages.SHOW_ESME_HOST)
                 .append(this.host).append(SmppOamMessages.SHOW_ESME_PORT).append(this.port)
-                .append(SmppOamMessages.SHOW_NETWORK_IDS).append(convert(networkIds))
+                .append(SmppOamMessages.SHOW_NETWORK_IDS).append(convert(networkIds, networkId))
                 .append(SmppOamMessages.CHARGING_ENABLED) .append(this.chargingEnabled)
                 .append(SmppOamMessages.SHOW_ESME_BIND_TYPE).append(this.smppBindType)
                 .append(SmppOamMessages.SHOW_ESME_SYSTEM_TYPE).append(this.systemType)
@@ -1813,29 +1801,47 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.esmeManagement.store();
 	}
 	
-    private static String convert(final int[] anIntArray) {
+    /**
+     * Gets the network IDs.
+     *
+     * @return the network IDs
+     */
+    int[] getNetworkIds() {
+        return networkIds;
+    }
+
+    /**
+     * Sets the network IDs.
+     *
+     * @param aNetworkIds the new network IDs
+     */
+    void setNetworkIds(final int[] aNetworkIds) {
+        networkIds = aNetworkIds;
+    }
+
+    private static String convert(final int[] anIntArray, final int aSingleValue) {
         if (anIntArray == null) {
-            return null;
+            return String.valueOf(aSingleValue);
         }
         if (anIntArray.length == 0) {
-            return EMPTY;
+            return String.valueOf(aSingleValue);
         }
         if (anIntArray.length == 1) {
             return String.valueOf(anIntArray[0]);
         }
-        final StringBuilder sb = new StringBuilder(anIntArray[0]);
+        final StringBuilder sb = new StringBuilder().append(anIntArray[0]);
         for (int i = 1; i < anIntArray.length; i++) {
             sb.append(SEPARATOR).append(anIntArray[i]);
         }
         return sb.toString();
     }
 
-    private static int[] convert(final String aListOfIntegerValues) {
+    private static int[] convert(final String aListOfIntegerValues, final int aSingleValue) {
         if (aListOfIntegerValues == null) {
-            return null;
+            return convert(aSingleValue);
         }
         if (aListOfIntegerValues.isEmpty()) {
-            return new int[0];
+            return convert(aSingleValue);
         }
         final String[] values = aListOfIntegerValues.split(SEPARATOR);
         final int[] r = new int[values.length];
@@ -1844,4 +1850,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         }
         return r;
     }
+
+    private static int[] convert(final int aSingleNetworkId) {
+        final int[] r = new int[1];
+        r[0] = aSingleNetworkId;
+        return r;
+    }
+
 }

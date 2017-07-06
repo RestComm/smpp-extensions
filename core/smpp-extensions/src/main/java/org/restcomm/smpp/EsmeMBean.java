@@ -77,10 +77,6 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     int getNetworkId();
 
-    void setNetworkIds(int[] networkIds);
-
-    int[] getNetworkIds();
-
     boolean getSplitLongMessages();
 
     void setSplitLongMessages(boolean splitLongMessages);

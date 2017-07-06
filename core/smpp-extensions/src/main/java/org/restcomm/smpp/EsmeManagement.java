@@ -639,8 +639,8 @@ public class EsmeManagement implements EsmeManagementMBean {
                 continue;
             }
             if (c.getNetworkId() != r[i]) {
-                throw new EsmeManagementException("NetworkId for cluster " + c.getClusterName()
-                        + " has invalid value. Expected: " + c.getNetworkId() + ". Actual: " + networkIds[i] + ".");
+                throw new EsmeManagementException("NetworkId for cluster " + c + " has invalid value. Expected: "
+                        + c.getNetworkId() + ". Actual: " + networkIds[i] + ".");
             }
         }
         return r;
