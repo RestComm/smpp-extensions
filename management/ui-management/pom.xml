@@ -33,40 +33,40 @@
 			<build>
 				<finalName>smpp-management</finalName>
 				<plugins>
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>deploy</id>
-						<phase>install</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<echo>
-									${jboss.home}server/default/deploy
-								</echo>
-								<copy file="${project.build.directory}/smpp-management.war" todir="${jboss.home}/server/${node}/deploy" />
-							</tasks>
-						</configuration>
-					</execution>
-					<execution>
-						<id>undeploy</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<delete failonerror="false" file="${jboss.home}/server/${node}/deploy/smpp-management.war" />
-							</tasks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>                        
-		</plugins>
-	</build>
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>deploy</id>
+								<phase>install</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<echo>
+											${jboss.home}server/default/deploy
+										</echo>
+										<copy file="${project.build.directory}/smpp-management.war" todir="${jboss.home}/server/${node}/deploy" />
+									</tasks>
+								</configuration>
+							</execution>
+							<execution>
+								<id>undeploy</id>
+								<phase>clean</phase>
+								<goals>
+									<goal>run</goal>
+								</goals>
+								<configuration>
+									<tasks>
+										<delete failonerror="false" file="${jboss.home}/server/${node}/deploy/smpp-management.war" />
+									</tasks>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
 		</profile>
 
 		<profile>
