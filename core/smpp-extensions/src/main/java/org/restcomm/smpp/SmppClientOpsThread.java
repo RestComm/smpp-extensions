@@ -264,12 +264,14 @@ public class SmppClientOpsThread implements Runnable {
 	private void initiateConnection(Esme esme) {
 		// If Esme is stopped, don't try to initiate connect
 		if (!esme.isStarted()) {
+		    logger.warn("ESME: " + esme.getName() + " is stopped. Will not try to initiate connection.");
 			return;
 		}
 
 		SmppSession smppSession = esme.getSmppSession();
 		if ((smppSession != null && smppSession.isBound()) || (smppSession != null && smppSession.isBinding())) {
 			// If process has already begun lets not do it again
+		    logger.warn("SMPP session is already bound or binding for ESME: " + esme.getName() + ". Will not try to initiate connection");
 			return;
 		}
 
@@ -328,6 +330,7 @@ public class SmppClientOpsThread implements Runnable {
 			session0 = clientBootstrap.bind(config0, sessionHandler);
 
 			// Set in ESME
+			logger.info("SMPP session has been created for ESME: " + esme.getName());
 			esme.setSmppSession((DefaultSmppSession) session0);
 
 			// Finally set Enquire Link schedule
@@ -373,7 +376,9 @@ public class SmppClientOpsThread implements Runnable {
 		public void fireChannelUnexpectedlyClosed() {
 			this.wrappedSmppSessionHandler.fireChannelUnexpectedlyClosed();
 
-			this.esme.getSmppSession().close();
+			if (this.esme.getSmppSession() != null) {
+                this.esme.getSmppSession().close();
+            }
 
 			// Schedule the connection again
 			scheduleConnect(this.esme);
@@ -409,7 +414,9 @@ public class SmppClientOpsThread implements Runnable {
 			this.wrappedSmppSessionHandler.fireUnknownThrowable(e);
 			// TODO is this ok?
 
-			this.esme.getSmppSession().close();
+			if (this.esme.getSmppSession() != null) {
+			    this.esme.getSmppSession().close();
+			}
 
 			// Schedule the connection again
 			scheduleConnect(this.esme);
