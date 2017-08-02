@@ -272,6 +272,8 @@ public class SmppClientOpsThread implements Runnable {
 	}
 
 	private void initiateConnection(Esme esme) {
+	    logger.info("Iniating connection for esme " + esme.getName() + " is started.");
+	    
 		// If Esme is stopped, don't try to initiate connect
 		if (!esme.isStarted()) {
 		    logger.warn("ESME: " + esme.getName() + " is stopped. Will not try to initiate connection.");
