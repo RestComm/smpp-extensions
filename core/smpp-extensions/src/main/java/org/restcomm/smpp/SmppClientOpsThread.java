@@ -21,6 +21,8 @@
  */
 package org.restcomm.smpp;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 
 import javolution.util.FastList;
@@ -52,6 +54,7 @@ public class SmppClientOpsThread implements Runnable {
 	private static final Logger logger = Logger.getLogger(SmppClientOpsThread.class);
 
 	private static final long SCHEDULE_CONNECT_DELAY = 1000 * 30; // 30 sec
+	private final SimpleDateFormat DATE_FORMAT =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); 
 
 	protected volatile boolean started = true;
 
@@ -90,8 +93,10 @@ public class SmppClientOpsThread implements Runnable {
         logger.info("Initiating a Client SMPP connection for ESME: " + esme.getName());
 
 		synchronized (this.pendingChanges) {
-			this.pendingChanges.add(new ChangeRequest(esme, ChangeRequest.CONNECT, System.currentTimeMillis()
-					+ SCHEDULE_CONNECT_DELAY));
+		    long executionTime = System.currentTimeMillis() + SCHEDULE_CONNECT_DELAY;
+			this.pendingChanges.add(new ChangeRequest(esme, ChangeRequest.CONNECT, executionTime));
+			logger.info("Pending change request CONNECT has been added for esme: " + esme 
+			        + " with scheduled execution time on " + DATE_FORMAT.format(new Date(executionTime)));
 		}
 
 		synchronized (this.waitObject) {
@@ -123,6 +128,7 @@ public class SmppClientOpsThread implements Runnable {
 			FastList<Esme> pendingList = new FastList<Esme>();
 
 			try {
+			    logger.debug("");
 				synchronized (this.pendingChanges) {
 					Iterator<ChangeRequest> changes = pendingChanges.iterator();
 
@@ -131,11 +137,15 @@ public class SmppClientOpsThread implements Runnable {
 						switch (change.getType()) {
 						case ChangeRequest.CONNECT:
 							if (!change.getEsme().isStarted()) {
+							    logger.warn("ESME " + change.getEsme() + " is stopped. Removing change request.");
 								pendingChanges.remove(change);
 							} else {
 								if (change.getExecutionTime() <= System.currentTimeMillis()) {
 									pendingChanges.remove(change);
 									initiateConnection(change.getEsme());
+								} else {
+								    logger.info("Change request for ESME " + change.getEsme() + " is scheduled for later: "
+								            + DATE_FORMAT.format(new Date(change.getExecutionTime())));
 								}
 							}
 							break;
@@ -277,6 +287,7 @@ public class SmppClientOpsThread implements Runnable {
 
 		SmppSession session0 = null;
 		try {
+		    logger.info("Creating SMPP Session with ESME " + esme.getName() + " started.");
 
 			SmppSessionConfiguration config0 = new SmppSessionConfiguration();
 			config0.setWindowSize(esme.getWindowSize());
@@ -314,6 +325,8 @@ public class SmppClientOpsThread implements Runnable {
 			}
 			
 			config0.setAddressRange(addressRangeObj);
+			
+			logger.info("Config for SMPP Session with ESME " + esme.getName() + " has been created.");
 
 			SmppSessionHandler sessionHandler = new ClientSmppSessionHandler(esme,
 					this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme));
@@ -327,6 +340,7 @@ public class SmppClientOpsThread implements Runnable {
 				config0.setSslConfiguration(sslConfiguration);
 			}
 
+			logger.info("Binding with ESME " + esme.getName());
 			session0 = clientBootstrap.bind(config0, sessionHandler);
 
 			// Set in ESME
