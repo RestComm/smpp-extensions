@@ -90,12 +90,13 @@ public class SmppClientOpsThread implements Runnable {
 
 	protected void scheduleConnect(Esme esme) {
 
-        logger.info("Initiating a Client SMPP connection for ESME: " + esme.getName());
+        logger.info("Scheduling a Client SMPP connection for ESME: " + esme.getName() 
+                + " systemId=" + esme.getSystemId());
 
 		synchronized (this.pendingChanges) {
 		    long executionTime = System.currentTimeMillis() + SCHEDULE_CONNECT_DELAY;
 			this.pendingChanges.add(new ChangeRequest(esme, ChangeRequest.CONNECT, executionTime));
-			logger.info("Pending change request CONNECT has been added for esme: " + esme 
+			logger.info("Pending change request CONNECT has been added for esme: " + esme.getName() 
 			        + " with scheduled execution time on " + DATE_FORMAT.format(new Date(executionTime)));
 		}
 
@@ -137,14 +138,14 @@ public class SmppClientOpsThread implements Runnable {
 						switch (change.getType()) {
 						case ChangeRequest.CONNECT:
 							if (!change.getEsme().isStarted()) {
-							    logger.warn("ESME " + change.getEsme() + " is stopped. Removing change request.");
+							    logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
 								pendingChanges.remove(change);
 							} else {
 								if (change.getExecutionTime() <= System.currentTimeMillis()) {
 									pendingChanges.remove(change);
 									initiateConnection(change.getEsme());
 								} else {
-								    logger.info("Change request for ESME " + change.getEsme() + " is scheduled for later: "
+								    logger.info("Change request for ESME " + change.getEsme().getName() + " is scheduled for later: "
 								            + DATE_FORMAT.format(new Date(change.getExecutionTime())));
 								}
 							}
@@ -293,7 +294,7 @@ public class SmppClientOpsThread implements Runnable {
 
 			SmppSessionConfiguration config0 = new SmppSessionConfiguration();
 			config0.setWindowSize(esme.getWindowSize());
-			config0.setName(esme.getSystemId());
+			config0.setName(esme.getName());
 			config0.setType(esme.getSmppBindType());
 			config0.setBindTimeout(esme.getClientBindTimeout());
 			config0.setHost(esme.getHost());
@@ -342,7 +343,7 @@ public class SmppClientOpsThread implements Runnable {
 				config0.setSslConfiguration(sslConfiguration);
 			}
 
-			logger.info("Binding with ESME " + esme.getName());
+			logger.info("Binding with ESME " + esme.getName() + " systemId=" + esme.getSystemId());
 			session0 = clientBootstrap.bind(config0, sessionHandler);
 
 			// Set in ESME
@@ -354,7 +355,7 @@ public class SmppClientOpsThread implements Runnable {
 		} catch (Exception e) {
 			logger.error(
 					String.format("Exception when trying to bind client SMPP connection for ESME systemId=%s",
-							esme.getSystemId()), e);
+							esme.getSystemId()) + " name = " + esme.getName(), e);
 			if (session0 != null) {
 				session0.close();
 			}
