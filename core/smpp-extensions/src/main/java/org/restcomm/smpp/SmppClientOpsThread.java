@@ -352,7 +352,7 @@ public class SmppClientOpsThread implements Runnable {
 
 			// Finally set Enquire Link schedule
 			this.scheduleEnquireLink(esme);
-		} catch (Exception e) {
+		} catch (Throwable e) {
 			logger.error(
 					String.format("Exception when trying to bind client SMPP connection for ESME systemId=%s",
 							esme.getSystemId()) + " name = " + esme.getName(), e);
