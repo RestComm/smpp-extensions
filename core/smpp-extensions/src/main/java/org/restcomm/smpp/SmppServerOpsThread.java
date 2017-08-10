@@ -239,6 +239,7 @@ public class SmppServerOpsThread implements Runnable {
 //                }
 
                 smppSession.destroy();
+                esme.nextLocalSessionId();
 
 			} else {
 				esme.setLinkRecvMessage(false);

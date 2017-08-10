@@ -344,6 +344,7 @@ public class SmppClientOpsThread implements Runnable {
 			}
 
 			logger.info("Binding with ESME " + esme.getName() + " systemId=" + esme.getSystemId());
+			esme.nextLocalSessionId();
 			session0 = clientBootstrap.bind(config0, sessionHandler);
 
 			// Set in ESME

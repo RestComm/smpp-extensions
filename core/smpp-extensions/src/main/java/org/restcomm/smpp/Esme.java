@@ -158,6 +158,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean linkRecvMessCheck = false;
 	private boolean linkStartFirstTime = false;
 
+	private AtomicLong localSessionId = new AtomicLong(0L);
 
 	// Default Server
 	private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
@@ -356,6 +357,14 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         this.maxMessageLength = maxMessageLength;
 	}
 
+    public Long nextLocalSessionId() {
+        return this.localSessionId.getAndIncrement();
+    }
+    
+    public Long getLocalSessionId() {
+        return this.localSessionId.get();
+    }
+    
 	/**
 	 * @return the name
 	 */
