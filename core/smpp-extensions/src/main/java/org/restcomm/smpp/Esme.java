@@ -1480,6 +1480,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		}
 		return this.state;
 	}
+	
+    public String getLocalStateName() {  
+        return this.state;
+    }
 
 	protected void setStateName(String name) {
 		this.state = name;
