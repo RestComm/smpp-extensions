@@ -155,6 +155,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             sessionConfiguration.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
 
 			esme.setStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
+			esme.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
 
 			// throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL,
 			// null);
@@ -261,7 +262,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			session.destroy();
 
 			//bringing back to close
-			esmeServer.setStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
+			esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
 		} finally {
             accessSemaphore.release();
         }

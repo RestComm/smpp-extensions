@@ -231,6 +231,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private int rxSubmitSmRespCount = -1;
 
     private String state = SmppSession.STATES[SmppSession.STATE_CLOSED];
+    private String localState = SmppSession.STATES[SmppSession.STATE_CLOSED];
 
 	private transient DefaultSmppSession defaultSmppSession = null;
 
@@ -1480,14 +1481,19 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		}
 		return this.state;
 	}
-	
-    public String getLocalStateName() {  
-        return this.state;
-    }
 
 	protected void setStateName(String name) {
 		this.state = name;
 	}
+	
+	   
+    public String getLocalStateName() {  
+        return this.localState;
+    }
+    
+    public void setLocalStateName(String name) {  
+        this.localState = name;
+    }
 
 	@Override
 	public String getTxDataSMCounter() {
