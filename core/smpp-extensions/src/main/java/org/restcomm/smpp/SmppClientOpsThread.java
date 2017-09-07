@@ -24,6 +24,7 @@ package org.restcomm.smpp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javolution.util.FastList;
 import javolution.util.FastMap;
@@ -58,7 +59,8 @@ public class SmppClientOpsThread implements Runnable {
 
 	protected volatile boolean started = true;
 
-	private FastList<ChangeRequest> pendingChanges = new FastList<ChangeRequest>();
+	ConcurrentLinkedQueue<ChangeRequest> workingSet = new ConcurrentLinkedQueue<ChangeRequest>();
+    ConcurrentLinkedQueue<ChangeRequest> futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
 
 	private Object waitObject = new Object();
 
@@ -92,14 +94,16 @@ public class SmppClientOpsThread implements Runnable {
 
         logger.info("Scheduling a Client SMPP connection for ESME: " + esme.getName() 
                 + " systemId=" + esme.getSystemId());
-
-		synchronized (this.pendingChanges) {
-		    long executionTime = System.currentTimeMillis() + SCHEDULE_CONNECT_DELAY;
-			this.pendingChanges.add(new ChangeRequest(esme, ChangeRequest.CONNECT, executionTime));
-			logger.info("Pending change request CONNECT has been added for esme: " + esme.getName() 
-			        + " with scheduled execution time on " + DATE_FORMAT.format(new Date(executionTime)));
-		}
-
+		
+        long executionTime = System.currentTimeMillis() + SCHEDULE_CONNECT_DELAY;
+        if (esme.getInConnectingQueue().compareAndSet(false, true)) {
+            this.futureSet.offer(new ChangeRequest(esme, ChangeRequest.CONNECT, executionTime));
+    		logger.info("Pending change request CONNECT has been added for esme: " + esme.getName() 
+    		        + " with scheduled execution time on " + DATE_FORMAT.format(new Date(executionTime)));
+        } else {
+            logger.warn("Pending change request CONNECT has NOT been added for esme: " + esme.getName() 
+            + " because it is already in queue");
+        }
 		synchronized (this.waitObject) {
 			this.waitObject.notify();
 		}
@@ -107,10 +111,8 @@ public class SmppClientOpsThread implements Runnable {
 	}
 
 	protected void scheduleEnquireLink(Esme esme) {
-		synchronized (this.pendingChanges) {
-			this.pendingChanges.add(new ChangeRequest(esme, ChangeRequest.ENQUIRE_LINK, System.currentTimeMillis()
+		this.futureSet.offer(new ChangeRequest(esme, ChangeRequest.ENQUIRE_LINK, System.currentTimeMillis()
 					+ esme.getEnquireLinkDelay()));
-		}
 
 		synchronized (this.waitObject) {
 			this.waitObject.notify();
@@ -124,61 +126,60 @@ public class SmppClientOpsThread implements Runnable {
 		if (logger.isInfoEnabled()) {
 			logger.info("SmppClientOpsThread started.");
 		}
-
+		
 		while (this.started) {
-			FastList<Esme> pendingList = new FastList<Esme>();
+		    workingSet = futureSet;
+		    futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
+		    
+		    FastList<Esme> pendingList = new FastList<Esme>();
+		    
+		    ChangeRequest change = workingSet.poll();
+            while (change != null) {
+			    switch (change.getType()) {
+                case ChangeRequest.CONNECT:
+                    if (!change.getEsme().isStarted()) {
+                        change.getEsme().getInConnectingQueue().set(false);
+                        logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
+                    } else {
+                        if (change.getExecutionTime() <= System.currentTimeMillis()) {
+                            change.getEsme().getInConnectingQueue().set(false);
+                            initiateConnection(change.getEsme());
+                        } else {
+                            futureSet.offer(change);
+                            logger.info("Change request for ESME " + change.getEsme().getName() + " is scheduled for later: "
+                                    + DATE_FORMAT.format(new Date(change.getExecutionTime())));
+                        }
+                    }
+                    break;
+                case ChangeRequest.ENQUIRE_LINK:
+                    if (change.getEsme().isStarted()) {
+                        if (change.getEsme().getEnquireClientEnabled()) {
+                            if (change.getExecutionTime() <= System.currentTimeMillis()) {
+                                pendingList.add(change.getEsme());
+                            } else {
+                                futureSet.offer(change); 
+                            }
+                        }
+                    }
+                    break;
+			    }
+			    
+			    change = workingSet.poll();
+            }
+	                
+         // Sending Enquire messages
+            Iterator<Esme> pendingchanges = pendingList.iterator();
+            while (pendingchanges.hasNext()) {
+                Esme esme = pendingchanges.next();
+                this.enquireLink(esme);
+            }
 
-			try {
-			    logger.debug("");
-				synchronized (this.pendingChanges) {
-					Iterator<ChangeRequest> changes = pendingChanges.iterator();
-
-					while (changes.hasNext()) {
-						ChangeRequest change = changes.next();
-						switch (change.getType()) {
-						case ChangeRequest.CONNECT:
-							if (!change.getEsme().isStarted()) {
-							    logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
-								pendingChanges.remove(change);
-							} else {
-								if (change.getExecutionTime() <= System.currentTimeMillis()) {
-									pendingChanges.remove(change);
-									initiateConnection(change.getEsme());
-								} else {
-								    logger.info("Change request for ESME " + change.getEsme().getName() + " is scheduled for later: "
-								            + DATE_FORMAT.format(new Date(change.getExecutionTime())));
-								}
-							}
-							break;
-						case ChangeRequest.ENQUIRE_LINK:
-							if (!change.getEsme().isStarted()) {
-								pendingChanges.remove(change);
-							} else {
-								if (change.getEsme().getEnquireClientEnabled()) {
-
-									if (change.getExecutionTime() <= System.currentTimeMillis()) {
-										pendingList.add(change.getEsme());
-										pendingChanges.remove(change);
-									}
-								}
-							}
-							break;
-						}
-					}
-				}
-
-				// Sending Enquire messages
-				Iterator<Esme> pendingchanges = pendingList.iterator();
-				while (pendingchanges.hasNext()) {
-					Esme change = pendingchanges.next();
-					this.enquireLink(change);
-				}
-
-				synchronized (this.waitObject) {
-					this.waitObject.wait(5000);
-				}
-
-				// checking of ESME CLOSED state - TODO: we need to refactor it after finding a reason of ESME not connecting
+            try {
+                synchronized (this.waitObject) {
+                    this.waitObject.wait(5000);
+                }
+    
+                // checking of ESME CLOSED state - TODO: we need to refactor it after finding a reason of ESME not connecting
                 try {
                     long curTimeStamp = System.currentTimeMillis();
                     for (FastList.Node<Esme> n = this.esmeManagement.esmes.head(), end = this.esmeManagement.esmes.tail(); (n = n
@@ -204,10 +205,10 @@ public class SmppClientOpsThread implements Runnable {
                     }
                 } catch (Throwable e) {
                 }
-				
-			} catch (InterruptedException e) {
-				logger.error("Error while looping SmppClientOpsThread thread", e);
-			}
+            } catch (InterruptedException e) {
+                logger.error("Error while looping SmppClientOpsThread thread", e);
+            }
+	            
 		}// while
 
 		if (logger.isInfoEnabled()) {
@@ -257,7 +258,7 @@ public class SmppClientOpsThread implements Runnable {
 
 		} else {
 			// This should never happen
-			logger.warn(String.format("Sending ENQURE_LINK fialed for ESME SystemId=%s as SmppSession is =%s !",
+			logger.warn(String.format("Sending ENQURE_LINK failed for ESME SystemId=%s as SmppSession is =%s !",
 					esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
 
 			if (smppSession != null) {
@@ -268,6 +269,7 @@ public class SmppClientOpsThread implements Runnable {
 							smppSession.getConfiguration().getName()));
 				}
 			}
+			
 			this.scheduleConnect(esme);
 		}
 	}

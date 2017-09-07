@@ -22,6 +22,7 @@
 
 package org.restcomm.smpp;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -159,6 +160,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean linkStartFirstTime = false;
 
 	private AtomicLong localSessionId = new AtomicLong(0L);
+	private AtomicBoolean inConnectingQueue = new AtomicBoolean(false);
 
 	// Default Server
 	private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
@@ -366,6 +368,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         return this.localSessionId.get();
     }
     
+	public AtomicBoolean getInConnectingQueue() {
+        return inConnectingQueue;
+    }
+
 	/**
 	 * @return the name
 	 */
