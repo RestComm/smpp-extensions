@@ -179,7 +179,7 @@ public class SmppClientOpsThread implements Runnable {
                     this.waitObject.wait(5000);
                 }
     
-                // checking of ESME CLOSED state - TODO: we need to refactor it after finding a reason of ESME not connecting
+                // checking of ESME CLOSED state
                 try {
                     long curTimeStamp = System.currentTimeMillis();
                     for (FastList.Node<Esme> n = this.esmeManagement.esmes.head(), end = this.esmeManagement.esmes.tail(); (n = n
