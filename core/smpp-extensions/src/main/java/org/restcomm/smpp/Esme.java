@@ -160,6 +160,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean linkStartFirstTime = false;
 
 	private AtomicBoolean inConnectingQueue = new AtomicBoolean(false);
+	private AtomicLong localSessionId = new AtomicLong(0L);
 
 	// Default Server
 	private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
@@ -232,6 +233,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private int rxSubmitSmRespCount = -1;
 
     private String state = SmppSession.STATES[SmppSession.STATE_CLOSED];
+    private String localState = SmppSession.STATES[SmppSession.STATE_CLOSED];
 
 	private transient DefaultSmppSession defaultSmppSession = null;
 
@@ -363,6 +365,14 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         return inConnectingQueue;
     }
 
+    public Long nextLocalSessionId() {
+        return this.localSessionId.getAndIncrement();
+    }
+    
+    public Long getLocalSessionId() {
+        return this.localSessionId.get();
+    }
+    
 	/**
 	 * @return the name
 	 */
@@ -1482,6 +1492,15 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	protected void setStateName(String name) {
 		this.state = name;
 	}
+	
+	   
+    public String getLocalStateName() {  
+        return this.localState;
+    }
+    
+    public void setLocalStateName(String name) {  
+        this.localState = name;
+    }
 
 	@Override
 	public String getTxDataSMCounter() {

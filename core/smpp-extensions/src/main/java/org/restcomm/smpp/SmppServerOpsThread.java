@@ -238,7 +238,7 @@ public class SmppServerOpsThread implements Runnable {
 //                    smppSession.expired(future);
 //                }
 
-                smppSession.destroy();
+                smppSession.destroy();                
 
 			} else {
 				esme.setLinkRecvMessage(false);

@@ -22,6 +22,7 @@
 package org.restcomm.smpp;
 
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
 
@@ -56,7 +57,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 	private final EsmeManagement esmeManagement;
 
 	private final SmppServerOpsThread smppServerOpsThread;
-
+	
+	private Semaphore accessSemaphore=new Semaphore(1);
+	
 	public DefaultSmppServerHandler(EsmeManagement esmeManagement, SmppServerOpsThread smppServerOpsThread,
 			SmppSessionHandlerInterface smppSessionHandlerInterface) {
 		this.esmeManagement = esmeManagement;
@@ -68,8 +71,12 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 	public void sessionBindRequested(Long sessionId, SmppSessionConfiguration sessionConfiguration,
 			final BaseBind bindRequest) throws SmppProcessingException {
 
-		synchronized (this) {
-
+	    try {
+            accessSemaphore.acquire();
+        } catch(InterruptedException e) {}
+        
+        try {
+            
 			if (this.smppSessionHandlerInterface == null) {
 				logger.error("Received BIND request but no SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
 				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
@@ -87,7 +94,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 						smppBindType));
 				throw new SmppProcessingException(SmppConstants.STATUS_INVSYSID);
 			}
-
+			
 			if (!esme.isStarted()) {
 				logger.error(String.format("Received BIND request but ESME is not yet started for name %s",
 						esme.getName()));
@@ -148,16 +155,23 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             sessionConfiguration.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
 
 			esme.setStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
+			esme.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
 
 			// throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL,
 			// null);
-		}
+		} finally {
+            accessSemaphore.release();
+        }
 	}
 
 	@Override
 	public void sessionCreated(Long sessionId, SmppServerSession session, BaseBindResp preparedBindResponse)
 			throws SmppProcessingException {
-		synchronized (this) {
+		try {
+		    accessSemaphore.acquire();
+		} catch(InterruptedException e) {}
+		
+		try {
 			if (logger.isInfoEnabled()) {
 				logger.info(String.format("Session created: Name=%s SystemId=%s", session.getConfiguration().getName(),
 						session.getConfiguration().getSystemId()));
@@ -179,8 +193,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
 			}
 
-			esme.setSmppSession((DefaultSmppSession) session);
-
+			esme.nextLocalSessionId();
+            esme.setSmppSession((DefaultSmppSession) session);
+			
 			if (!logger.isDebugEnabled()) {
 				session.getConfiguration().getLoggingOptions().setLogBytes(false);
 				session.getConfiguration().getLoggingOptions().setLogPdu(false);
@@ -198,7 +213,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
 			// start enquire message imedialtely
 			this.smppServerOpsThread.scheduleList(esme.getName(), 0L);
-		}
+		} finally {
+            accessSemaphore.release();
+        }
 	}
 
 	@Override
@@ -208,7 +225,11 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
 	public void sessionDestroyed(SmppSession session) {
 
-		synchronized (this) {
+	    try {
+            accessSemaphore.acquire();
+        } catch(InterruptedException e) {}
+        
+        try {
 			if (logger.isInfoEnabled()) {
 				logger.info(String.format("Session destroyed: %s", session.getConfiguration().getSystemId()));
 			}
@@ -239,7 +260,12 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
 			// make sure it's really shutdown
 			session.destroy();
-		}
+
+			//bringing back to close
+			esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
+		} finally {
+            accessSemaphore.release();
+        }
 	}
 
 	private SmppBindType getSmppBindType(int commandId) {

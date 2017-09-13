@@ -182,21 +182,21 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 				if (esme.getHost().equals(host) && esme.getPort() == -1) {
 					// Hosts match but port is any
-					if (esme.getStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+					if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
 						return esme;
 					}
 				}
 
 				if (esme.getHost().equals("-1") && esme.getPort() == port) {
 					// Host is any but port matches
-					if (esme.getStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+					if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
 						return esme;
 					}
 				}
 
 				if (esme.getHost().equals("-1") && esme.getPort() == -1) {
 					// Host is any and port is also any
-					if (esme.getStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+					if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
 						return esme;
 					}
 				}
