@@ -494,15 +494,20 @@
 				mbeanRead = 0;
 				esmeResponses = {};
 				esmes = [];
-
+                // creating bulk json
+                jsonEsmes =[];
+               
 				jQuery.each(html.value, function() {
 					mbeanVar = this;
 					noOfEsmes = noOfEsmes +1;
-					
-					jolokia.request(
-							[
-								{ type: "read", mbean: mbeanVar },
-							],
+					itemEsme = {}
+                    itemEsme["type"] = "read";
+                    itemEsme["mbean"] = mbeanVar;
+                    jsonEsmes.push(itemEsme);
+                });
+                            
+				jolokia.request(
+								jsonEsmes,
 							{
 								success: [ onEsmeResponse ],
 								error: function(value) {
@@ -513,7 +518,7 @@
 							}
 						); 
 
-				});
+				
 				
 				if(noOfEsmes == 0){
 					$('#no-esmes-table').show();
