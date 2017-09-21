@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>restcomm-parent</artifactId>
 		<groupId>org.restcomm</groupId>
-		<version>3.0.5</version>
+		<version>3.0.5</version> <!-- 3.0.5 4.1.0-6 -->
 	</parent>
 
 	<artifactId>smpp-extensions-parent</artifactId>
@@ -29,10 +29,10 @@
 		<netty.version>3.9.0.Final</netty.version>
 		<joda-time.version>2.9.9</joda-time.version>
 
-		<ch.smpp.version>5.0.13</ch.smpp.version>
+		<ch.smpp.version>5.1.0-9</ch.smpp.version> <!-- 5.0.13 -->
 		<ch-commons-util.version>7.0.6</ch-commons-util.version> <!-- 7.0.5 -->
 		<ch-commons-charset.version>7.0.6</ch-commons-charset.version> <!-- 3.0.2 -->
-		<jss7.restcomm.version>7.3.1398</jss7.restcomm.version>
+		<jss7.restcomm.version>7.4.0-9</jss7.restcomm.version>
 	</properties>
 
 	<modules>
