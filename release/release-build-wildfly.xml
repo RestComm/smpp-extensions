@@ -96,7 +96,7 @@
 
 		<delete dir="${restcomm-smpp.path}" />
 
-		<delete file="${jboss.deploy}/smpp-management-console.war" />
+		<delete file="${jboss.deploy}/smpp-management.war" />
 		<delete file="${jboss.deploy}/jolokia.war" />
 
 		<delete file="${jboss.home}/bin/ss7-cli.sh" />
