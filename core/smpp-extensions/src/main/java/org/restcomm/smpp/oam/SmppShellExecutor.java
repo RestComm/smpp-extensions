@@ -152,6 +152,30 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("counters-enabled")) {
                 boolean countersEnabled = Boolean.parseBoolean(args[count++]);
                 esme.setCountersEnabled(countersEnabled);
+            } else if (key.equals("esme-error-counters-enabled")) {
+                if (args[count].equals("null")) {
+                    esme.setEsmeErrorCountersEnabled(null);
+                    count++;
+                } else {
+                    boolean esmeErrorCountersEnabled = Boolean.parseBoolean(args[count++]);
+                    esme.setEsmeErrorCountersEnabled(esmeErrorCountersEnabled);
+                }
+            } else if (key.equals("esme-maintenance-counters-enabled")) {
+                if (args[count].equals("null")) {
+                    esme.setEsmeMaintenanceCountersEnabled(null);
+                    count++;
+                } else {
+                    boolean esmeMaintenanceCountersEnabled = Boolean.parseBoolean(args[count++]);
+                    esme.setEsmeMaintenanceCountersEnabled(esmeMaintenanceCountersEnabled);
+                }
+            } else if (key.equals("session-error-counters-enabled")) {
+                if (args[count].equals("null")) {
+                    esme.setSessionErrorCountersEnabled(null);
+                    count++;
+                } else {
+                    boolean sessionErrorCountersEnabled = Boolean.parseBoolean(args[count++]);
+                    esme.setSessionErrorCountersEnabled(sessionErrorCountersEnabled);
+                }
             } else if (key.equals("enquire-link-delay")) {
                 int enquireLinkDelay = Integer.parseInt(args[count++]);
                 esme.setEnquireLinkDelay(enquireLinkDelay);
@@ -305,6 +329,9 @@ public class SmppShellExecutor implements ShellExecutor {
         long windowWaitTimeout = SmppConstants.DEFAULT_WINDOW_WAIT_TIMEOUT;
 
         boolean countersEnabled = true;
+        Boolean esmeErrorCountersEnabled = null;
+        Boolean esmeMaintenanceCountersEnabled = null;
+        Boolean sessionErrorCountersEnabled = null;
         int enquireLinkDelay = 30000;
         int enquireLinkDelayServer = 0;
         long linkDropServer = 0L;
@@ -363,6 +390,21 @@ public class SmppShellExecutor implements ShellExecutor {
                 clusterName = args[count++];
             } else if (key.equals("counters-enabled")) {
                 countersEnabled = Boolean.parseBoolean(args[count++]);
+            } else if (key.equals("esme-error-counters-enabled")) {
+                if (args[count] != null)
+                    esmeErrorCountersEnabled = Boolean.parseBoolean(args[count++]);
+                else 
+                    count++;
+            } else if (key.equals("esme-maintenance-counters-enabled")) {
+                if (args[count] != null)
+                    esmeMaintenanceCountersEnabled = Boolean.parseBoolean(args[count++]);
+                else 
+                    count++;
+            } else if (key.equals("session-error-counters-enabled")) {
+                if (args[count] != null)
+                    sessionErrorCountersEnabled = Boolean.parseBoolean(args[count++]);
+                else 
+                    count++;
             } else if (key.equals("enquire-link-delay")) {
                 enquireLinkDelay = Integer.parseInt(args[count++]);
             } else if (key.equals("enquire-link-delay-server")) {
@@ -412,7 +454,8 @@ public class SmppShellExecutor implements ShellExecutor {
         Esme esme = this.smppManagement.getEsmeManagement().createEsme(name, systemId, password, host, intPort,
                 chargingEnabled, smppBindTypeStr, systemType, smppVersionType, esmeTonType, esmeNpiType, esmeAddrRange,
                 smppSessionTypeStr, windowSize, connectTimeout, requestExpiryTimeout, clientBindTimeout, windowMonitorInterval,
-                windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, linkDropServer,
+                windowWaitTimeout, clusterName, countersEnabled, esmeErrorCountersEnabled, esmeMaintenanceCountersEnabled, 
+                sessionErrorCountersEnabled, enquireLinkDelay, enquireLinkDelayServer, linkDropServer,
                 sourceTon, sourceNpi, sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId,
                 splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay,
                 nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);

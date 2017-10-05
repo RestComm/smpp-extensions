@@ -96,6 +96,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";
 	private static final String LINK_DROP_SERVER = "linkDropServer";
 	private static final String COUNTERS_ENABLED = "countersEnabled";
+	private static final String ESME_ERROR_COUNTERS_ENABLED = "esmeErrorCountersEnabled";
+	private static final String ESME_MAINTENANCE_COUNTERS_ENABLED = "esmeMaintenanceCountersEnabled";
+	private static final String SESSION_ERROR_COUNTERS_ENABLED = "sessionErrorCountersEnabled";
 
     private static final String RATE_LIMIT_PER_SECOND = "rateLimitPerSecond";
     private static final String RATE_LIMIT_PER_MINUTE = "rateLimitPerMinute";
@@ -151,7 +154,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 	private boolean chargingEnabled = false;
 
 	private boolean countersEnabled = true;
-
+	private Boolean esmeErrorCountersEnabled = null;
+	private Boolean esmeMaintenanceCountersEnabled = null;
+	private Boolean sessionErrorCountersEnabled = null;
+	
 	private int enquireLinkDelay = 30000;
 	private int enquireLinkDelayServer = 0;
 
@@ -263,6 +269,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
      * @param windowWaitTimeout
      * @param clusterName
      * @param countersEnabled
+     * @param esmeErrorCountersEnabled
+     * @param esmeMaintenanceCountersEnabled
+     * @param sessionErrorCountersEnabled
      * @param enquireLinkDelay
      * @param enquireLinkDelayServer
      * @param linkDropServer
@@ -288,7 +297,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
             SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
             long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName,
-            boolean countersEnabled, int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon,
+            boolean countersEnabled, Boolean esmeErrorCountersEnabled, Boolean esmeMaintenanceCountersEnabled, 
+            Boolean sessionErrorCountersEnabled, int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon,
             int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
             int networkId, boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
@@ -324,6 +334,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.clusterName = clusterName;
 
 		this.countersEnabled = countersEnabled;
+		this.esmeErrorCountersEnabled = esmeErrorCountersEnabled;
+		this.esmeMaintenanceCountersEnabled = esmeMaintenanceCountersEnabled;
+		this.sessionErrorCountersEnabled = sessionErrorCountersEnabled;
 
 		this.enquireLinkDelay = enquireLinkDelay;
 		this.enquireLinkDelayServer = enquireLinkDelayServer;
@@ -934,6 +947,39 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 		this.countersEnabled = countersEnabled;
 		this.store();
 	}
+	
+	@Override
+    public Boolean getEsmeErrorCountersEnabled() {
+        return esmeErrorCountersEnabled;
+    }
+
+    @Override
+    public void setEsmeErrorCountersEnabled(Boolean esmeErrorCountersEnabled) {
+        this.esmeErrorCountersEnabled = esmeErrorCountersEnabled;
+        this.store();
+    }
+    
+    @Override
+    public Boolean getEsmeMaintenanceCountersEnabled() {
+        return esmeMaintenanceCountersEnabled;
+    }
+
+    @Override
+    public void setEsmeMaintenanceCountersEnabled(Boolean esmeMaintenanceCountersEnabled) {
+        this.esmeMaintenanceCountersEnabled = esmeMaintenanceCountersEnabled;
+        this.store();
+    }
+    
+    @Override
+    public Boolean getSessionErrorCountersEnabled() {
+        return sessionErrorCountersEnabled;
+    }
+
+    @Override
+    public void setSessionErrorCountersEnabled(Boolean sessionErrorCountersEnabled) {
+        this.sessionErrorCountersEnabled = sessionErrorCountersEnabled;
+        this.store();
+    }    
 
 	@Override
 	public boolean isChargingEnabled() {
@@ -1117,6 +1163,15 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			esme.windowMonitorInterval = xml.getAttribute(WINDOW_MONITOR_INTERVAL, 0L);
 			esme.windowWaitTimeout = xml.getAttribute(WINDOW_WAIT_TIMEOUT, 0L);
 			esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
+			Boolean nullBoolean = null;
+			
+			if(xml.getAttribute(ESME_ERROR_COUNTERS_ENABLED) != null)
+			    esme.esmeErrorCountersEnabled = xml.getAttribute(ESME_ERROR_COUNTERS_ENABLED, false);
+			if(xml.getAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED) != null)
+			    esme.esmeMaintenanceCountersEnabled = xml.getAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED, false);
+			if(xml.getAttribute(SESSION_ERROR_COUNTERS_ENABLED) != null)
+			    esme.sessionErrorCountersEnabled = xml.getAttribute(SESSION_ERROR_COUNTERS_ENABLED, false);
+			
 			esme.enquireLinkDelay = xml.getAttribute(ENQUIRE_LINK_DELAY, 30000);
 			esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
 			esme.linkDropServer = xml.getAttribute(LINK_DROP_SERVER, 0L);
@@ -1221,6 +1276,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(WINDOW_MONITOR_INTERVAL, esme.windowMonitorInterval);
 			xml.setAttribute(WINDOW_WAIT_TIMEOUT, esme.windowWaitTimeout);
 			xml.setAttribute(COUNTERS_ENABLED, esme.countersEnabled);
+			xml.setAttribute(ESME_ERROR_COUNTERS_ENABLED, esme.esmeErrorCountersEnabled);
+			xml.setAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED, esme.esmeMaintenanceCountersEnabled);
+			xml.setAttribute(SESSION_ERROR_COUNTERS_ENABLED, esme.sessionErrorCountersEnabled);
 			xml.setAttribute(ENQUIRE_LINK_DELAY, esme.enquireLinkDelay);
 			xml.setAttribute(ENQUIRE_LINK_DELAY_SERVER, esme.enquireLinkDelayServer);
 			xml.setAttribute(LINK_DROP_SERVER, esme.linkDropServer);

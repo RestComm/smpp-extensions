@@ -181,6 +181,55 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 	 * @param countersEnabled
 	 */
 	void setCountersEnabled(boolean countersEnabled);
+	
+	/**
+     * Returns null if this esmeErrorCountersEnabled for this esme is not set, 
+     * otherwise it's boolean value
+     * 
+     * @return
+     */
+    public Boolean getEsmeErrorCountersEnabled();
+    
+    
+    /**
+     * Set to null to unset this property for this esme. Value takes 
+     * effect only when ESME is restarted
+     * 
+     * @param esmeErrorCountersEnabled
+     */
+    public void setEsmeErrorCountersEnabled(Boolean esmeErrorCountersEnabled);
+    
+    /**
+     * Returns null if this esmeMaintenanceCountersEnabled for this esme is not set, 
+     * otherwise it's boolean value
+     * 
+     * @return
+     */
+    public Boolean getEsmeMaintenanceCountersEnabled();
+    
+    /**
+     * Set to null to unset this property for this esme. Value takes 
+     * effect only when ESME is restarted
+     * 
+     * @param esmeMaintenanceCountersEnabled
+     */
+    public void setEsmeMaintenanceCountersEnabled(Boolean esmeMaintenanceCountersEnabled);
+    
+    /**
+     * Returns null if this sessionErrorCountersEnabled for this esme is not set, 
+     * otherwise it's boolean value
+     * 
+     * @return
+     */
+    public Boolean getSessionErrorCountersEnabled();
+    
+    /**
+     * Set to null to unset this property for this esme. Value takes 
+     * effect only when ESME is restarted
+     * 
+     * @param sessionErrorCountersEnabled
+     */
+    public void setSessionErrorCountersEnabled(Boolean sessionErrorCountersEnabled);
 
 	/**
 	 * Sets the default window size. Value takes effect only when ESME is
