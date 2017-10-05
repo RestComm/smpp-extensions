@@ -148,7 +148,6 @@ public class SmppManagement implements SmppManagementMBean {
                 + ",name=" + this.getName());
         this.registerMBean(this.esmeManagement, EsmeManagementMBean.class, false, esmeObjNname);
 
-        this.isStarted = true;
         logger.info("Started SmppManagement");
 
         // Step 6 Start SMPP Server
@@ -174,8 +173,6 @@ public class SmppManagement implements SmppManagementMBean {
     }
 
     public void stopSmppManagement() throws Exception {
-
-        this.isStarted = false;
 
         this.esmeManagement.stop();
         ObjectName esmeObjNname = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT
