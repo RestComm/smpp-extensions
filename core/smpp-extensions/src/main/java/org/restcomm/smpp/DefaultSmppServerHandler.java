@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 import org.apache.log4j.Logger;
+import org.restcomm.smpp.oam.SessionKey;
 
 import com.cloudhopper.commons.util.windowing.Window;
 import com.cloudhopper.commons.util.windowing.WindowFuture;
@@ -193,7 +194,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
 			}
 
+			esmeManagement.sessionClosed(new SessionKey(esme.getName(), sessionId));
 			esme.nextLocalSessionId();
+			esmeManagement.sessionCreated(new SessionKey(esme.getName(), sessionId));
             esme.setSmppSession((DefaultSmppSession) session);
 			
 			if (!logger.isDebugEnabled()) {
@@ -258,6 +261,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
                 defaultSession.expired(future);
             }
 
+            esmeManagement.sessionClosed(new SessionKey(esmeServer.getName(), esmeServer.getLocalSessionId()));
 			// make sure it's really shutdown
 			session.destroy();
 

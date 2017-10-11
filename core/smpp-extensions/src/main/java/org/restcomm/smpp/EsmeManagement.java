@@ -53,6 +53,7 @@ import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
 import org.jboss.mx.util.MBeanServerLocator;
+import org.restcomm.smpp.oam.SessionKey;
 import org.restcomm.smpp.oam.SmppOamMessages;
 
 import com.cloudhopper.smpp.SmppBindType;
@@ -93,6 +94,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 
     private Timer timer;
     private TimerTask timerTask;
+
+    private SmppStateListener listener;
 
 	private static EsmeManagement instance = null;
 
@@ -358,6 +361,10 @@ public class EsmeManagement implements EsmeManagementMBean {
 		esme.setStarted(true);
 		this.store();
 
+		System.out.println("listener is " + listener);
+		if (listener != null)
+		    listener.esmeStarted(esme.getName(), esme.getClusterName());
+		
 		if (esme.getSmppSessionType().equals(SmppSession.Type.CLIENT)) {
 			this.smppClient.startSmppClientSession(esme);
 		}
@@ -367,6 +374,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 	@Override
 	public void stopEsme(String esmeName) throws Exception {
 		Esme esme = this.getEsmeByName(esmeName);
+		Long currSessionId = esme.getLocalSessionId();
 		if (esme == null) {
 			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
 		}
@@ -377,6 +385,10 @@ public class EsmeManagement implements EsmeManagementMBean {
 			esme.resetLinkRecvMessage();
 		}
 
+		if (listener != null)
+            listener.esmeStopped(esme.getName(), esme.getClusterName(), currSessionId);
+        
+        
 		this.store();
 
 		this.stopWrappedSession(esme);
@@ -413,10 +425,14 @@ public class EsmeManagement implements EsmeManagementMBean {
 			}
 		}
 	}
+	
+	public void setListener(SmppStateListener listener) {
+	    this.listener = listener;	
+	    updateListener();
+	}
 
 	public void start() throws Exception {
-
-        try {
+	    try {
 					if (this.mbeanServer == null) {
 						this.mbeanServer = MBeanServerLocator.locateJBoss();
 					}
@@ -436,7 +452,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 		}
 
 		logger.info(String.format("Loading ESME configuration from %s", persistFile.toString()));
-
+		
 		try {
 			this.load();
 		} catch (FileNotFoundException e) {
@@ -444,8 +460,12 @@ public class EsmeManagement implements EsmeManagementMBean {
 		}
 
 		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
-			this.registerEsmeMbean(esme);
+            Esme esme = n.getValue();
+            this.registerEsmeMbean(esme);
+        }
+		
+		if (listener != null) {
+		    updateListener();
 		}
 
 		// setting a timer for cleaning of 
@@ -455,6 +475,16 @@ public class EsmeManagement implements EsmeManagementMBean {
         this.timer.scheduleAtFixedRate(timerTask, 0, 1000);
 	}
 
+	private void updateListener()
+	{
+	    for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+            Esme esme = n.getValue();
+            if (listener != null && esme.isStarted()) {
+                listener.esmeStarted(esme.getName(), esme.getClusterName());
+            }
+        }
+	}
+	
 	public void stop() throws Exception {
         this.clearMessageClearTimer();
 
@@ -587,6 +617,18 @@ public class EsmeManagement implements EsmeManagementMBean {
 		}
 	}
 
+	protected void sessionCreated(SessionKey key) {
+	    if (listener != null) {
+	        listener.sessionCreated(key);
+	    }
+	}
+	
+	public void sessionClosed(SessionKey key) {
+        if (listener != null) {
+            listener.sessionClosed(key);
+        }
+    }
+	
     private class MessageCleanerTimerTask extends TimerTask {
 
         private int lastDay = -1;

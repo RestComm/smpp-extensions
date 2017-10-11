@@ -68,6 +68,8 @@ public class SmppManagement implements SmppManagementMBean {
 
     private SmppServerManagement smppServerManagement = null;
     private SmppClientManagement smppClientManagement = null;
+    
+    private SmppStateListener listener;
 
     private SmppManagement(String name) {
         this.name = name;
@@ -125,6 +127,13 @@ public class SmppManagement implements SmppManagementMBean {
     public void setMbeanServer(MBeanServer mbeanServer) {
         this.mbeanServer = mbeanServer;
     }
+    
+    public void setListener(SmppStateListener listener) {
+        this.listener = listener;
+        if (this.esmeManagement != null) {
+            this.esmeManagement.setListener(listener);
+        }
+    }
 
     public void start() {
         this.isStarted = true;
@@ -143,6 +152,9 @@ public class SmppManagement implements SmppManagementMBean {
             this.esmeManagement.setMbeanServer(this.mbeanServer);
         }
         this.esmeManagement.start();
+        if (listener != null) {
+            this.esmeManagement.setListener(listener);
+        }
 
         ObjectName esmeObjNname = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT
                 + ",name=" + this.getName());

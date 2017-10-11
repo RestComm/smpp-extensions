@@ -30,6 +30,7 @@ import javolution.util.FastList;
 import javolution.util.FastMap;
 
 import org.apache.log4j.Logger;
+import org.restcomm.smpp.oam.SessionKey;
 
 import com.cloudhopper.smpp.PduAsyncResponse;
 import com.cloudhopper.smpp.SmppSession;
@@ -343,8 +344,10 @@ public class SmppClientOpsThread implements Runnable {
 				config0.setSslConfiguration(sslConfiguration);
 			}
 
+			esmeManagement.sessionClosed(new SessionKey(esme.getName(), esme.getLocalSessionId()));
 			logger.debug("Binding with ESME " + esme.getName() + " systemId=" + esme.getSystemId());
 			esme.nextLocalSessionId();
+			esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
 			session0 = clientBootstrap.bind(config0, sessionHandler);
 
 			// Set in ESME
