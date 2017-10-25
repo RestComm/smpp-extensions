@@ -21,10 +21,12 @@
  */
 package org.restcomm.smpp;
 
-import javolution.util.FastList;
+import org.apache.log4j.Logger;
 
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppSession;
+
+import javolution.util.FastList;
 
 /**
  * 
@@ -32,6 +34,9 @@ import com.cloudhopper.smpp.SmppSession;
  * 
  */
 public class EsmeCluster {
+    
+    private final Logger LOG = Logger.getLogger(EsmeCluster.class);
+
 	private final String clusterName;
 	private final FastList<Esme> esmes = new FastList<Esme>();
     private final int networkId;
@@ -83,24 +88,63 @@ public class EsmeCluster {
 	 * 
 	 * @return
 	 */
-	synchronized Esme getNextEsme() {
+	synchronized Esme getNextEsme(final boolean anUpdateIndex) {
+	    int idx = index;
+	    if (LOG.isDebugEnabled()) {
+	        LOG.debug("Index: " + idx + ". Getting next ESME.");
+	    }
 		// TODO synchronized is correct here?
 		for (int i = 0; i < this.esmesToSendPdu.size(); i++) {
-			this.index++;
-			if (this.index >= this.esmesToSendPdu.size()) {
-				this.index = 0;
+			idx++;
+			if (idx >= this.esmesToSendPdu.size()) {
+				idx = 0;
 			}
 
-			Esme esme = this.esmesToSendPdu.get(this.index);
+			Esme esme = this.esmesToSendPdu.get(idx);
 			if (esme.isBound()) {
+		        if (LOG.isDebugEnabled()) {
+		            LOG.debug("Index: " + idx + ". Using ESME: " + esme.getName() + ".");
+		        }
+		        if (anUpdateIndex) {
+		            index = idx;
+		        }
 				return esme;
 			}
 		}
-
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Index: " + idx + ". Next ESME not selected.");
+        }
+        if (anUpdateIndex) {
+            index = idx;
+        }
 		return null;
 	}
+
 
 	boolean hasMoreEsmes() {
 		return (esmes.size() > 0);
 	}
+
+    @Override
+    public String toString() {
+        final int countAll = esmes.size();
+        final int countEsmesForSending = esmesToSendPdu.size();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(clusterName).append("[");
+        for (int i = 0; i < countAll; i++) {
+            sb.append(esmes.get(i).getName());
+            if (i < countAll - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("][");
+        for (int i = 0; i < countEsmesForSending; i++) {
+            sb.append(esmesToSendPdu.get(i).getName());
+            if (i < countEsmesForSending - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

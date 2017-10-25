@@ -159,14 +159,14 @@ public class EsmeManagement implements EsmeManagementMBean {
 	}
 
 	@Override
-	public Esme getEsmeByClusterName(String esmeClusterName) {
-		EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
+	public Esme getEsmeByClusterName(final String esmeClusterName, final boolean anIndexUpdate) {
+		final EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
 		if (esmeCluster != null) {
-			return esmeCluster.getNextEsme();
+			return esmeCluster.getNextEsme(anIndexUpdate);
 		}
 		return null;
 	}
-
+	
 	protected Esme getEsmeByPrimaryKey(String SystemId, String host, int port, SmppBindType smppBindType) {
 
 		// Check for actual SystemId, host and port

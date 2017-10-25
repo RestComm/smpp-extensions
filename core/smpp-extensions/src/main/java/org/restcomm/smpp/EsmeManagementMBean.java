@@ -35,7 +35,7 @@ public interface EsmeManagementMBean {
 
 	Esme getEsmeByName(String esmeName);
 
-	Esme getEsmeByClusterName(String esmeClusterName);
+	Esme getEsmeByClusterName(String esmeClusterName, boolean anIndexUpdate);
 
     Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
             String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
