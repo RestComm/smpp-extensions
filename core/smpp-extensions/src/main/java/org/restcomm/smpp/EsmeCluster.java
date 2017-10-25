@@ -103,4 +103,41 @@ public class EsmeCluster {
 	boolean hasMoreEsmes() {
 		return (esmes.size() > 0);
 	}
+	
+    /**
+     * Checks if is OK for given request parameters.
+     *
+     * @param aTon the TON
+     * @param anNpi the NPI
+     * @param anAddress the address
+     * @param aName the a name
+     * @return true, if is OK for give parameters
+     */
+    public boolean isOkFor(final int aTon, final int anNpi, final String anAddress, final String aName) {
+        for (FastList.Node<Esme> n = esmesToSendPdu.head(), end = esmesToSendPdu.tail(); (n = n.getNext()) != end;) {
+            final Esme esme = n.getValue();
+            if (esme.getName().equals(aName)) {
+                continue;
+            }
+            if (esme.isRoutingAddressMatching(aTon, anNpi, anAddress)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        final int count = esmes.size();
+        final StringBuilder sb = new StringBuilder();
+        sb.append(clusterName).append("[");
+        for (int i = 0; i < count; i++) {
+            sb.append(esmes.get(i).getName());
+            if (i < count - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
+    }
 }

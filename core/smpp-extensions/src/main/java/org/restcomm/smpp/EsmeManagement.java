@@ -74,6 +74,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 	private static final String CLASS_ATTRIBUTE = "type";
 	private static final XMLBinding binding = new XMLBinding();
 	private static final String PERSIST_FILE_NAME = "esme.xml";
+	
+	private static final String ESME_CLUSTERS_SEPARATOR = ",";
 
 	private final String name;
 
@@ -83,7 +85,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 	protected FastMap<String, Long> esmesServer = new FastMap<String, Long>();
 
-	protected FastMap<String, EsmeCluster> esmeClusters = new FastMap<String, EsmeCluster>();
+	protected final FastMap<String, EsmeCluster> esmeClusters = new FastMap<String, EsmeCluster>();
+	protected final FastMap<Integer, EsmeCluster> esmeClusterByNetworkId = new FastMap<Integer, EsmeCluster>();
 
 	private final TextBuilder persistFile = TextBuilder.newInstance();
 
@@ -213,7 +216,7 @@ public class EsmeManagement implements EsmeManagementMBean {
             String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long clientBindTimeout,
             long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
             int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi,
-            String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
+            String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, String networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
             int maxMessageLength) throws Exception {
@@ -280,35 +283,23 @@ public class EsmeManagement implements EsmeManagementMBean {
 //						host, port, smppBindType));
 //			}
 		}// for loop
-
-		EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
-        if (esmeCluster != null) {
-            if (esmeCluster.getNetworkId() != networkId) {
-                throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_WRONG_NETWORKID_IN_ESMECLUSTER, esmeCluster.getNetworkId(), networkId));
-            }
-        }
-
-		if (clusterName == null) {
-			clusterName = name;
-		}
+		
+		final String clusterNames = correctClusterName(clusterName, name).trim();
+		final int[] networkIds = validateClustersAndNetworkIds(clusterNames, networkId);
 
         Esme esme = new Esme(name, systemId, password, host, port, chargingEnabled, systemType, smppInterfaceVersionTypeObj,
                 ton, npi, address, smppBindTypeOb, smppSessionTypeObj, windowSize, connectTimeout, requestExpiryTimeout,
-                clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay,
+                clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterNames, countersEnabled, enquireLinkDelay,
                 enquireLinkDelayServer, linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi,
-                routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
+                routingAddressRange, networkIds[0], splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
                 rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);
+        esme.setNetworkIds(networkIds);
 
 		esme.esmeManagement = this;
 
 		esmes.add(esme);
 
-		if (esmeCluster == null) {
-			esmeCluster = new EsmeCluster(clusterName, networkId);
-			this.esmeClusters.put(clusterName, esmeCluster);
-		}
-
-		esmeCluster.addEsme(esme);
+		addEsmeToClusters(esme);
 
 		this.store();
 
@@ -316,8 +307,8 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 		return esme;
 	}
-
-	public Esme destroyEsme(String esmeName) throws Exception {
+    
+    public Esme destroyEsme(String esmeName) throws Exception {
 		Esme esme = this.getEsmeByName(esmeName);
 		if (esme == null) {
 			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
@@ -329,11 +320,12 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 		esmes.remove(esme);
 
-		EsmeCluster esmeCluster = this.esmeClusters.get(esme.getClusterName());
-		esmeCluster.removeEsme(esme);
-
-		if (!esmeCluster.hasMoreEsmes()) {
-			this.esmeClusters.remove(esme.getClusterName());
+		for(final EsmeCluster esmeCluster : esmeClusters.values()) {
+		    esmeCluster.removeEsme(esme);
+	        if (!esmeCluster.hasMoreEsmes()) {
+	            esmeClusters.remove(esme.getClusterName());
+	            esmeClusterByNetworkId.remove(esmeCluster.getNetworkId());
+	        }
 		}
 
 		this.store();
@@ -417,7 +409,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 
         try {
 					if (this.mbeanServer == null) {
-						this.mbeanServer = MBeanServerLocator.locateJBoss();
+            this.mbeanServer = MBeanServerLocator.locateJBoss();
 					}
         } catch (Exception e) {
         }
@@ -535,15 +527,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 				
 				esme.esmeManagement = this;
 				
-				String esmeClusterName = esme.getClusterName();
-				EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
-				if (esmeCluster == null) {
-					esmeCluster = new EsmeCluster(esmeClusterName, esme.getNetworkId());
-					this.esmeClusters.put(esmeClusterName, esmeCluster);
-                } else {
-                    esme.setNetworkId(esmeCluster.getNetworkId());
-                }
-                esmeCluster.addEsme(esme);
+				addEsmeToClusters(esme);
 			}
 
 			reader.close();
@@ -552,7 +536,17 @@ public class EsmeManagement implements EsmeManagementMBean {
 			// "Error while re-creating Linksets from persisted file", ex);
 		}
 	}
-
+	
+    /**
+     * Gets the ESME cluster.
+     *
+     * @param aNetworkId the network ID
+     * @return the ESME cluster
+     */
+    public EsmeCluster getEsmeCluster(final int aNetworkId) {
+        return esmeClusterByNetworkId.get(aNetworkId);
+    }
+	
 	private void registerEsmeMbean(Esme esme) {
 		try {
 			ObjectName esmeObjNname = new ObjectName(SmppManagement.JMX_DOMAIN + ":layer=Esme,name=" + esme.getName());
@@ -585,6 +579,72 @@ public class EsmeManagement implements EsmeManagementMBean {
 			logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
 		}
 	}
+
+    private void addEsmeToClusters(final Esme anEsme) {
+        final int[] networkIds = anEsme.getNetworkIds();
+        final String[] clusterNames = anEsme.getClusterName().split(ESME_CLUSTERS_SEPARATOR);
+        for (int i = 0; i < clusterNames.length; i++) {
+            addEsmeToCluster(anEsme, clusterNames[i].trim(), networkIds[i]);
+        }
+    }
+    
+    private void addEsmeToCluster(final Esme anEsme,
+            final String aClusterName, final int aNetworkId) {
+        getEsmeCluster(aClusterName, aNetworkId).addEsme(anEsme);
+    }
+    
+    private EsmeCluster getEsmeCluster(final String aName,
+            final int aNetworkId) {
+        final EsmeCluster ec = esmeClusters.get(aName);
+        if (ec == null) {
+            final EsmeCluster nec = new EsmeCluster(aName, aNetworkId);
+            esmeClusters.put(aName, nec);
+            esmeClusterByNetworkId.put(aNetworkId, nec);
+            return nec;
+        }
+        return ec;
+    }
+
+    private static String correctClusterName(final String aClusterName, final String anEsmeName) throws EsmeManagementException {
+        if (aClusterName == null) {
+            if (anEsmeName == null) {
+                throw new EsmeManagementException("EsmeName is not specified.");
+            }
+            return anEsmeName;
+        }
+        return aClusterName;
+    }
+
+    private int[] validateClustersAndNetworkIds(final String aClusterName, final String aNetworkId)
+            throws EsmeManagementException {
+        if ((aClusterName == null) || aClusterName.isEmpty()) {
+            throw new EsmeManagementException("Clusters name is not specified.");
+        }
+        final String[] clusters = aClusterName.split(ESME_CLUSTERS_SEPARATOR);
+        final String[] networkIds = aNetworkId.split(ESME_CLUSTERS_SEPARATOR);
+        if (clusters.length != networkIds.length) {
+            throw new EsmeManagementException("Clusters count (" + clusters.length
+                    + ") does not match NetworkIds count (" + networkIds.length + ").");
+        }
+        final int r[] = new int[clusters.length];
+        for (int i = 0; i < clusters.length; i++) {
+            try {
+                r[i] = Integer.parseInt(networkIds[i]);
+            } catch (NumberFormatException e) {
+                throw new EsmeManagementException(
+                        "NetworkId for cluster " + clusters[i].trim() + " has non-integer value: " + networkIds[i] + ".");
+            }
+            final EsmeCluster c = this.esmeClusters.get(clusters[i].trim());
+            if (c == null) {
+                continue;
+            }
+            if (c.getNetworkId() != r[i]) {
+                throw new EsmeManagementException("NetworkId for cluster " + c + " has invalid value. Expected: "
+                        + c.getNetworkId() + ". Actual: " + networkIds[i] + ".");
+            }
+        }
+        return r;
+    }
 
     private class MessageCleanerTimerTask extends TimerTask {
 
