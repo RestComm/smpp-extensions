@@ -9,12 +9,6 @@
         <resource-root path="ch-commons-util-${ch-commons-util.version}.jar"/>
         <resource-root path="ch-smpp-${ch.smpp.version}.jar"/>
 
-        <resource-root path="scheduler-${jss7.restcomm.version}.jar"/>
-        <resource-root path="shell-server-api-${jss7.restcomm.version}.jar"/>
-        <resource-root path="shell-server-impl-${jss7.restcomm.version}.jar"/>
-        <resource-root path="shell-transport-${jss7.restcomm.version}.jar"/>
-
-        <resource-root path="javolution-${javolution.version}.jar"/>
         <resource-root path="netty-${netty.version}.jar"/>
         <resource-root path="joda-time-${joda-time.version}.jar"/>
     </resources>
@@ -36,5 +30,6 @@
         <module name="org.jboss.msc"/>
         <module name="org.jboss.logging"/>
         <module name="org.slf4j"/>
+        <module name="org.mobicents.ss7.commons"/>
     </dependencies>
 </module>

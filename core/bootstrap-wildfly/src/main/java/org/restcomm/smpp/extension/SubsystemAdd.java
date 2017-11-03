@@ -14,6 +14,7 @@ import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.restcomm.smpp.service.SmppService;
+import org.restcomm.smpp.service.SmppServiceInterface;
 
 import javax.management.MBeanServer;
 import java.util.List;
@@ -51,7 +52,7 @@ class SubsystemAdd extends AbstractBoottimeAddStepHandler {
         service.setModel(fullModel);
 
         ServiceName name = SmppService.getServiceName();
-        ServiceController<SmppService> controller = context.getServiceTarget()
+        ServiceController<SmppServiceInterface> controller = context.getServiceTarget()
                 .addService(name, service)
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())
                 .addDependency(MBeanServerService.SERVICE_NAME, MBeanServer.class, service.getMbeanServer())

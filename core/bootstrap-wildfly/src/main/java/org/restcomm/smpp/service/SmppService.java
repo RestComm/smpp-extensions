@@ -18,7 +18,7 @@ import org.restcomm.smpp.oam.SmppShellExecutor;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-public class SmppService implements Service<SmppService> {
+public class SmppService implements SmppServiceInterface,Service<SmppServiceInterface> {
 
     public static final SmppService INSTANCE = new SmppService();
 
@@ -40,7 +40,7 @@ public class SmppService implements Service<SmppService> {
     private static final String DATA_DIR = "jboss.server.data.dir";
 
     private ModelNode fullModel;
-
+    
     private Scheduler schedulerMBean = null;
     private SmppManagement smppManagementMBean = null;
     private SmppShellExecutor smppShellExecutor = null;
@@ -101,31 +101,14 @@ public class SmppService implements Service<SmppService> {
         log.info("Starting SmppExtension Service");
 
         String dataDir = pathManagerInjector.getValue().getPathEntry(DATA_DIR).resolvePath();
-
-        // ss7Clock
-        DefaultClock ss7Clock = null;
-        try {
-            ss7Clock = new DefaultClock();
-        } catch (Exception e) {
-            log.warn("SS7Clock MBean creating is failed: " + e);
-        }
-
-        // schedulerMBean
-        schedulerMBean = null;
-        try {
-            schedulerMBean = new Scheduler();
-            schedulerMBean.setClock(ss7Clock);
-        } catch (Exception e) {
-            log.warn("SS7Scheduler MBean creating is failed: " + e);
-        }
-
+        
         // smppManagementMBean
         smppManagementMBean = SmppManagement.getInstance("SmppManagement");
         smppManagementMBean.setMbeanServer(getMbeanServer().getValue());
         smppManagementMBean.setPersistDir(dataDir);
         smppManagementMBean.start();
         registerMBean(smppManagementMBean, "org.restcomm.smpp:name=SmppManagement");
-
+        
         smppShellExecutor = null;
         try {
             smppShellExecutor = new SmppShellExecutor();
@@ -133,34 +116,65 @@ public class SmppService implements Service<SmppService> {
         } catch (Exception e) {
             log.warn("SccpExecutor MBean creating is failed: " + e);
         }
+        
+        System.out.println("SMPP shellExecutorExists():" + shellExecutorExists());
+        
+        if(shellExecutorExists()) {
+        	// ss7Clock
+            DefaultClock ss7Clock = null;
+            try {
+                ss7Clock = new DefaultClock();
+            } catch (Exception e) {
+                log.warn("SS7Clock MBean creating is failed: " + e);
+            }
 
-        shellExecutorMBean = null;
-        try {
-            FastList<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
-            shellExecutors.add(smppShellExecutor);
+            // schedulerMBean
+            schedulerMBean = null;
+            try {
+                schedulerMBean = new Scheduler();
+                schedulerMBean.setClock(ss7Clock);
+            } catch (Exception e) {
+                log.warn("SS7Scheduler MBean creating is failed: " + e);
+            }
 
-            String address = getPropertyString("ShellExecutor", "address", "127.0.0.1");
-            int port = getPropertyInt("ShellExecutor", "port", 3435);
-            String securityDomain = getPropertyString("ShellExecutor", "securityDomain", "jmx-console");
+            shellExecutorMBean = null;
+            try {
+                FastList<ShellExecutor> shellExecutors = new FastList<ShellExecutor>();
+                shellExecutors.add(smppShellExecutor);
 
-            shellExecutorMBean = new ShellServerWildFly(schedulerMBean, shellExecutors);
-            shellExecutorMBean.setAddress(address);
-            shellExecutorMBean.setPort(port);
-            shellExecutorMBean.setSecurityDomain(securityDomain);
-        } catch (Exception e) {
-            throw new StartException("ShellExecutor MBean creating is failed: " + e.getMessage(), e);
+                String address = getPropertyString("ShellExecutor", "address", "127.0.0.1");
+                int port = getPropertyInt("ShellExecutor", "port", 3436);
+                String securityDomain = getPropertyString("ShellExecutor", "securityDomain", "jmx-console");
+
+                shellExecutorMBean = new ShellServerWildFly(schedulerMBean, shellExecutors);
+                shellExecutorMBean.setAddress(address);
+                shellExecutorMBean.setPort(port);
+                shellExecutorMBean.setSecurityDomain(securityDomain);
+            } catch (Exception e) {
+                throw new StartException("ShellExecutor MBean creating is failed: " + e.getMessage(), e);
+            }
+
+            // starting
+            try {
+                schedulerMBean.start();
+                shellExecutorMBean.start();
+            } catch (Exception e) {
+                throw new StartException("MBeans starting is failed: " + e.getMessage(), e);
+            }
         }
-
-        // starting
+        
         try {
-            schedulerMBean.start();
             smppShellExecutor.start();
-            shellExecutorMBean.start();
         } catch (Exception e) {
             throw new StartException("MBeans starting is failed: " + e.getMessage(), e);
         }
     }
 
+    private boolean shellExecutorExists() {
+        ModelNode shellExecutorNode = peek(fullModel, "mbean", "ShellExecutor");
+        return shellExecutorNode != null;
+    }
+    
     @Override
     public void stop(StopContext context) {
         log.info("Stopping SmppExtension Service");
@@ -184,11 +198,20 @@ public class SmppService implements Service<SmppService> {
         }
     }
 
-    private void unregisterMBean(String name) {
+    @SuppressWarnings("unused")
+	private void unregisterMBean(String name) {
         try {
             getMbeanServer().getValue().unregisterMBean(new ObjectName(name));
         } catch (Throwable e) {
             log.error("failed to unregister mbean", e);
         }
     }
+
+	public SmppShellExecutor getSmppShellExecutor() {
+		return smppShellExecutor;
+	}
+    
+	public SmppManagement getSmppManagementMBean() {
+		return smppManagementMBean;
+	}
 }

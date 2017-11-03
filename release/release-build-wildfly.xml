@@ -49,7 +49,7 @@
 
 		<!-- adding of ss7 subsystem into standalone.xml -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
-			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][@reflection]]"/>
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:smpp-extensions:1.0'][@reflection]]"/>
 			<insert path="/:server/:profile/*[local-name()='subsystem'][last()]" position="after" file="template/wildfly-smpp-subsystem.txt"></insert>
 		</xmltask> 
 
@@ -78,6 +78,10 @@
 			</fileset>			
 		</copy>
 
+		<!-- Copy SS7 commons modules -->
+		<ant antfile="${jboss.home}/../extra/restcomm-ss7/ss7-wildfly/build.xml" target="deploy-commons">
+			<property name="basedir" value="${jboss.home}/../extra/restcomm-ss7/ss7-wildfly" />	
+		</ant>
 	</target>
 
 	<target name="undeploy">
@@ -91,7 +95,7 @@
 		</xmltask>
 
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
-			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][@name='SS7Clock']]"/>
+			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:smpp-extensions:1.0']]"/>
 		</xmltask>
 
 		<delete dir="${restcomm-smpp.path}" />
