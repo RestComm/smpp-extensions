@@ -246,6 +246,8 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			esmeServer.resetEnquireLinkFail();
 			this.smppServerOpsThread.removeEnquireList(esmeName);
 			this.smppSessionHandlerInterface.destroySmppSessionHandler(esmeServer);
+			//bringing back to close
+			esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
 			
             DefaultSmppSession defaultSession = (DefaultSmppSession) session;
 
@@ -261,8 +263,6 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			// make sure it's really shutdown
 			session.destroy();
 
-			//bringing back to close
-			esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
 		} finally {
             accessSemaphore.release();
         }
