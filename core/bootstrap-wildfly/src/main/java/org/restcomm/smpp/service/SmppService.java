@@ -101,6 +101,7 @@ public class SmppService implements SmppServiceInterface,Service<SmppServiceInte
         log.info("Starting SmppExtension Service");
 
         String dataDir = pathManagerInjector.getValue().getPathEntry(DATA_DIR).resolvePath();
+        log.info("smpp dataDir: " + dataDir);
         
         // smppManagementMBean
         smppManagementMBean = SmppManagement.getInstance("SmppManagement");

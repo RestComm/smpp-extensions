@@ -16,6 +16,7 @@
 	<property name="jboss.modules.path" value="${jboss.home}/modules/system/layers/base" />
 	<property name="jboss.standalone.path" value="${jboss.home}/standalone" />
 	<property name="restcomm-smpp.path" value="${jboss.modules.path}/org/restcomm/smpp/bootstrap" />
+	<property name="restcomm-ss7.path" value="${jboss.modules.path}/org/mobicents/ss7" />
 
 	<condition property="file_url" value="file:/">
 		<os family="windows" />
@@ -40,20 +41,20 @@
 		<xmlproperty file="${jboss.standalone.path}/configuration/standalone.xml" keeproot="true"/>
 		<property name="serverXmlns" value="${server(xmlns)}"/>
 
-		<!-- adding of "<extension module="org.mobicents.ss7.extension"/>" into standalone.xml -->
+		<!-- adding of "<extension module="org.mobicents.smpp.bootstrap/>" into standalone.xml -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
 			<insert path="/:server/:extensions/:extension[last()]" position="after">
 				<![CDATA[<extension xmlns="${serverXmlns}" module="org.restcomm.smpp.bootstrap"/>]]>
 			</insert>
 		</xmltask>
 
-		<!-- adding of ss7 subsystem into standalone.xml -->
+		<!-- adding of smpp subsystem into standalone.xml -->
 		<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
 			<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:smpp-extensions:1.0'][@reflection]]"/>
 			<insert path="/:server/:profile/*[local-name()='subsystem'][last()]" position="after" file="template/wildfly-smpp-subsystem.txt"></insert>
 		</xmltask> 
 
-		<!-- Copy jSS7 Extension with Modules -->
+		<!-- Copy SMPP Extension with Modules -->
 		<copy overwrite="true" todir="${restcomm-smpp.path}">
 			<fileset dir="${basedir}/restcomm-smpp-server">
 				<include name="*/**" />
@@ -79,9 +80,16 @@
 		</copy>
 
 		<!-- Copy SS7 commons modules -->
+		<copy overwrite="true" todir="${restcomm-ss7.path}/commons">
+			<fileset dir="${basedir}/commons">
+				<include name="*/**" />
+			</fileset>
+		</copy>
+<!--
 		<ant antfile="${jboss.home}/../extra/restcomm-ss7/ss7-wildfly/build.xml" target="deploy-commons">
 			<property name="basedir" value="${jboss.home}/../extra/restcomm-ss7/ss7-wildfly" />	
 		</ant>
+-->
 	</target>
 
 	<target name="undeploy">

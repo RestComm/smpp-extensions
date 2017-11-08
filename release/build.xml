@@ -8,7 +8,7 @@
 	<property name="docs.dir" location="${restcomm.smpp.dist}/_docs" />
 
 	<!--Versions -->
-	<property name="restcomm.jss7.version" value="7.4.0-9" />
+	<property name="restcomm.jss7.version" value="7.4.0-65" />
 	<property name="release.version" value="${smpp.release.version}"/>
 
 	<property name="github.url" value="https://github.com/RestComm" />
@@ -103,6 +103,13 @@
 			  failonerror="true"/>
 		<copy file="${smpp.dir}/release/xmltask.jar" tofile="${restcomm.smpp.dist}/wildfly/xmltask.jar"
 			  failonerror="true"/>
+
+		<!-- Copy a jSS7 WildFly common module -->
+    	<copy todir="${restcomm.smpp.dist}/wildfly/commons" failonerror="true">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}/ss7-wildfly/restcomm-ss7-service/commons">
+				<include name="**/*" />
+			</fileset>
+		</copy>
     </target>
 
 	<target name="build-smpp">
