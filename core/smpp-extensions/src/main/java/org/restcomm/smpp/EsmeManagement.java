@@ -216,7 +216,7 @@ public class EsmeManagement implements EsmeManagementMBean {
             String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
-            int maxMessageLength) throws Exception {
+            int maxMessageLength, int overloadThreshold, int normalThreshold) throws Exception {
 
 		SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
 
@@ -297,7 +297,7 @@ public class EsmeManagement implements EsmeManagementMBean {
                 clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay,
                 enquireLinkDelayServer, linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi,
                 routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
-                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength, overloadThreshold, normalThreshold);
 
 		esme.esmeManagement = this;
 

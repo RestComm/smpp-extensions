@@ -109,6 +109,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private static final String MAX_MESSAGE_LENGTH = "maxMessageLength";
 
 	private static final String STARTED = "started";
+	
+	private static final String OVERLOAD_THRESHOLD = "overloadThreshold";
+	private static final String NORMAL_THRESHOLD = "normalThreshold";
 
 	private String name;
 	private String clusterName;
@@ -236,6 +239,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private String localState = SmppSession.STATES[SmppSession.STATE_CLOSED];
 
 	private transient DefaultSmppSession defaultSmppSession = null;
+	
+	private int overloadThreshold;
+	private int normalThreshold;
+	
+	private boolean overloaded;
 
 	public Esme() {
 
@@ -292,7 +300,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
             int networkId, boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
-            int maxMessageLength
+            int maxMessageLength, int overloadThreshold, int normalThreshold
 
     ) {
 		this.name = name;
@@ -358,6 +366,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         this.destAddrSendLimit = destAddrSendLimit;
         this.minMessageLength = minMessageLength;
         this.maxMessageLength = maxMessageLength;
+        
+        this.overloadThreshold = overloadThreshold;
+        this.normalThreshold = normalThreshold;
 	}
 
     
@@ -1142,6 +1153,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             esme.destAddrSendLimit = xml.getAttribute(DEST_ADDR_SEND_LIMIT, 0);
             esme.minMessageLength = xml.getAttribute(MIN_MESSAGE_LENGTH, -1);
             esme.maxMessageLength = xml.getAttribute(MAX_MESSAGE_LENGTH, -1);
+            esme.overloadThreshold = xml.getAttribute(OVERLOAD_THRESHOLD, -1);
+            esme.normalThreshold = xml.getAttribute(NORMAL_THRESHOLD, -1);
 
 			// SSL
 			esme.useSsl = xml.getAttribute(USE_SSL, false);
@@ -1234,6 +1247,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 			xml.setAttribute(ROUTING_TON, esme.routingTon);
 			xml.setAttribute(ROUTING_NPI, esme.routingNpi);
 			xml.setAttribute(ROUTING_ADDRESS_RANGE, esme.routingAddressRange);
+			
+			xml.setAttribute(OVERLOAD_THRESHOLD, esme.overloadThreshold);
+			xml.setAttribute(NORMAL_THRESHOLD, esme.normalThreshold);
 
 			// SSl
 			xml.setAttribute(USE_SSL, esme.useSsl);
@@ -1299,6 +1315,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 .append(SmppOamMessages.SHOW_DEST_ADDR_SEND_LIMIT).append(this.destAddrSendLimit)
                 .append(SmppOamMessages.MIN_MESSAGE_LENGTH).append(this.getMinMessageLength())
                 .append(SmppOamMessages.MAX_MESSAGE_LENGTH).append(this.getMaxMessageLength())
+                .append(SmppOamMessages.OVERLOAD_THRESHOLD).append(this.overloadThreshold)
+                .append(SmppOamMessages.NORMAL_THRESHOLD).append(this.normalThreshold)
                 .append(SmppOamMessages.SPLIT_LONG_MESSAGES).append(this.splitLongMessages);
 
         sb.append(SmppOamMessages.NEW_LINE);
@@ -1789,8 +1807,43 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         return this.receivedMsgPerDay.get();
     }
 
+    @Override
+    public int getOverloadThreshold() {
+        return overloadThreshold;
+    }
 
-	@Override
+    @Override
+    public void setOverloadThreshold(int overloadThreshold) {
+        if (overloadThreshold >= 0) { 
+            this.overloadThreshold = overloadThreshold;
+        }
+        this.store();
+    }
+
+    @Override
+    public int getNormalThreshold() {
+        return normalThreshold;
+    }
+
+    @Override
+    public void setNormalThreshold(int normalThreshold) {
+        if(normalThreshold >= 0) {
+            this.normalThreshold = normalThreshold;
+        }
+        this.store();
+    }
+
+    @Override
+    public boolean isOverloaded() {
+        return overloaded;
+    }
+
+    @Override
+    public void setOverloaded(boolean overloaded) {
+        this.overloaded = overloaded;
+    }
+
+    @Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;

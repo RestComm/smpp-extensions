@@ -212,6 +212,12 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("max-message-length")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setMaxMessageLength(val);
+            } else if (key.equals("overload-threshold")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setOverloadThreshold(val);
+            } else if (key.equals("normal-threshold")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setNormalThreshold(val);
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -233,7 +239,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour
      * <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
-     * max-message-length <max-message-length>
+     * max-message-length <max-message-length> overload-threshold <overload-threshold> normal-threshold <normal-threshold>
      * 
      * @param args
      * @return
@@ -323,6 +329,9 @@ public class SmppShellExecutor implements ShellExecutor {
         int destAddrSendLimit = 0;
         int minMessageLength = -1;
         int maxMessageLength = -1;
+        
+        int overloadThreshold = -1;
+        int normalThreshold = -1;
 
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
@@ -403,6 +412,10 @@ public class SmppShellExecutor implements ShellExecutor {
                 minMessageLength = Integer.parseInt(args[count++]);
             } else if (key.equals("max-message-length")) {
                 maxMessageLength = Integer.parseInt(args[count++]);
+            } else if (key.equals("overload-threshold")) {
+                overloadThreshold = Integer.parseInt(args[count++]);
+            } else if (key.equals("normal-threshold")) {
+                normalThreshold = Integer.parseInt(args[count++]);
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -415,7 +428,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay, enquireLinkDelayServer, linkDropServer,
                 sourceTon, sourceNpi, sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId,
                 splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay,
-                nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);
+                nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength, 
+                overloadThreshold, normalThreshold);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 
