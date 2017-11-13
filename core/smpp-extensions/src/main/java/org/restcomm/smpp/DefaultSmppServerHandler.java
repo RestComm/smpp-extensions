@@ -261,7 +261,11 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             }
 
 			// make sure it's really shutdown
-			session.destroy();
+            try {
+                session.destroy();
+            } catch (Exception e) {
+                logger.warn("Exception when invoking of session.destroy() from sessionDestroyed()", e);
+            }
 
 		} finally {
             accessSemaphore.release();
