@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  
+ * TeleStax, Open Source Cloud Communications
  * Copyright 2012, Telestax Inc and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -52,7 +52,6 @@ import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 import org.restcomm.smpp.oam.SmppOamMessages;
 
 import com.cloudhopper.smpp.SmppBindType;
@@ -417,7 +416,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 
         try {
 					if (this.mbeanServer == null) {
-						this.mbeanServer = MBeanServerLocator.locateJBoss();
+						this.mbeanServer = JBossMbeanLocator.locateJBoss();
 					}
         } catch (Exception e) {
         }
@@ -447,7 +446,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 			this.registerEsmeMbean(esme);
 		}
 
-		// setting a timer for cleaning of 
+		// setting a timer for cleaning of
         this.clearMessageClearTimer();
         this.timer = new Timer();
         this.timerTask = new MessageCleanerTimerTask();
@@ -500,7 +499,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 
 	/**
 	 * Load and create LinkSets and Link from persisted file
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	public void load() throws FileNotFoundException {
@@ -532,9 +531,9 @@ public class EsmeManagement implements EsmeManagementMBean {
 			// Populate cluster
 			for (FastList.Node<Esme> n = this.esmes.head(), end = this.esmes.tail(); (n = n.getNext()) != end;) {
 				Esme esme = n.getValue();
-				
+
 				esme.esmeManagement = this;
-				
+
 				String esmeClusterName = esme.getClusterName();
 				EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
 				if (esmeCluster == null) {

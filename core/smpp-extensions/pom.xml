@@ -32,13 +32,6 @@
 			<version>${ch.smpp.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.jboss.jbossas</groupId>
-			<artifactId>jboss-as-system-jmx</artifactId>
-			<version>${jboss.version}</version>
-			<scope>compile</scope>
-		</dependency>
-
         <dependency>
             <artifactId>shell-server-api</artifactId>
             <groupId>org.mobicents.protocols.ss7.management</groupId>
