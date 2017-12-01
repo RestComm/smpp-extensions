@@ -27,6 +27,7 @@
 				<th>SystemId</th>
 				<th>Type</th>
 				<th>State</th>
+				<th>Overloaded</th>
 				<th style="text-align: center; width: 150px;">Actions</th>
 			</tr>
 		</thead>
@@ -417,14 +418,14 @@
 				</div>
 				
 				<div id="div-overloadThreshold" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for builds up to this value, the Overload Threshold will be triggered.">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for builds up to this value, the Overload Threshold will be triggered. Default value is -1, otherwise non-positive value will be ignored. Overload Threshold cannot be set unless Normal Threshold has been already defined.">
 						<span class="add-on">Overload Threshold</span>
 						<input id="overloadThreshold" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Overload Threshold" value="-1"/>
 					</span>	
 				</div>		
 				
 				<div id="div-normalThreshold" class="control-group">
-					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for goes down to this value, the Normal Threshold will be triggered.">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for goes down to this value, the Normal Threshold will be triggered. Default value is -1, otherwise negative value will be ignored. It won't be possible to set Normal Threshold to -1 if Overload Threshold is currently set.">
 						<span class="add-on">Normal Threshold</span>
 						<input id="normalThreshold" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Normal Threshold" value="-1"/>
 					</span>	
@@ -596,6 +597,7 @@
 		var systemId = response.value.SystemId;
 		var localType = response.value.LocalTypeName;
 		var state = response.value.StateName;
+		var overloadStatus = response.value.Overloaded;
 		
 		var systemType = response.value.SystemType;
 		var bindType = response.value.BindTypeName;
@@ -690,6 +692,7 @@
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + systemId + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + localType + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + state + '</td>' +
+				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + overloadStatus + '</td>' +
 				'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
 					'<button class="btn btn-small btn-success"' + (isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Start ESME" data-placement="bottom" onclick="esmeOperation(\'startEsme\', \'' + name + '\')"><i class="icon-play"> </i></button> ' +
 					'<button class="btn btn-small btn-danger"' + (!isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Stop ESME" data-placement="bottom" onclick="esmeOperation(\'stopEsme\', \'' + name +  '\')"><i class="icon-stop"> </i></button> ' +

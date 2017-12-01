@@ -92,7 +92,7 @@ public class EsmeCluster {
 			}
 
 			Esme esme = this.esmesToSendPdu.get(this.index);
-			if (esme.isBound() && !esme.isOverloaded()) {
+			if (esme.isBound() && !esme.getOverloaded()) {
 				return esme;
 			}
 		}

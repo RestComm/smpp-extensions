@@ -19,9 +19,9 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-single-shift <national-language-single-shift>
 	national-language-locking-shift <national-language-locking-shift> 
-	dest-addr-send-limit <dest-addr-send-limit>
-	min-message-length <min-message-length value>
-	max-message-length <max-message-length value>
+	dest-addr-send-limit <dest-addr-send-limit> min-message-length 
+	<min-message-length value> max-message-length <max-message-length value>
+	overload-threshold <overload-threshold> normal-threshold <normal-threshold>
 
 DESCRIPTION
 	This command is used to configure a new ESME.
@@ -378,7 +378,7 @@ PARAMETERS
 					and can be overwritten for each ESME created.
 					Default value: 0 - no limitations
 							  
-	min-message-length    - This paramter is used to specify the minimum
+	min-message-length    - This parameter is used to specify the minimum
 					message length (in characters) acceptable to
 					the SMSC GW, for messages coming from this ESME.
 					
@@ -389,7 +389,7 @@ PARAMETERS
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
 					
-	max-message-length    - This paramter is used to specify the maximum
+	max-message-length    - This parameter is used to specify the maximum
 					message length (in characters) acceptable to
 					the SMSC GW, for messages coming from this ESME.
 					
@@ -399,6 +399,23 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
+					
+	overload-threshold    - This value may be used by application to compare 
+					messages queue size with it and based on outcome mark ESME 
+					as 'overloaded'. Then based on this state further 
+					functionality may be applied by application, such as 
+					bypassing this ESME while sending new messages.
+					Default value is -1, otherwise non-positive value 
+					will be ignored. Overload Threshold cannot be set unless 
+					Normal Threshold has been already defined
+	 
+	normal-threshold 	  - This value is opposite to overload-threshold and might 
+					be used as a condition to mark current ESME state as 
+					not 'overloaded' and consequent resuming of sending new messages 
+					through this ESME.
+					Default value is -1, otherwise negative value will be ignored.
+					It won't be possible to set Normal Threshold to -1 if 
+					Overload Threshold is currently set.
 
 EXAMPLES
 	smpp esme create test test 127.0.0.1 -1 TRANSCEIVER SERVER password yyyy esme-range 6667

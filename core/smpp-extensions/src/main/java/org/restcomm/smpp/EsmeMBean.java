@@ -359,7 +359,7 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     void setNormalThreshold(int normalThreshold);
 
-    boolean isOverloaded();
+    boolean getOverloaded();
 
     void setOverloaded(boolean overloaded);
 

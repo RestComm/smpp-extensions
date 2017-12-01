@@ -17,9 +17,9 @@ SYNOPSIS
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-locking-shift <national-language-locking-shift> 
 	national-language-single-shift <national-language-single-shift>
-	dest-addr-send-limit <dest-addr-send-limit>
-	min-message-length <min-message-length value>
-	max-message-length <max-message-length value>
+	dest-addr-send-limit <dest-addr-send-limit> min-message-length 
+	<min-message-length value> max-message-length <max-message-length value>
+	overload-threshold <overload-threshold> normal-threshold <normal-threshold>
 	
 DESCRIPTION
 	This command is used to modify the settings of an existing ESME configuration.
@@ -383,6 +383,20 @@ PARAMETERS
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
 					also implies "no limitations".
+					
+	overload-threshold    - This value may be used by application to compare 
+					messages queue size with it and based on outcome mark ESME 
+					as 'overloaded'. Then based on this state further 
+					functionality may be applied by application, such as 
+					bypassing this ESME while sending new messages.
+	 
+	normal-threshold 	  - This value is opposite to overload-threshold and might 
+					be used as a condition to mark current ESME state as 
+					not 'overloaded' and consequent resuming of sending new messages 
+					through this ESME.
+					Default value is -1, otherwise negative value will be ignored.
+					It won't be possible to set Normal Threshold to -1 if 
+					Overload Threshold is currently set.
 
 EXAMPLES
 	smpp esme modify test password yyyy

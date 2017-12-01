@@ -152,5 +152,7 @@ public interface SmppOamMessages {
 	public static final String OVERLOAD_THRESHOLD = " overloadThreshold=";
 	
 	public static final String NORMAL_THRESHOLD = " normalThreshold=";
+	
+	public static final String OVERLOADED = " overloaded=";
 
 }
