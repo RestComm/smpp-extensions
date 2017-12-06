@@ -92,6 +92,70 @@
 -->
 	</target>
 
+	<target name="deploy-telscale">
+
+			<!-- adding of "org.restcomm.smpp.bootstrap" into /org/telscale/slee/container/lib/main/module.xml -->
+			<xmltask source="${jboss.modules.path}/org/telscale/slee/container/lib/main/module.xml" dest="${jboss.modules.path}/org/telscale/slee/container/lib/main/module.xml">
+				<remove path="/:module/:dependencies/:module[@name='org.restcomm.smpp.bootstrap']"/>
+				<insert path="/:module/:dependencies/:module[last()]" position="after">
+					<![CDATA[<module xmlns="urn:jboss:module:1.0" name="org.restcomm.smpp.bootstrap" export="true"/>]]>
+				</insert>
+			</xmltask> 
+
+			<xmlproperty file="${jboss.standalone.path}/configuration/standalone.xml" keeproot="true"/>
+			<property name="serverXmlns" value="${server(xmlns)}"/>
+
+			<!-- adding of "<extension module="org.mobicents.smpp.bootstrap/>" into standalone.xml -->
+			<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+				<insert path="/:server/:extensions/:extension[last()]" position="after">
+					<![CDATA[<extension xmlns="${serverXmlns}" module="org.restcomm.smpp.bootstrap"/>]]>
+				</insert>
+			</xmltask>
+
+			<!-- adding of smpp subsystem into standalone.xml -->
+			<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+				<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:smpp-extensions:1.0'][@reflection]]"/>
+				<insert path="/:server/:profile/*[local-name()='subsystem'][last()]" position="after" file="template/wildfly-smpp-subsystem.txt"></insert>
+			</xmltask> 
+
+			<!-- Copy SMPP Extension with Modules -->
+			<copy overwrite="true" todir="${restcomm-smpp.path}">
+				<fileset dir="${basedir}/restcomm-smpp-server">
+					<include name="*/**" />
+				</fileset>
+			</copy>
+
+			<copy overwrite="true" todir="${jboss.home}/bin">
+				<fileset dir="${basedir}/../shell/bin">
+					<include name="**" />
+				</fileset>			
+			</copy>
+
+			<copy overwrite="true" todir="${jboss.home}/lib">
+				<fileset dir="${basedir}/../shell/lib">
+					<include name="**" />
+				</fileset>			
+			</copy>
+
+			<copy overwrite="true" todir="${jboss.deploy}">
+				<fileset dir="${basedir}/../oam/new-ui">
+					<include name="**" />
+				</fileset>			
+			</copy>
+
+			<!-- Copy SS7 commons modules -->
+			<copy overwrite="true" todir="${restcomm-ss7.path}/commons">
+				<fileset dir="${basedir}/commons">
+					<include name="*/**" />
+				</fileset>
+			</copy>
+	<!--
+			<ant antfile="${jboss.home}/../extra/restcomm-ss7/ss7-wildfly/build.xml" target="deploy-commons">
+				<property name="basedir" value="${jboss.home}/../extra/restcomm-ss7/ss7-wildfly" />	
+			</ant>
+	-->
+		</target>
+	
 	<target name="undeploy">
 
 		<xmltask source="${jboss.modules.path}/org/restcomm/slee/container/lib/main/module.xml" dest="${jboss.modules.path}/org/restcomm/slee/container/lib/main/module.xml">
@@ -130,4 +194,41 @@
 		<delete file="${jboss.home}/lib/smpp-cli.jar" />
 	</target>
 
+	<target name="undeploy-telscale">
+
+			<xmltask source="${jboss.modules.path}/org/telscale/slee/container/lib/main/module.xml" dest="${jboss.modules.path}/org/telscale/slee/container/lib/main/module.xml">
+				<remove path="/:module/:dependencies/:module[@name='org.restcomm.smpp.bootstrap']"/>
+			</xmltask> 
+
+			<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+				<remove path="/:server/:extensions/:extension[@module='org.restcomm.smpp.bootstrap']"/>
+			</xmltask>
+
+			<xmltask source="${jboss.standalone.path}/configuration/standalone.xml" dest="${jboss.standalone.path}/configuration/standalone.xml">
+				<remove path="/:server/:profile/*[local-name()='subsystem'][*[local-name()='mbean'][namespace-uri()='urn:org.restcomm:smpp-extensions:1.0']]"/>
+			</xmltask>
+
+			<delete dir="${restcomm-smpp.path}" />
+
+			<delete file="${jboss.deploy}/smpp-management.war" />
+			<delete file="${jboss.deploy}/jolokia.war" />
+
+			<delete file="${jboss.home}/bin/ss7-cli.sh" />
+			<delete file="${jboss.home}/bin/ss7-cli.bat" />
+
+			<delete verbose="true">
+				<fileset dir="${jboss.home}/lib" includes="**/jansi-*.jar"/>
+			</delete>
+			<delete verbose="true">
+				<fileset dir="${jboss.home}/lib" includes="**/javolution-*.jar"/>
+			</delete>
+			<delete verbose="true">
+				<fileset dir="${jboss.home}/lib" includes="**/jreadline-*.jar"/>
+			</delete>
+			<delete verbose="true">
+				<fileset dir="${jboss.home}/lib" includes="**/shell-transport-*.jar"/>
+			</delete>
+			<delete file="${jboss.home}/lib/restcomm-ss7-shell.jar" />
+			<delete file="${jboss.home}/lib/smpp-cli.jar" />
+		</target>
 </project>
