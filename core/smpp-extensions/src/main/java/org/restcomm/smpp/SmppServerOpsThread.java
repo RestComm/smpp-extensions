@@ -35,228 +35,222 @@ import java.util.Iterator;
  * @author nhanth87
  */
 public class SmppServerOpsThread implements Runnable {
-	private static final Logger logger = Logger.getLogger(SmppServerOpsThread.class);
+    private static final Logger logger = Logger.getLogger(SmppServerOpsThread.class);
 
-	protected volatile boolean started = true;
+    protected volatile boolean started = true;
 
-	private static final int MAX_ENQUIRE_FAILED = 1;
+    private static final int MAX_ENQUIRE_FAILED = 1;
 
-	private FastMap<String, Long> esmesServer;
+    private FastMap<String, Long> esmesServer;
 
-	private final EsmeManagement esmeManagement;
+    private final EsmeManagement esmeManagement;
 
-	private Object waitObject = new Object();
+    private Object waitObject = new Object();
 
-	public SmppServerOpsThread(EsmeManagement esmeManagement) {
-		this.esmeManagement = esmeManagement;
-		this.esmesServer = esmeManagement.esmesServer;
+    public SmppServerOpsThread(EsmeManagement esmeManagement) {
+        this.esmeManagement = esmeManagement;
+        this.esmesServer = esmeManagement.esmesServer;
 
-	}
+    }
 
-	protected void setStarted(boolean started) {
-		this.started = started;
+    protected void setStarted(boolean started) {
+        this.started = started;
 
-		synchronized (this.waitObject) {
-			this.waitObject.notify();
-		}
-	}
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
 
-	protected void scheduleList(String esmeServerName, Long delayValue) {
-		synchronized (this.esmesServer) {
-			this.esmesServer.put(esmeServerName, delayValue);
-		}
+    protected void scheduleList(String esmeServerName, Long delayValue) {
+        synchronized (this.esmesServer) {
+            this.esmesServer.put(esmeServerName, delayValue);
+        }
 
-		synchronized (this.waitObject) {
-			this.waitObject.notify();
-		}
-	}
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
 
-		protected void removeEnquireList(String esmeServerName) {
-			synchronized (this.esmesServer) {
-				this.esmesServer.remove (esmeServerName);
-			}
+    protected void removeEnquireList(String esmeServerName) {
+        synchronized (this.esmesServer) {
+            this.esmesServer.remove(esmeServerName);
+        }
 
-			synchronized (this.waitObject) {
-				this.waitObject.notify();
-			}
-	}
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
 
-	@Override
-	public void run() {
-		if (logger.isInfoEnabled()) {
-			logger.info("SmppServerOpsThread started.");
-		}
+    @Override
+    public void run() {
+        if (logger.isInfoEnabled()) {
+            logger.info("SmppServerOpsThread started.");
+        }
 
-		while (this.started) {
+        while (this.started) {
 
-			FastList<Esme> pendingList = new FastList<Esme>();
+            FastList<Esme> pendingList = new FastList<Esme>();
 
-			try {
-				synchronized (this.esmesServer) {
-					for (String esmeServerName: this.esmesServer.keySet()) {
-						Esme nextServer =  this.esmeManagement.getEsmeByName(esmeServerName);
+            try {
+                synchronized (this.esmesServer) {
+                    for (String esmeServerName : this.esmesServer.keySet()) {
+                        Esme nextServer = this.esmeManagement.getEsmeByName(esmeServerName);
 
-						if (!nextServer.isStarted()) {
-							nextServer.setServerBound(false);
-						}
+                        if (!nextServer.isStarted()) {
+                            nextServer.setServerBound(false);
+                        }
 
-						/* check server is dropped by link */
+                        /* check server is dropped by link */
                         if ((!nextServer.getLinkDropServerEnabled() && !nextServer.getEnquireServerEnabled())
                                 || !nextServer.isServerBound()) {
                             continue;
-						}
+                        }
 
-						// server is always in the list, let send enquire message
-						Long delay = this.esmesServer.get(nextServer.getName());
+                        // server is always in the list, let send enquire message
+                        Long delay = this.esmesServer.get(nextServer.getName());
 
-						if (delay <= System.currentTimeMillis()) {
-							pendingList.add(nextServer);
-						}
-					} // for
-				}
+                        if (delay <= System.currentTimeMillis()) {
+                            pendingList.add(nextServer);
+                        }
+                    } // for
+                }
 
-				// Sending Enquire messages
-				Iterator<Esme> changes = pendingList.iterator();
-				while (changes.hasNext()) {
-					Esme change = changes.next();
+                // Sending Enquire messages
+                Iterator<Esme> changes = pendingList.iterator();
+                while (changes.hasNext()) {
+                    Esme change = changes.next();
 
-					if (change.getLinkDropServerEnabled()) {
-						this.serverLinkDown(change);
-					} else {
-						this.enquireLink(change);
-					}
-				}
-				
-				synchronized (this.waitObject) {
-					this.waitObject.wait(5000);
-				}
+                    if (change.getLinkDropServerEnabled()) {
+                        this.serverLinkDown(change);
+                    } else {
+                        this.enquireLink(change);
+                    }
+                }
 
-			} catch (Exception e) {
-				logger.error("Error while looping SmpServerOpsThread thread", e);
-			}
+                synchronized (this.waitObject) {
+                    this.waitObject.wait(5000);
+                }
 
-		}// while
+            } catch (Exception e) {
+                logger.error("Error while looping SmpServerOpsThread thread", e);
+            }
 
-		if (logger.isInfoEnabled()) {
-			logger.info("SmppServerOpsThread for stopped.");
-		}
-	}
+        } // while
 
-	private void enquireLink(Esme esme) {
-		DefaultSmppSession smppSession = esme.getSmppSession();
+        if (logger.isInfoEnabled()) {
+            logger.info("SmppServerOpsThread for stopped.");
+        }
+    }
 
-		if (smppSession != null && smppSession.isBound() && esme.isServerBound()) {
-			try {
-				smppSession.enquireLink(new EnquireLink(), 10000);
+    private void enquireLink(Esme esme) {
+        DefaultSmppSession smppSession = esme.getSmppSession();
 
-				esme.resetEnquireLinkFail();
+        if (smppSession != null && smppSession.isBound() && esme.isServerBound()) {
+            try {
+                smppSession.enquireLink(new EnquireLink(), 10000);
 
-				//debug
-				//esme.incEnquireLinkFail();
+                esme.resetEnquireLinkFail();
 
-				// Update next sending time
-				this.scheduleList(esme.getName(), System.currentTimeMillis() +
-						esme.getEnquireLinkDelay());
+                // debug
+                // esme.incEnquireLinkFail();
 
-			} catch (Exception e) {
+                // Update next sending time
+                this.scheduleList(esme.getName(), System.currentTimeMillis() + esme.getEnquireLinkDelay());
 
-				logger.error(
-						String.format("Exception while trying to send ENQUIRE_LINK for ESME SystemId=%s",
-								esme.getSystemId()), e);
-				// For all exceptions lets increase the Server Enquire Link Fail Counter
-				esme.incEnquireLinkFail();
-			}
+            } catch (Exception e) {
 
-		} else {
-			// This should never happen
-			logger.warn(String.format("Sending ENQURE_LINK failed for ESME SystemId=%s as SmppSession is =%s !",
-					esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
+                logger.error(
+                        String.format("Exception while trying to send ENQUIRE_LINK for ESME SystemId=%s", esme.getSystemId()),
+                        e);
+                // For all exceptions lets increase the Server Enquire Link Fail Counter
+                esme.incEnquireLinkFail();
+            }
 
-			if (smppSession != null) {
-				try {
-					smppSession.close();
-				} catch (Exception e) {
-					logger.error(String.format("Failed to close smpp server session for %s.",
-							smppSession.getConfiguration().getName()));
-				}
+        } else {
+            // This should never happen
+            logger.warn(String.format("Sending ENQURE_LINK failed for ESME SystemId=%s as SmppSession is =%s !",
+                    esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
 
-//				// firing of onPduRequestTimeout() for sent messages for which we do not have responses
-//                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-//                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-//                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-//                    this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 1: "
-//                            + future.getRequest().toString());
-//                    smppSession.expired(future);
-//                }
+            if (smppSession != null) {
+                try {
+                    smppSession.close();
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to close smpp server session for %s.",
+                            smppSession.getConfiguration().getName()));
+                }
 
-				smppSession.destroy();
-				return;
-			}
-		}
+                // // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+                // Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+                // Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+                // for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                // this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 1: "
+                // + future.getRequest().toString());
+                // smppSession.expired(future);
+                // }
 
-		if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
-			logger.warn("Can't send ENQUIRE_LINK for ESME SystemId=" + esme.getSystemId());
-			try {
-				smppSession.close();
-			} catch (Exception e) {
-				logger.error(String.format("Failed to close smpp server session for %s.",
-						smppSession.getConfiguration().getName()));
-			}
+                smppSession.destroy();
+                return;
+            }
+        }
+
+        if (this.MAX_ENQUIRE_FAILED <= esme.getEnquireLinkFail()) {
+            logger.warn("Can't send ENQUIRE_LINK for ESME SystemId=" + esme.getSystemId());
+            try {
+                smppSession.close();
+            } catch (Exception e) {
+                logger.error(
+                        String.format("Failed to close smpp server session for %s.", smppSession.getConfiguration().getName()));
+            }
 
             // firing of onPduRequestTimeout() for sent messages for which we do not have responses
-//            Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-//            Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-//            for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-//                this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 2: "
-//                        + future.getRequest().toString());
-//                smppSession.expired(future);
-//            }
+            // Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+            // Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+            // for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+            // this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.enquireLink() - 2: "
+            // + future.getRequest().toString());
+            // smppSession.expired(future);
+            // }
 
             smppSession.destroy();
-		}
-	}
+        }
+    }
 
-	private void serverLinkDown(Esme esme) {
-		DefaultSmppSession smppSession = esme.getSmppSession();
+    private void serverLinkDown(Esme esme) {
+        DefaultSmppSession smppSession = esme.getSmppSession();
 
-		if (!esme.getLinkStartFirstTime()) {
-			if (!esme.checkLinkRecvMessage()) {
-				logger.warn("linkDropServer dropped connection because no packet received for ESME SystemId=" + esme.getSystemId());
-				try {
-					smppSession.close();
-				} catch (Exception e) {
-					logger.error(String.format("Failed to close smpp server session for %s.",
-							smppSession.getConfiguration().getName()));
-				}
+        if (!esme.getLinkStartFirstTime()) {
+            if (!esme.checkLinkRecvMessage()) {
+                logger.warn(
+                        "linkDropServer dropped connection because no packet received for ESME SystemId=" + esme.getSystemId());
+                try {
+                    smppSession.close();
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to close smpp server session for %s.",
+                            smppSession.getConfiguration().getName()));
+                }
 
                 // firing of onPduRequestTimeout() for sent messages for which we do not have responses
-//                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-//                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-//                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-//                    this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.serverLinkDown() - 1: "
-//                            + future.getRequest().toString());
-//                    smppSession.expired(future);
-//                }
+                // Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+                // Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+                // for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                // this.logger.warn("Firing of onPduRequestTimeout from SmppServerOpsThread.serverLinkDown() - 1: "
+                // + future.getRequest().toString());
+                // smppSession.expired(future);
+                // }
 
-                smppSession.destroy();                
+                smppSession.destroy();
 
-			} else {
-				esme.setLinkRecvMessage(false);
-				// Update next sending time
-				this.scheduleList(esme.getName(), System.currentTimeMillis() +
-						esme.getLinkDropServer());
-			}
-		} else {
-			esme.setLinkStartFirstTime(false);
-			// Update next sending time
-			this.scheduleList(esme.getName(), System.currentTimeMillis() +
-					esme.getLinkDropServer());
-		}
+            } else {
+                esme.setLinkRecvMessage(false);
+                // Update next sending time
+                this.scheduleList(esme.getName(), System.currentTimeMillis() + esme.getLinkDropServer());
+            }
+        } else {
+            esme.setLinkStartFirstTime(false);
+            // Update next sending time
+            this.scheduleList(esme.getName(), System.currentTimeMillis() + esme.getLinkDropServer());
+        }
 
-	}
-
-
-
-
+    }
 
 }
