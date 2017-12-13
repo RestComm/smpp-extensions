@@ -233,7 +233,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
         try {
             if (logger.isInfoEnabled()) {
-                logger.info(String.format("Session destroyed: %s", session.getConfiguration().getSystemId()));
+                logger.info(String.format("Session destroyed: SystemId=%s", session.getConfiguration().getSystemId()));
             }
 
             // print out final stats
@@ -263,11 +263,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             }
 
             // make sure it's really shutdown
-            try {
-                session.destroy();
-            } catch (Exception e) {
-                logger.warn("Exception when invoking of session.destroy() from sessionDestroyed()", e);
-            }
+            session.destroy();
 
         } finally {
             accessSemaphore.release();

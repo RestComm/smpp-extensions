@@ -220,8 +220,8 @@ public class SmppServerOpsThread implements Runnable {
 
         if (!esme.getLinkStartFirstTime()) {
             if (!esme.checkLinkRecvMessage()) {
-                logger.warn(
-                        "linkDropServer dropped connection because no packet received for ESME SystemId=" + esme.getSystemId());
+                logger.warn("linkDropServer dropped connection because no packet received for ESME " + esme.getName()
+                        + " SystemId=" + esme.getSystemId());
                 try {
                     smppSession.close();
                 } catch (Exception e) {
