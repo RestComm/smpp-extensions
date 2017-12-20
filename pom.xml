@@ -32,7 +32,7 @@
         <ch.smpp.version>5.1.0-100</ch.smpp.version> <!-- 5.0.13 -->
         <ch-commons-util.version>7.0.6</ch-commons-util.version> <!-- 7.0.5 -->
         <ch-commons-charset.version>7.0.6</ch-commons-charset.version> <!-- 3.0.2 -->
-        <jss7.restcomm.version>7.4.0-65</jss7.restcomm.version>
+        <jss7.restcomm.version>7.4.0-102</jss7.restcomm.version>
         <slf4j.version>1.5.5</slf4j.version>
         <junit.version>4.1</junit.version>
     </properties>
