@@ -8,7 +8,7 @@
 	<property name="docs.dir" location="${restcomm.smpp.dist}/_docs" />
 
 	<!--Versions -->
-	<property name="restcomm.jss7.version" value="7.4.0-65" />
+	<property name="restcomm.jss7.version" value="7.4.0-102" />
 	<property name="release.version" value="${smpp.release.version}"/>
 
 	<property name="github.url" value="https://github.com/RestComm" />
