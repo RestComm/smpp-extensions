@@ -49,7 +49,7 @@
 
 	<target name="undeploy">
 		<delete dir="${jboss.deploy}/restcomm-smpp-server" />
-		<delete file="${jboss.deploy}/smpp-management-console.war" />
+		<delete file="${jboss.deploy}/smpp-management.war" />
 		<delete file="${jboss.deploy}/jolokia.war" />
 		<delete file="${jboss.home}/bin/ss7-cli.sh" />
 		<delete file="${jboss.home}/bin/ss7-cli.bat" />

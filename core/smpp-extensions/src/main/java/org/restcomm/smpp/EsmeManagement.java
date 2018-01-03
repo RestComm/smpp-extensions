@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  
+ * TeleStax, Open Source Cloud Communications
  * Copyright 2012, Telestax Inc and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -52,7 +52,6 @@ import javolution.xml.XMLObjectWriter;
 import javolution.xml.stream.XMLStreamException;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 import org.restcomm.smpp.oam.SessionKey;
 import org.restcomm.smpp.oam.SmppOamMessages;
 
@@ -68,27 +67,27 @@ import com.cloudhopper.smpp.impl.DefaultSmppSession;
  */
 public class EsmeManagement implements EsmeManagementMBean {
 
-	private static final Logger logger = Logger.getLogger(EsmeManagement.class);
+    private static final Logger logger = Logger.getLogger(EsmeManagement.class);
 
-	private static final String ESME_LIST = "esmeList";
-	private static final String TAB_INDENT = "\t";
-	private static final String CLASS_ATTRIBUTE = "type";
-	private static final XMLBinding binding = new XMLBinding();
-	private static final String PERSIST_FILE_NAME = "esme.xml";
+    private static final String ESME_LIST = "esmeList";
+    private static final String TAB_INDENT = "\t";
+    private static final String CLASS_ATTRIBUTE = "type";
+    private static final XMLBinding binding = new XMLBinding();
+    private static final String PERSIST_FILE_NAME = "esme.xml";
 
-	private final String name;
+    private final String name;
 
-	private String persistDir = null;
+    private String persistDir = null;
 
-	protected FastList<Esme> esmes = new FastList<Esme>();
+    protected FastList<Esme> esmes = new FastList<Esme>();
 
-	protected FastMap<String, Long> esmesServer = new FastMap<String, Long>();
+    protected FastMap<String, Long> esmesServer = new FastMap<String, Long>();
 
-	protected FastMap<String, EsmeCluster> esmeClusters = new FastMap<String, EsmeCluster>();
+    protected FastMap<String, EsmeCluster> esmeClusters = new FastMap<String, EsmeCluster>();
 
-	private final TextBuilder persistFile = TextBuilder.newInstance();
+    private final TextBuilder persistFile = TextBuilder.newInstance();
 
-	private SmppClientManagement smppClient = null;
+    private SmppClientManagement smppClient = null;
 
     private MBeanServer mbeanServer = null;
 
@@ -97,14 +96,15 @@ public class EsmeManagement implements EsmeManagementMBean {
 
     private SmppStateListener listener;
 
-	private static EsmeManagement instance = null;
+    private static EsmeManagement instance = null;
 
-	protected EsmeManagement(String name) {
-		this.name = name;
 
-		binding.setClassAttribute(CLASS_ATTRIBUTE);
-		binding.setAlias(Esme.class, "esme");
-	}
+    protected EsmeManagement(String name) {
+        this.name = name;
+
+        binding.setClassAttribute(CLASS_ATTRIBUTE);
+        binding.setAlias(Esme.class, "esme");
+    }
 
     protected static EsmeManagement getInstance(String name) {
         if (instance == null) {
@@ -117,183 +117,183 @@ public class EsmeManagement implements EsmeManagementMBean {
         EsmeManagement.instance = instance;
     }
 
-	public static EsmeManagement getInstance() {
-		return instance;
-	}
+    public static EsmeManagement getInstance() {
+        return instance;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPersistDir() {
-		return persistDir;
-	}
+    public String getPersistDir() {
+        return persistDir;
+    }
 
-	public void setPersistDir(String persistDir) {
-		this.persistDir = persistDir;
-	}
+    public void setPersistDir(String persistDir) {
+        this.persistDir = persistDir;
+    }
 
-	public void setMbeanServer(MBeanServer mbeanServer) {
-		this.mbeanServer = mbeanServer;
-	}
+    public void setMbeanServer(MBeanServer mbeanServer) {
+        this.mbeanServer = mbeanServer;
+    }
 
-	/**
-	 * @param smppClient
-	 *            the smppClient to set
-	 */
-	protected void setSmppClient(SmppClientManagement smppClient) {
-		this.smppClient = smppClient;
-	}
+    /**
+     * @param smppClient the smppClient to set
+     */
+    protected void setSmppClient(SmppClientManagement smppClient) {
+        this.smppClient = smppClient;
+    }
 
     @Override
     public FastList<Esme> getEsmes() {
         return esmes;
     }
 
-	@Override
-	public Esme getEsmeByName(String esmeName) {
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
-			if (esme.getName().equals(esmeName)) {
-				return esme;
-			}
-		}
-		return null;
-	}
+    @Override
+    public Esme getEsmeByName(String esmeName) {
+        for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+            Esme esme = n.getValue();
+            if (esme.getName().equals(esmeName)) {
+                return esme;
+            }
+        }
+        return null;
+    }
 
-	@Override
-	public Esme getEsmeByClusterName(String esmeClusterName) {
-		EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
-		if (esmeCluster != null) {
-			return esmeCluster.getNextEsme();
-		}
-		return null;
-	}
+    @Override
+    public Esme getEsmeByClusterName(String esmeClusterName) {
+        EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
+        if (esmeCluster != null) {
+            return esmeCluster.getNextEsme();
+        }
+        return null;
+    }
 
-	protected Esme getEsmeByPrimaryKey(String SystemId, String host, int port, SmppBindType smppBindType) {
+    protected Esme getEsmeByPrimaryKey(String SystemId, String host, int port, SmppBindType smppBindType) {
 
-		// Check for actual SystemId, host and port
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
+        // Check for actual SystemId, host and port
+        for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+            Esme esme = n.getValue();
 
-			if (esme.getSystemId().equals(SystemId) && esme.getSmppBindType() == smppBindType) {
-				//discoveredEsme = esme;
-				if (esme.getHost().equals(host) && esme.getPort() == port) {
-					// exact match found
-					return esme;
-				}
+            if (esme.getSystemId().equals(SystemId) && esme.getSmppBindType() == smppBindType) {
+                // discoveredEsme = esme;
+                if (esme.getHost().equals(host) && esme.getPort() == port) {
+                    // exact match found
+                    return esme;
+                }
 
-				if (esme.getHost().equals(host) && esme.getPort() == -1) {
-					// Hosts match but port is any
-					if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
-						return esme;
-					}
-				}
+                if (esme.getHost().equals(host) && esme.getPort() == -1) {
+                    // Hosts match but port is any
+                    if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+                        return esme;
+                    }
+                }
 
-				if (esme.getHost().equals("-1") && esme.getPort() == port) {
-					// Host is any but port matches
-					if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
-						return esme;
-					}
-				}
+                if (esme.getHost().equals("-1") && esme.getPort() == port) {
+                    // Host is any but port matches
+                    if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+                        return esme;
+                    }
+                }
 
-				if (esme.getHost().equals("-1") && esme.getPort() == -1) {
-					// Host is any and port is also any
-					if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
-						return esme;
-					}
-				}
+                if (esme.getHost().equals("-1") && esme.getPort() == -1) {
+                    // Host is any and port is also any
+                    if (esme.getLocalStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+                        return esme;
+                    }
+                }
 
-			}// esme.getSystemId().equals(SystemId) && esme.getSmppBindType() ==
-				// smppBindType
-		}
+            } // esme.getSystemId().equals(SystemId) && esme.getSmppBindType() ==
+              // smppBindType
+        }
 
-		return null;
-	}
+        return null;
+    }
 
     public Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
             String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
             String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long clientBindTimeout,
             long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled, Boolean esmeErrorCountersEnabled,
-            Boolean esmeMaintenanceCountersEnabled, Boolean sessionErrorCountersEnabled, int enquireLinkDelay, int enquireLinkDelayServer,  
-            long linkDropServer, int sourceTon, int sourceNpi,String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, 
-            int networkId, boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
-            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
-            int maxMessageLength) throws Exception {
+            Boolean esmeMaintenanceCountersEnabled, Boolean sessionErrorCountersEnabled, 
+            int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi,
+            String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
+            boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
+            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
+            int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold) throws Exception {
 
-		SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
+        SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
 
-		if (smppBindTypeOb == null) {
-			throw new Exception("SmppBindType must be either of TRANSCEIVER, TRANSMITTER or RECEIVER. Passed is "
-					+ smppBindType);
-		}
+        if (smppBindTypeOb == null) {
+            throw new Exception(
+                    "SmppBindType must be either of TRANSCEIVER, TRANSMITTER or RECEIVER. Passed is " + smppBindType);
+        }
 
-		SmppSession.Type smppSessionTypeObj = SmppSession.Type.valueOf(smppSessionType);
-		if (smppSessionTypeObj == null) {
-			throw new Exception("SmppSession.Type must be either of SERVER or CLIENT. Passed is " + smppSessionType);
-		}
+        SmppSession.Type smppSessionTypeObj = SmppSession.Type.valueOf(smppSessionType);
+        if (smppSessionTypeObj == null) {
+            throw new Exception("SmppSession.Type must be either of SERVER or CLIENT. Passed is " + smppSessionType);
+        }
 
-		SmppInterfaceVersionType smppInterfaceVersionTypeObj = SmppInterfaceVersionType
-				.getInterfaceVersionType(smppIntVersion);
+        SmppInterfaceVersionType smppInterfaceVersionTypeObj = SmppInterfaceVersionType.getInterfaceVersionType(smppIntVersion);
 
-		if (smppInterfaceVersionTypeObj == null) {
-			smppInterfaceVersionTypeObj = SmppInterfaceVersionType.SMPP34;
-		}
+        if (smppInterfaceVersionTypeObj == null) {
+            smppInterfaceVersionTypeObj = SmppInterfaceVersionType.SMPP34;
+        }
 
-		if (smppSessionTypeObj == SmppSession.Type.CLIENT) {
-			if (port < 1) {
-				throw new Exception(SmppOamMessages.CREATE_EMSE_FAIL_PORT_CANNOT_BE_LESS_THAN_ZERO);
-			}
+        if (smppSessionTypeObj == SmppSession.Type.CLIENT) {
+            if (port < 1) {
+                throw new Exception(SmppOamMessages.CREATE_EMSE_FAIL_PORT_CANNOT_BE_LESS_THAN_ZERO);
+            }
 
-			if (host == null || host.equals("-1")) {
-				throw new Exception(SmppOamMessages.CREATE_EMSE_FAIL_HOST_CANNOT_BE_ANONYMOUS);
-			}
-		}
-
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
-
-			// Name should be unique
-			if (esme.getName().equals(name)) {
-				throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_ALREADY_EXIST, name));
-			}
-
-			// SystemId:IP:Port:SmppBindType combination should be unique for
-			// CLIENT. For SERVER it accepts multiple incoming binds as far as
-			// host is anonymous (-1) and/or port is -1
-//			String primaryKey = systemId + smppBindType;
-//			String existingPrimaryKey = esme.getSystemId() + esme.getSmppBindType().name();
-//
-//			if (smppSessionTypeObj == SmppSession.Type.SERVER) {
-//				if (!host.equals("-1") && port != -1) {
-//					primaryKey = primaryKey + host + port;
-//					existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
-//				} else {
-//					// Let the ESME be created
-//					primaryKey = "X";
-//					existingPrimaryKey = "Y";
-//				}
-//			} else {
-//				primaryKey = primaryKey + host + port;
-//				existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
-//			}
-//
-//			if (primaryKey.equals(existingPrimaryKey)) {
-//				throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_PRIMARY_KEY_ALREADY_EXIST, systemId,
-//						host, port, smppBindType));
-//			}
-		}// for loop
-
-		EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
-        if (esmeCluster != null) {
-            if (esmeCluster.getNetworkId() != networkId) {
-                throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_WRONG_NETWORKID_IN_ESMECLUSTER, esmeCluster.getNetworkId(), networkId));
+            if (host == null || host.equals("-1")) {
+                throw new Exception(SmppOamMessages.CREATE_EMSE_FAIL_HOST_CANNOT_BE_ANONYMOUS);
             }
         }
 
-		if (clusterName == null) {
-			clusterName = name;
-		}
+        for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+            Esme esme = n.getValue();
+
+            // Name should be unique
+            if (esme.getName().equals(name)) {
+                throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_ALREADY_EXIST, name));
+            }
+
+            // SystemId:IP:Port:SmppBindType combination should be unique for
+            // CLIENT. For SERVER it accepts multiple incoming binds as far as
+            // host is anonymous (-1) and/or port is -1
+            // String primaryKey = systemId + smppBindType;
+            // String existingPrimaryKey = esme.getSystemId() + esme.getSmppBindType().name();
+            //
+            // if (smppSessionTypeObj == SmppSession.Type.SERVER) {
+            // if (!host.equals("-1") && port != -1) {
+            // primaryKey = primaryKey + host + port;
+            // existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
+            // } else {
+            // // Let the ESME be created
+            // primaryKey = "X";
+            // existingPrimaryKey = "Y";
+            // }
+            // } else {
+            // primaryKey = primaryKey + host + port;
+            // existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
+            // }
+            //
+            // if (primaryKey.equals(existingPrimaryKey)) {
+            // throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_PRIMARY_KEY_ALREADY_EXIST, systemId,
+            // host, port, smppBindType));
+            // }
+        } // for loop
+
+        EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
+        if (esmeCluster != null) {
+            if (esmeCluster.getNetworkId() != networkId) {
+                throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_WRONG_NETWORKID_IN_ESMECLUSTER,
+                        esmeCluster.getNetworkId(), networkId));
+            }
+        }
+
+        if (clusterName == null) {
+            clusterName = name;
+        }
 
         Esme esme = new Esme(name, systemId, password, host, port, chargingEnabled, systemType, smppInterfaceVersionTypeObj,
                 ton, npi, address, smppBindTypeOb, smppSessionTypeObj, windowSize, connectTimeout, requestExpiryTimeout,
@@ -301,75 +301,75 @@ public class EsmeManagement implements EsmeManagementMBean {
                 esmeErrorCountersEnabled, esmeMaintenanceCountersEnabled, sessionErrorCountersEnabled, enquireLinkDelay,
                 enquireLinkDelayServer, linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi,
                 routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
-                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength,
+                maxMessageLength, overloadThreshold, normalThreshold);
 
-		esme.esmeManagement = this;
+        esme.esmeManagement = this;
 
-		esmes.add(esme);
+        esmes.add(esme);
 
-		if (esmeCluster == null) {
-			esmeCluster = new EsmeCluster(clusterName, networkId);
-			this.esmeClusters.put(clusterName, esmeCluster);
-		}
+        if (esmeCluster == null) {
+            esmeCluster = new EsmeCluster(clusterName, networkId);
+            this.esmeClusters.put(clusterName, esmeCluster);
+        }
 
-		esmeCluster.addEsme(esme);
+        esmeCluster.addEsme(esme);
 
-		this.store();
+        this.store();
 
-		this.registerEsmeMbean(esme);
+        this.registerEsmeMbean(esme);
 
-		return esme;
-	}
+        return esme;
+    }
 
-	public Esme destroyEsme(String esmeName) throws Exception {
-		Esme esme = this.getEsmeByName(esmeName);
-		if (esme == null) {
-			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
-		}
+    public Esme destroyEsme(String esmeName) throws Exception {
+        Esme esme = this.getEsmeByName(esmeName);
+        if (esme == null) {
+            throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
+        }
 
-		if (esme.isStarted()) {
-			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_ESME_STARTED));
-		}
+        if (esme.isStarted()) {
+            throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_ESME_STARTED));
+        }
 
-		esmes.remove(esme);
+        esmes.remove(esme);
 
-		EsmeCluster esmeCluster = this.esmeClusters.get(esme.getClusterName());
-		esmeCluster.removeEsme(esme);
+        EsmeCluster esmeCluster = this.esmeClusters.get(esme.getClusterName());
+        esmeCluster.removeEsme(esme);
 
-		if (!esmeCluster.hasMoreEsmes()) {
-			this.esmeClusters.remove(esme.getClusterName());
-		}
+        if (!esmeCluster.hasMoreEsmes()) {
+            this.esmeClusters.remove(esme.getClusterName());
+        }
 
-		this.store();
+        this.store();
 
-		this.unregisterEsmeMbean(esme.getName());
+        this.unregisterEsmeMbean(esme.getName());
 
-		return esme;
-	}
+        return esme;
+    }
 
-	@Override
-	public void startEsme(String esmeName) throws Exception {
-		Esme esme = this.getEsmeByName(esmeName);
-		if (esme == null) {
-			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
-		}
+    @Override
+    public void startEsme(String esmeName) throws Exception {
+        Esme esme = this.getEsmeByName(esmeName);
+        if (esme == null) {
+            throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
+        }
 
-		if (esme.isStarted()) {
-			throw new Exception(String.format(SmppOamMessages.START_ESME_FAILED_ALREADY_STARTED, esmeName));
-		}
+        if (esme.isStarted()) {
+            throw new Exception(String.format(SmppOamMessages.START_ESME_FAILED_ALREADY_STARTED, esmeName));
+        }
 
-		esme.setStarted(true);
-		this.store();
+        esme.setStarted(true);
+        this.store();
 
-		System.out.println("listener is " + listener);
 		if (listener != null)
 		    listener.esmeStarted(esme.getName(), esme.getClusterName());
 		
-		if (esme.getSmppSessionType().equals(SmppSession.Type.CLIENT)) {
-			this.smppClient.startSmppClientSession(esme);
-		}
+        if (esme.getSmppSessionType().equals(SmppSession.Type.CLIENT)) {
+            this.smppClient.startSmppClientSession(esme);
+        }
 
-	}
+    }
 
 	@Override
 	public void stopEsme(String esmeName) throws Exception {
@@ -379,43 +379,41 @@ public class EsmeManagement implements EsmeManagementMBean {
 			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
 		}
 
-		esme.setStarted(false);
+        esme.setStarted(false);
 
-		if (esme.getLinkDropServerEnabled()) {
-			esme.resetLinkRecvMessage();
-		}
+        if (esme.getLinkDropServerEnabled()) {
+            esme.resetLinkRecvMessage();
+        }
 
 		if (listener != null)
             listener.esmeStopped(esme.getName(), esme.getClusterName(), currSessionId);
-        
-        
 		this.store();
 
-		this.stopWrappedSession(esme);
-	}
+        this.stopWrappedSession(esme);
+    }
 
-	private void stopWrappedSession(Esme esme) {
-		if (esme.getSmppSessionType().equals(SmppSession.Type.SERVER)) {
-			DefaultSmppSession smppSession = esme.getSmppSession();
+    private void stopWrappedSession(Esme esme) {
+        if (esme.getSmppSessionType().equals(SmppSession.Type.SERVER)) {
+            DefaultSmppSession smppSession = esme.getSmppSession();
 
-			if (smppSession != null) {
-				// TODO can server side send UNBIND?
-				// smppSession.unbind(5000);
-				try {
-					smppSession.close();
-				} catch (Exception e) {
-					logger.error(String.format("Failed to close smpp session for %s.",
-							smppSession.getConfiguration().getName()));
-				}
+            if (smppSession != null) {
+                // TODO can server side send UNBIND?
+                // smppSession.unbind(5000);
+                try {
+                    smppSession.close();
+                } catch (Exception e) {
+                    logger.error(
+                            String.format("Failed to close smpp session for %s.", smppSession.getConfiguration().getName()));
+                }
 
-//                // firing of onPduRequestTimeout() for sent messages for which we do not have responses
-//                Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
-//                Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
-//                for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
-//                    this.logger.warn("Firing of onPduRequestTimeout from EsmeManagement.stopWrappedSession() - 1: "
-//                            + future.getRequest().toString());
-//                    smppSession.expired(future);
-//                }
+                // // firing of onPduRequestTimeout() for sent messages for which we do not have responses
+                // Window<Integer, PduRequest, PduResponse> wind = smppSession.getSendWindow();
+                // Map<Integer, WindowFuture<Integer, PduRequest, PduResponse>> futures = wind.createSortedSnapshot();
+                // for (WindowFuture<Integer, PduRequest, PduResponse> future : futures.values()) {
+                // this.logger.warn("Firing of onPduRequestTimeout from EsmeManagement.stopWrappedSession() - 1: "
+                // + future.getRequest().toString());
+                // smppSession.expired(future);
+                // }
 
                 smppSession.destroy();
 			}
@@ -432,24 +430,23 @@ public class EsmeManagement implements EsmeManagementMBean {
 	}
 
 	public void start() throws Exception {
-	    try {
-					if (this.mbeanServer == null) {
-						this.mbeanServer = MBeanServerLocator.locateJBoss();
-					}
+        try {
+            if (this.mbeanServer == null) {
+                this.mbeanServer = JBossMbeanLocator.locateJBoss();
+            }
         } catch (Exception e) {
         }
 
-		this.persistFile.clear();
+        this.persistFile.clear();
 
-		if (persistDir != null) {
-			this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_")
-					.append(PERSIST_FILE_NAME);
-		} else {
-			persistFile
-					.append(System.getProperty(SmppManagement.SMSC_PERSIST_DIR_KEY,
-							System.getProperty(SmppManagement.USER_DIR_KEY))).append(File.separator).append(this.name)
-					.append("_").append(PERSIST_FILE_NAME);
-		}
+        if (persistDir != null) {
+            this.persistFile.append(persistDir).append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
+        } else {
+            persistFile
+                    .append(System.getProperty(SmppManagement.SMSC_PERSIST_DIR_KEY,
+                            System.getProperty(SmppManagement.USER_DIR_KEY)))
+                    .append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
+        }
 
 		logger.info(String.format("Loading ESME configuration from %s", persistFile.toString()));
 		
@@ -468,12 +465,12 @@ public class EsmeManagement implements EsmeManagementMBean {
 		    updateListener();
 		}
 
-		// setting a timer for cleaning of 
+        // setting a timer for cleaning of
         this.clearMessageClearTimer();
         this.timer = new Timer();
         this.timerTask = new MessageCleanerTimerTask();
         this.timer.scheduleAtFixedRate(timerTask, 0, 1000);
-	}
+    }
 
 	private void updateListener()
 	{
@@ -490,12 +487,12 @@ public class EsmeManagement implements EsmeManagementMBean {
 
         this.store();
 
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
-			Esme esme = n.getValue();
-			this.stopWrappedSession(esme);
-			this.unregisterEsmeMbean(esme.getName());
-		}
-	}
+        for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+            Esme esme = n.getValue();
+            this.stopWrappedSession(esme);
+            this.unregisterEsmeMbean(esme.getName());
+        }
+    }
 
     private void clearMessageClearTimer() {
         if (timerTask != null) {
@@ -508,38 +505,39 @@ public class EsmeManagement implements EsmeManagementMBean {
         }
     }
 
-	/**
-	 * Persist
-	 */
-	public void store() {
+    /**
+     * Persist
+     */
+    public void store() {
 
-		// TODO : Should we keep reference to Objects rather than recreating
-		// everytime?
-		try {
-			XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
-			writer.setBinding(binding);
-			// Enables cross-references.
-			// writer.setReferenceResolver(new XMLReferenceResolver());
-			writer.setIndentation(TAB_INDENT);
-			writer.write(esmes, ESME_LIST, FastList.class);
+        // TODO : Should we keep reference to Objects rather than recreating
+        // everytime?
+        try {
+            XMLObjectWriter writer = XMLObjectWriter.newInstance(new FileOutputStream(persistFile.toString()));
+            writer.setBinding(binding);
+            // Enables cross-references.
+            // writer.setReferenceResolver(new XMLReferenceResolver());
+            writer.setIndentation(TAB_INDENT);
+            writer.write(esmes, ESME_LIST, FastList.class);
 
-			writer.close();
-		} catch (Exception e) {
-			logger.error("Error while persisting the Rule state in file", e);
-		}
-	}
+            writer.close();
+        } catch (Exception e) {
+            logger.error("Error while persisting the Rule state in file", e);
+        }
+    }
 
-	/**
-	 * Load and create LinkSets and Link from persisted file
-	 * 
-	 * @throws Exception
-	 */
-	public void load() throws FileNotFoundException {
+    /**
+     * Load and create LinkSets and Link from persisted file
+     *
+     * @throws Exception
+     */
+    public void load() throws FileNotFoundException {
 
-	    // backward compatibility: rename old file name to new one
+        // backward compatibility: rename old file name to new one
         if (persistDir != null) {
             TextBuilder oldFileName = new TextBuilder();
-            oldFileName.append(persistDir).append(File.separator).append("SmscManagement").append("_").append(PERSIST_FILE_NAME);
+            oldFileName.append(persistDir).append(File.separator).append("SmscManagement").append("_")
+                    .append(PERSIST_FILE_NAME);
 
             Path oldPath = FileSystems.getDefault().getPath(oldFileName.toString());
             Path newPath = FileSystems.getDefault().getPath(persistFile.toString());
@@ -553,69 +551,69 @@ public class EsmeManagement implements EsmeManagementMBean {
             }
         }
 
-		XMLObjectReader reader = null;
-		try {
-			reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
+        XMLObjectReader reader = null;
+        try {
+            reader = XMLObjectReader.newInstance(new FileInputStream(persistFile.toString()));
 
-			reader.setBinding(binding);
-			this.esmes = reader.read(ESME_LIST, FastList.class);
+            reader.setBinding(binding);
+            this.esmes = reader.read(ESME_LIST, FastList.class);
 
-			// Populate cluster
-			for (FastList.Node<Esme> n = this.esmes.head(), end = this.esmes.tail(); (n = n.getNext()) != end;) {
-				Esme esme = n.getValue();
-				
-				esme.esmeManagement = this;
-				
-				String esmeClusterName = esme.getClusterName();
-				EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
-				if (esmeCluster == null) {
-					esmeCluster = new EsmeCluster(esmeClusterName, esme.getNetworkId());
-					this.esmeClusters.put(esmeClusterName, esmeCluster);
+            // Populate cluster
+            for (FastList.Node<Esme> n = this.esmes.head(), end = this.esmes.tail(); (n = n.getNext()) != end;) {
+                Esme esme = n.getValue();
+
+                esme.esmeManagement = this;
+
+                String esmeClusterName = esme.getClusterName();
+                EsmeCluster esmeCluster = this.esmeClusters.get(esmeClusterName);
+                if (esmeCluster == null) {
+                    esmeCluster = new EsmeCluster(esmeClusterName, esme.getNetworkId());
+                    this.esmeClusters.put(esmeClusterName, esmeCluster);
                 } else {
                     esme.setNetworkId(esmeCluster.getNetworkId());
                 }
                 esmeCluster.addEsme(esme);
-			}
+            }
 
-			reader.close();
-		} catch (XMLStreamException ex) {
-			// this.logger.info(
-			// "Error while re-creating Linksets from persisted file", ex);
-		}
-	}
+            reader.close();
+        } catch (XMLStreamException ex) {
+            // this.logger.info(
+            // "Error while re-creating Linksets from persisted file", ex);
+        }
+    }
 
-	private void registerEsmeMbean(Esme esme) {
-		try {
-			ObjectName esmeObjNname = new ObjectName(SmppManagement.JMX_DOMAIN + ":layer=Esme,name=" + esme.getName());
-			StandardMBean esmeMxBean = new StandardMBean(esme, EsmeMBean.class, true);
+    private void registerEsmeMbean(Esme esme) {
+        try {
+            ObjectName esmeObjNname = new ObjectName(SmppManagement.JMX_DOMAIN + ":layer=Esme,name=" + esme.getName());
+            StandardMBean esmeMxBean = new StandardMBean(esme, EsmeMBean.class, true);
 
             if (this.mbeanServer != null)
                 this.mbeanServer.registerMBean(esmeMxBean, esmeObjNname);
-		} catch (InstanceAlreadyExistsException e) {
-			logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
-		} catch (MBeanRegistrationException e) {
-			logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
-		} catch (NotCompliantMBeanException e) {
-			logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
-		} catch (MalformedObjectNameException e) {
-			logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
-		}
-	}
+        } catch (InstanceAlreadyExistsException e) {
+            logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
+        } catch (MBeanRegistrationException e) {
+            logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
+        } catch (NotCompliantMBeanException e) {
+            logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
+        } catch (MalformedObjectNameException e) {
+            logger.error(String.format("Error while registering MBean for ESME %s", esme.getName()), e);
+        }
+    }
 
-	private void unregisterEsmeMbean(String esmeName) {
+    private void unregisterEsmeMbean(String esmeName) {
 
-		try {
-			ObjectName esmeObjNname = new ObjectName(SmppManagement.JMX_DOMAIN + ":layer=Esme,name=" + esmeName);
+        try {
+            ObjectName esmeObjNname = new ObjectName(SmppManagement.JMX_DOMAIN + ":layer=Esme,name=" + esmeName);
             if (this.mbeanServer != null)
                 this.mbeanServer.unregisterMBean(esmeObjNname);
-		} catch (MBeanRegistrationException e) {
-			logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
-		} catch (InstanceNotFoundException e) {
-			logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
-		} catch (MalformedObjectNameException e) {
-			logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
-		}
-	}
+        } catch (MBeanRegistrationException e) {
+            logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
+        } catch (InstanceNotFoundException e) {
+            logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
+        } catch (MalformedObjectNameException e) {
+            logger.error(String.format("Error while unregistering MBean for ESME %s", esmeName), e);
+        }
+    }
 
 	protected void sessionCreated(SessionKey key) {
 	    if (listener != null) {

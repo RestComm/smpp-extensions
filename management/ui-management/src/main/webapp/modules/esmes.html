@@ -27,6 +27,7 @@
 				<th>SystemId</th>
 				<th>Type</th>
 				<th>State</th>
+				<th>Overloaded</th>
 				<th style="text-align: center; width: 150px;">Actions</th>
 			</tr>
 		</thead>
@@ -447,7 +448,21 @@
 						<span class="add-on">Max Message Length</span>
 						<input id="maxMessageLength" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Max Message Length" value="-1"/>
 					</span>	
-				</div>																															
+				</div>
+				
+				<div id="div-overloadThreshold" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for builds up to this value, the Overload Threshold will be triggered. Default value is -1, otherwise non-positive value will be ignored. Overload Threshold cannot be set unless Normal Threshold has been already defined.">
+						<span class="add-on">Overload Threshold</span>
+						<input id="overloadThreshold" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Overload Threshold" value="-1"/>
+					</span>	
+				</div>		
+				
+				<div id="div-normalThreshold" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If queue of messages which SMSC hasn't received responses for goes down to this value, the Normal Threshold will be triggered. Default value is -1, otherwise negative value will be ignored. It won't be possible to set Normal Threshold to -1 if Overload Threshold is currently set.">
+						<span class="add-on">Normal Threshold</span>
+						<input id="normalThreshold" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Normal Threshold" value="-1"/>
+					</span>	
+				</div>																																
 
 				<div id="div-splitLongMessages" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="If true long messages will be split before sending to this destination">
@@ -527,15 +542,20 @@
 				mbeanRead = 0;
 				esmeResponses = {};
 				esmes = [];
-
+                // creating bulk json
+                jsonEsmes =[];
+               
 				jQuery.each(html.value, function() {
 					mbeanVar = this;
 					noOfEsmes = noOfEsmes +1;
-					
-					jolokia.request(
-							[
-								{ type: "read", mbean: mbeanVar },
-							],
+					itemEsme = {}
+                    itemEsme["type"] = "read";
+                    itemEsme["mbean"] = mbeanVar;
+                    jsonEsmes.push(itemEsme);
+                });
+                            
+				jolokia.request(
+								jsonEsmes,
 							{
 								success: [ onEsmeResponse ],
 								error: function(value) {
@@ -546,7 +566,7 @@
 							}
 						); 
 
-				});
+				
 				
 				if(noOfEsmes == 0){
 					$('#no-esmes-table').show();
@@ -610,6 +630,7 @@
 		var systemId = response.value.SystemId;
 		var localType = response.value.LocalTypeName;
 		var state = response.value.StateName;
+		var overloadStatus = response.value.Overloaded;
 		
 		var systemType = response.value.SystemType;
 		var bindType = response.value.BindTypeName;
@@ -701,7 +722,9 @@
 		var destAddrSendLimit = response.value.DestAddrSendLimit;
 		var minMessageLength = response.value.MinMessageLength;
 		var maxMessageLength = response.value.MaxMessageLength;
-		
+
+		var overloadThreshold = response.value.OverloadThreshold;
+		var normalThreshold = response.value.NormalThreshold;
 		
 		if(systemType == null || systemType==""){
 			systemType = "null";
@@ -714,6 +737,7 @@
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + systemId + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + localType + '</td>' +
 				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + state + '</td>' +
+				'<td style="cursor: pointer;" onclick="$(this).parent().next().toggle();">' + overloadStatus + '</td>' +
 				'<td style="font-size: 16px; vertical-align: middle; text-align: center; width: 150px;">' + 
 					'<button class="btn btn-small btn-success"' + (isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Start ESME" data-placement="bottom" onclick="esmeOperation(\'startEsme\', \'' + name + '\')"><i class="icon-play"> </i></button> ' +
 					'<button class="btn btn-small btn-danger"' + (!isSmppServerStarted ? 'disabled' : '') + ' data-toggle="tooltip" title="Stop ESME" data-placement="bottom" onclick="esmeOperation(\'stopEsme\', \'' + name +  '\')"><i class="icon-stop"> </i></button> ' +
@@ -824,6 +848,8 @@
 						'<dt>DestAddrSendLimit</dt> <dd>' + destAddrSendLimit + ' </dd>' +
 						'<dt>MinMessageLength</dt> <dd>' + minMessageLength + ' </dd>' +
 						'<dt>MaxMessageLength</dt> <dd>' + maxMessageLength + ' </dd>' +
+						'<dt>OverloadThreshold</dt> <dd>' + overloadThreshold + ' </dd>' +
+						'<dt>NormalThreshold</dt> <dd>' + normalThreshold + ' </dd>' +
 					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
 						'</dl>'+
 		        '    </div>'+	
@@ -1465,7 +1491,39 @@
 											'</td>'+
 											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"MaxMessageLength"+']\').toggle(); $(\'input[id^='+name+"MaxMessageLength"+']\').focus();"></i>' +
 											'</td>'+
-										'</tr>'+																	
+										'</tr>'+
+										
+										'<tr data-toggle="tooltip" title="If queue of messages which SMSC hasn\'t received responses for builds up to this value, the Overload Threshold will be triggered.">'+
+											'<td style="font-size: 0.9em;">Overload Threshold</td>'+
+											'<td style="font-size: 0.9em; padding: 0;">'+
+												'<div id="div-' + name +'OverloadThreshold-input" class="control-group">'+
+												'<span id="' + name +'OverloadThreshold-input" style="display: none;">'+
+													'<input type="text" class="input-small" value="' + overloadThreshold + '" /> ' +
+													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'OverloadThreshold\', \'' + name+"OverloadThreshold" + '\', \'true\')"></i> ' +
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"OverloadThreshold"+']\').toggle(); $(\'input[id^='+name+"OverloadThreshold"+']\').focus();"></i>' + 
+												'</span>'+
+												'</div>' +
+												'<span id="' +name + 'OverloadThreshold-text">' + overloadThreshold + '</span>'+
+											'</td>'+
+											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"OverloadThreshold"+']\').toggle(); $(\'input[id^='+name+"OverloadThreshold"+']\').focus();"></i>' +
+											'</td>'+
+										'</tr>'+
+										
+										'<tr data-toggle="tooltip" title="If queue of messages which SMSC hasn\'t received responses for goes down to this value, the Normal Threshold will be triggered.">'+
+											'<td style="font-size: 0.9em;">Normal Threshold</td>'+
+											'<td style="font-size: 0.9em; padding: 0;">'+
+												'<div id="div-' + name +'NormalThreshold-input" class="control-group">'+
+												'<span id="' + name +'NormalThreshold-input" style="display: none;">'+
+													'<input type="text" class="input-small" value="' + normalThreshold + '" /> ' +
+													'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'NormalThreshold\', \'' + name+"NormalThreshold" + '\', \'true\')"></i> ' +
+													'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"NormalThreshold"+']\').toggle(); $(\'input[id^='+name+"NormalThreshold"+']\').focus();"></i>' + 
+												'</span>'+
+												'</div>' +
+												'<span id="' +name + 'NormalThreshold-text">' + normalThreshold + '</span>'+
+											'</td>'+
+											'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"NormalThreshold"+']\').toggle(); $(\'input[id^='+name+"NormalThreshold"+']\').focus();"></i>' +
+											'</td>'+
+										'</tr>'+
 
 											'<tr data-toggle="tooltip" title="If true long messages will be split before sending to this destination">'+
 												'<td style="font-size: 0.9em;">Long message splitting</td>'+
@@ -2321,6 +2379,16 @@
 			maxMessageLength = "-1";
 		}			
 		
+		var overloadThreshold = $("#overloadThreshold").val();
+		if(overloadThreshold == "") {
+			overloadThreshold = "-1";
+		}
+		
+		var normalThreshold = $("#normalThreshold").val();
+		if(normalThreshold == "") {
+			normalThreshold = "-1";
+		}
+		
 		if(formInvalid) {
 			$("#login-settings-error").show();
 			logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
@@ -2329,7 +2397,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,esmeErrorCountersEnabled,esmeMaintenanceCountersEnabled,sessionErrorCountersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength, 
+		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,esmeErrorCountersEnabled,esmeMaintenanceCountersEnabled,sessionErrorCountersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold,
 				{
 					success: function(value) {
 						updateEsmes();

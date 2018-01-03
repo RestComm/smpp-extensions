@@ -67,31 +67,30 @@ public class SmppShellExecutor implements ShellExecutor {
     }
 
     /**
-     * @param smppManagement
-     *            the SmppManagement to set
+     * @param smppManagement the SmppManagement to set
      */
     public void setSmppManagement(SmppManagement smppManagement) {
         this.smppManagement = smppManagement;
     }
 
     /**
-     * Command is smpp esme modify <name> password <password> networkid <networkid> split-long-messages <true | false>
-     * esme-ton <esme address ton> esme-npi <esme address npi> esme-range <esme address range> window-size <windowSize>
-     * connect-timeout <connectTimeout> request-expiry-timeout <requestExpiryTimeout> client-bind-timeout <clientBindTimeout>
+     * Command is smpp esme modify <name> password <password> networkid <networkid> split-long-messages <true | false> esme-ton
+     * <esme address ton> esme-npi <esme address npi> esme-range <esme address range> window-size <windowSize> connect-timeout
+     * <connectTimeout> request-expiry-timeout <requestExpiryTimeout> client-bind-timeout <clientBindTimeout>
      * window-monitor-interval <windowMonitorInter<0> window-wait-timeout <windowWaitTimeout> counters-enabled <true | false>
      * enquire-link-delay <30000> enquire-link-delay-server <0> link-drop-server <0> charging-enabled <true | false> source-ton
      * <source address ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address
      * ton> routing-npi <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond>
      * ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
      * national-language-locking-shift <national-language-locking-shift> national-language-single-shift
-     * <national-language-single-shift> dest-addr-send-limit <dest-addr-send-limit> 
-     * min-message-length <min-message-length> max-message-length <max-message-length>
+     * <national-language-single-shift> dest-addr-send-limit <dest-addr-send-limit> min-message-length <min-message-length>
+     * max-message-length <max-message-length>
      * 
      * @param args
      * @return
      */
     private String modifyEsme(String[] args) throws Exception {
-        if (args.length < 6 || args.length > 58) {
+        if (args.length < 6 || args.length > 100) {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
@@ -227,15 +226,21 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("national-language-single-shift")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setNationalLanguageSingleShift(val);
-            } else if(key.equals("dest-addr-send-limit")) {
-            	int val = Integer.parseInt(args[count++]);
-            	esme.setDestAddrSendLimit(val);
+            } else if (key.equals("dest-addr-send-limit")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setDestAddrSendLimit(val);
             } else if (key.equals("min-message-length")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setMinMessageLength(val);
             } else if (key.equals("max-message-length")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setMaxMessageLength(val);
+            } else if (key.equals("overload-threshold")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setOverloadThreshold(val);
+            } else if (key.equals("normal-threshold")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setNormalThreshold(val);
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -257,13 +262,13 @@ public class SmppShellExecutor implements ShellExecutor {
      * <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour
      * <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
-     * max-message-length <max-message-length>
+     * max-message-length <max-message-length> overload-threshold <overload-threshold> normal-threshold <normal-threshold>
      * 
      * @param args
      * @return
      */
     private String createEsme(String[] args) throws Exception {
-        if (args.length < 9 || args.length > 69) {
+        if (args.length < 9 || args.length > 100) {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
@@ -351,6 +356,9 @@ public class SmppShellExecutor implements ShellExecutor {
         int minMessageLength = -1;
         int maxMessageLength = -1;
 
+        int overloadThreshold = -1;
+        int normalThreshold = -1;
+
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
             String key = args[count++];
@@ -380,8 +388,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 connectTimeout = Long.parseLong(args[count++]);
             } else if (key.equals("request-expiry-timeout")) {
                 requestExpiryTimeout = Long.parseLong(args[count++]);
-			} else if (key.equals("client-bind-timeout")) {
-				clientBindTimeout = Long.parseLong(args[count++]);
+            } else if (key.equals("client-bind-timeout")) {
+                clientBindTimeout = Long.parseLong(args[count++]);
             } else if (key.equals("window-monitor-interval")) {
                 windowMonitorInterval = Long.parseLong(args[count++]);
             } else if (key.equals("window-wait-timeout")) {
@@ -440,11 +448,15 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("national-language-locking-shift")) {
                 nationalLanguageLockingShift = Integer.parseInt(args[count++]);
             } else if (key.equals("dest-addr-send-limit")) {
-            	destAddrSendLimit = Integer.parseInt(args[count++]);
+                destAddrSendLimit = Integer.parseInt(args[count++]);
             } else if (key.equals("min-message-length")) {
                 minMessageLength = Integer.parseInt(args[count++]);
             } else if (key.equals("max-message-length")) {
                 maxMessageLength = Integer.parseInt(args[count++]);
+            } else if (key.equals("overload-threshold")) {
+                overloadThreshold = Integer.parseInt(args[count++]);
+            } else if (key.equals("normal-threshold")) {
+                normalThreshold = Integer.parseInt(args[count++]);
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -458,7 +470,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 sessionErrorCountersEnabled, enquireLinkDelay, enquireLinkDelayServer, linkDropServer,
                 sourceTon, sourceNpi, sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId,
                 splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay,
-                nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength);
+                nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength, overloadThreshold,
+                normalThreshold);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 
@@ -479,7 +492,7 @@ public class SmppShellExecutor implements ShellExecutor {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
-        Esme esme = this.smppManagement.getEsmeManagement().destroyEsme(esmeName);
+        this.smppManagement.getEsmeManagement().destroyEsme(esmeName);
 
         return String.format(SmppOamMessages.DELETE_ESME_SUCCESSFUL, esmeName);
     }
@@ -552,9 +565,9 @@ public class SmppShellExecutor implements ShellExecutor {
         } else if (parName.equals("maxconnectionsize")) {
             int val = Integer.parseInt(options[4]);
             smppServerManagement.setMaxConnectionSize(val);
-        } else if(parName.equals("smppactivitytimeout")) {
-        	int val = Integer.parseInt(options[4]);
-        	smppServerManagement.setSmppActivityTimeout(val);
+        } else if (parName.equals("smppactivitytimeout")) {
+            int val = Integer.parseInt(options[4]);
+            smppServerManagement.setSmppActivityTimeout(val);
         } else if (parName.equals("defaultwindowsize")) {
             int val = Integer.parseInt(options[4]);
             smppServerManagement.setDefaultWindowSize(val);
@@ -570,10 +583,10 @@ public class SmppShellExecutor implements ShellExecutor {
         } else if (parName.equals("defaultsessioncountersenabled")) {
             boolean val = Boolean.parseBoolean(options[4]);
             smppServerManagement.setDefaultSessionCountersEnabled(val);
-        }  else if (parName.equals("bindipaddress")) {
-			String val = options[4];
-			smppServerManagement.setBindIpAddress(val);
-		} else {
+        } else if (parName.equals("bindipaddress")) {
+            String val = options[4];
+            smppServerManagement.setBindIpAddress(val);
+        } else {
             return SmppOamMessages.INVALID_COMMAND;
         }
 
@@ -612,7 +625,7 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (parName.equals("maxconnectionsize")) {
                 sb.append(smppServerManagement.getMaxConnectionSize());
             } else if (parName.equals("smppactivitytimeout")) {
-            	sb.append(smppServerManagement.getSmppActivityTimeout());
+                sb.append(smppServerManagement.getSmppActivityTimeout());
             } else if (parName.equals("defaultwindowsize")) {
                 sb.append(smppServerManagement.getDefaultWindowSize());
             } else if (parName.equals("defaultwindowwaittimeout")) {
@@ -624,8 +637,8 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (parName.equals("defaultsessioncountersenabled")) {
                 sb.append(smppServerManagement.isDefaultSessionCountersEnabled());
             } else if (parName.equals("bindipaddress")) {
-				sb.append(smppServerManagement.getBindIpAddress());
-			}else {
+                sb.append(smppServerManagement.getBindIpAddress());
+            } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
 
@@ -636,9 +649,9 @@ public class SmppShellExecutor implements ShellExecutor {
             sb.append(smppServerManagement.getBindPort());
             sb.append("\n");
 
-			sb.append("bind-ip-address = ");
-			sb.append(smppServerManagement.getBindIpAddress());
-			sb.append("\n");
+            sb.append("bind-ip-address = ");
+            sb.append(smppServerManagement.getBindIpAddress());
+            sb.append("\n");
 
             sb.append("bind-timeout = ");
             sb.append(smppServerManagement.getBindTimeout());
@@ -667,7 +680,7 @@ public class SmppShellExecutor implements ShellExecutor {
             sb.append("smpp-activity-timeout = ");
             sb.append(smppServerManagement.getSmppActivityTimeout());
             sb.append("\n");
-            
+
             sb.append("default-window-size = ");
             sb.append(smppServerManagement.getDefaultWindowSize());
             sb.append("\n");

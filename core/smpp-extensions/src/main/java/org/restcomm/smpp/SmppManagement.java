@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  
+ * TeleStax, Open Source Cloud Communications
  * Copyright 2012, Telestax Inc and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -32,12 +32,11 @@ import javax.management.ObjectName;
 import javolution.xml.XMLBinding;
 
 import org.apache.log4j.Logger;
-import org.jboss.mx.util.MBeanServerLocator;
 
 /**
  * @author Amit Bhayani
  * @author sergey vetyutnev
- * 
+ *
  */
 public class SmppManagement implements SmppManagementMBean {
     private static final Logger logger = Logger.getLogger(SmppManagement.class);
@@ -75,7 +74,7 @@ public class SmppManagement implements SmppManagementMBean {
         this.name = name;
 
         this.esmeManagement = EsmeManagement.getInstance(this.name);
-        
+
         binding.setClassAttribute(CLASS_ATTRIBUTE);
         binding.setAlias(Esme.class, "esme");
     }
@@ -143,7 +142,7 @@ public class SmppManagement implements SmppManagementMBean {
 
         // Step 1 Get the MBeanServer
         if (this.mbeanServer == null) {
-            this.mbeanServer = MBeanServerLocator.locateJBoss();
+            this.mbeanServer = JBossMbeanLocator.locateJBoss();
         }
 
         // Step 2 Setup ESME
@@ -160,7 +159,6 @@ public class SmppManagement implements SmppManagementMBean {
                 + ",name=" + this.getName());
         this.registerMBean(this.esmeManagement, EsmeManagementMBean.class, false, esmeObjNname);
 
-        this.isStarted = true;
         logger.info("Started SmppManagement");
 
         // Step 6 Start SMPP Server
@@ -186,8 +184,6 @@ public class SmppManagement implements SmppManagementMBean {
     }
 
     public void stopSmppManagement() throws Exception {
-
-        this.isStarted = false;
 
         this.esmeManagement.stop();
         ObjectName esmeObjNname = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT
@@ -228,5 +224,5 @@ public class SmppManagement implements SmppManagementMBean {
             logger.error(String.format("Error while unregistering MBean %s", name), e);
         }
     }
-    
+
 }

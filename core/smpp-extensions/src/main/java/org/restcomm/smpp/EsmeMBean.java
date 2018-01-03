@@ -399,5 +399,17 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
     int getMaxMessageLength();
 
     void setMaxMessageLength(int maxMessageLength);
+    
+    int getOverloadThreshold();
+
+    void setOverloadThreshold(int overloadThreshold);
+    
+    int getNormalThreshold();
+
+    void setNormalThreshold(int normalThreshold);
+
+    boolean getOverloaded();
+
+    void setOverloaded(boolean overloaded);
 
 }

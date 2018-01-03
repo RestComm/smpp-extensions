@@ -8,25 +8,16 @@
 	<property name="docs.dir" location="${restcomm.smpp.dist}/_docs" />
 
 	<!--Versions -->
-	<property name="restcomm.jss7.version" value="7.3.1398" />
+	<property name="restcomm.jss7.version" value="7.4.0-102" />
 	<property name="release.version" value="${smpp.release.version}"/>
 
-	<!--<property name="github.url" value="https://github.com/RestComm" />-->
-	<property name="cloudbees.url" value="https://mobicents.ci.cloudbees.com/job/Restcomm-jSS7-non-netty" />
+	<property name="github.url" value="https://github.com/RestComm" />
 	<property name="checkout.dir" value="${base.dir}/checkout" />
 
 	<property name="checkout.restcomm-jss7.dir" value="${checkout.dir}/restcomm-jss7" />
-	<property name="restcomm-jss7.build-number" value="1398" />
-	<property name="restcomm-jss7.version" value="7.3.${restcomm-jss7.build-number}" />
-	<property name="restcomm-jss7.release" value="7.3.1398" />
 
-	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm-jss7.version}.zip" />
-	<!--
-	<property name="restcomm-jss7.download.url"
-			  value="${github.url}/jss7/releases/download/${restcomm-jss7.release}/${restcomm-jss7.download.distro.file}" />
-	-->
-	<property name="restcomm-jss7.download.url"
-			  value="${cloudbees.url}/${restcomm-jss7.build-number}/artifact/release/${restcomm-jss7.download.distro.file}" />
+	<property name="restcomm-jss7.download.distro.file" value="restcomm-jss7-${restcomm.jss7.version}.zip" />
+	<property name="restcomm-jss7.download.url" value="${github.url}/jss7/releases/download/${restcomm.jss7.version}/${restcomm-jss7.download.distro.file}" />
 	<property name="restcomm-jss7.distro.zip.path" value="${checkout.dir}/${restcomm-jss7.download.distro.file}" />
 
 
@@ -47,7 +38,7 @@
 
 	<available file="${restcomm-jss7.distro.zip.path}" property="got.restcomm-jss7" />
 	<target name="get-restcomm-jss7" unless="got.restcomm-jss7">
-		<echo>Downloading RestComm JSS7 version: ${restcomm-jss7.version}</echo>
+		<echo>Downloading RestComm JSS7 version: ${restcomm.jss7.version}</echo>
 		<exec failonerror="true" executable="wget">
 			<arg value="${restcomm-jss7.download.url}" />
 		    <arg value="--output-document=${restcomm-jss7.download.distro.file}" />
@@ -59,7 +50,7 @@
 	<target name="extract-restcomm-jss7" depends="get-restcomm-jss7">
 		<delete dir="${checkout.restcomm-jss7.dir}" failonerror="false" />
 		<unzip src="${restcomm-jss7.distro.zip.path}" dest="${checkout.restcomm-jss7.dir}"/>
-		<move file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}-restcomm" tofile="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}" failonerror="false"/>
+		<move file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}-restcomm" tofile="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}" failonerror="false"/>
 	</target>
 
     <target name="copy-smpp">
@@ -84,12 +75,12 @@
 			</fileset>
 		</copy>
     	<copy todir="${restcomm.smpp.dist}/shell/bin" failonerror="true">
-			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell/bin">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}/ss7/shell/bin">
 				<include name="**/*" />
 			</fileset>
 		</copy>
 		<copy todir="${restcomm.smpp.dist}/shell/lib" failonerror="true">
-			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/ss7/shell/lib">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}/ss7/shell/lib">
 				<include name="jansi-*.jar" />
 				<include name="javolution-*.jar" />
 				<include name="jreadline-*.jar" />
@@ -99,7 +90,7 @@
 		</copy>
 
 		<!-- oam/new-ui - jolokia war & smpp-management.war -->
-		<copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm-jss7.version}/oam/new-ui/jolokia.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
+		<copy file="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}/oam/new-ui/jolokia.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
 		<copy file="${smpp.dir}/management/ui-management/target/smpp-management.war" todir="${restcomm.smpp.dist}/oam/new-ui" failonerror="true" />
 
 		<!-- Copy files for deploying/undeployng jSS7 to JBoss 5 and WildFly -->
@@ -112,6 +103,13 @@
 			  failonerror="true"/>
 		<copy file="${smpp.dir}/release/xmltask.jar" tofile="${restcomm.smpp.dist}/wildfly/xmltask.jar"
 			  failonerror="true"/>
+
+		<!-- Copy a jSS7 WildFly common module -->
+    	<copy todir="${restcomm.smpp.dist}/wildfly/commons" failonerror="true">
+			<fileset dir="${checkout.restcomm-jss7.dir}/restcomm-jss7-${restcomm.jss7.version}/ss7-wildfly/restcomm-ss7-service/commons">
+				<include name="**/*" />
+			</fileset>
+		</copy>
     </target>
 
 	<target name="build-smpp">

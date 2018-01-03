@@ -17,10 +17,20 @@
     </fileSets>
 
     <dependencySets>
-        <dependencySet>
-            <outputDirectory>/</outputDirectory>
-            <useTransitiveDependencies>false</useTransitiveDependencies>
-        </dependencySet>
-    </dependencySets>
+		<dependencySet>
+			<outputDirectory>/</outputDirectory>
+			<unpack>false</unpack>
+			<scope>runtime</scope>
+			<includes>
+				<include>org.restcomm.smpp:ch-smpp</include>
+				<include>org.restcomm.smpp:ch-commons-util</include>
+				<include>org.restcomm.smpp:ch-commons-charset</include>
+				<include>org.restcomm.smpp:bootstrap-wildfly</include>
+				<include>joda-time:joda-time</include>
+				<include>io.netty:netty</include>
+				<include>org.restcomm.smpp:smpp-extensions</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
 
 </assembly>

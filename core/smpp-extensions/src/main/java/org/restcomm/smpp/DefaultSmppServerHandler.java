@@ -51,116 +51,116 @@ import com.cloudhopper.smpp.type.SmppProcessingException;
  */
 public class DefaultSmppServerHandler implements SmppServerHandler {
 
-	private static final Logger logger = Logger.getLogger(DefaultSmppServerHandler.class);
+    private static final Logger logger = Logger.getLogger(DefaultSmppServerHandler.class);
 
-	private final SmppSessionHandlerInterface smppSessionHandlerInterface;
+    private final SmppSessionHandlerInterface smppSessionHandlerInterface;
 
-	private final EsmeManagement esmeManagement;
+    private final EsmeManagement esmeManagement;
 
-	private final SmppServerOpsThread smppServerOpsThread;
-	
-	private Semaphore accessSemaphore=new Semaphore(1);
-	
-	public DefaultSmppServerHandler(EsmeManagement esmeManagement, SmppServerOpsThread smppServerOpsThread,
-			SmppSessionHandlerInterface smppSessionHandlerInterface) {
-		this.esmeManagement = esmeManagement;
-		this.smppServerOpsThread = smppServerOpsThread;
-		this.smppSessionHandlerInterface = smppSessionHandlerInterface;
-	}
+    private final SmppServerOpsThread smppServerOpsThread;
 
-	@Override
-	public void sessionBindRequested(Long sessionId, SmppSessionConfiguration sessionConfiguration,
-			final BaseBind bindRequest) throws SmppProcessingException {
+    private Semaphore accessSemaphore = new Semaphore(1);
 
-	    try {
-            accessSemaphore.acquire();
-        } catch(InterruptedException e) {}
-        
+    public DefaultSmppServerHandler(EsmeManagement esmeManagement, SmppServerOpsThread smppServerOpsThread,
+            SmppSessionHandlerInterface smppSessionHandlerInterface) {
+        this.esmeManagement = esmeManagement;
+        this.smppServerOpsThread = smppServerOpsThread;
+        this.smppSessionHandlerInterface = smppSessionHandlerInterface;
+    }
+
+    @Override
+    public void sessionBindRequested(Long sessionId, SmppSessionConfiguration sessionConfiguration, final BaseBind bindRequest)
+            throws SmppProcessingException {
+
         try {
-            
-			if (this.smppSessionHandlerInterface == null) {
-				logger.error("Received BIND request but no SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
-				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
-			}
+            accessSemaphore.acquire();
+        } catch (InterruptedException e) {
+        }
 
-			SmppBindType smppBindType = this.getSmppBindType(bindRequest.getCommandId());
+        try {
 
-			Esme esme = this.esmeManagement.getEsmeByPrimaryKey(bindRequest.getSystemId(),
-					sessionConfiguration.getHost(), sessionConfiguration.getPort(), smppBindType);
+            if (this.smppSessionHandlerInterface == null) {
+                logger.error(
+                        "Received BIND request but no SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
+                throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
+            }
 
-			if (esme == null) {
-				logger.error(String.format(
-						"Received BIND request but no ESME configured for SystemId=%s Host=%s Port=%d SmppBindType=%s",
-						bindRequest.getSystemId(), sessionConfiguration.getHost(), sessionConfiguration.getPort(),
-						smppBindType));
-				throw new SmppProcessingException(SmppConstants.STATUS_INVSYSID);
-			}
-			
-			if (!esme.isStarted()) {
-				logger.error(String.format("Received BIND request but ESME is not yet started for name %s",
-						esme.getName()));
-				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
-			}
+            SmppBindType smppBindType = this.getSmppBindType(bindRequest.getCommandId());
 
-			if (!esme.getStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
-				logger.error(String.format(
-						"Received BIND request but ESME Already in Bound State Name=%s SystemId=%s Host=%s Port=%d",
-						esme.getName(), bindRequest.getSystemId(), esme.getHost(), esme.getPort()));
-				throw new SmppProcessingException(SmppConstants.STATUS_ALYBND);
-			}
+            Esme esme = this.esmeManagement.getEsmeByPrimaryKey(bindRequest.getSystemId(), sessionConfiguration.getHost(),
+                    sessionConfiguration.getPort(), smppBindType);
 
-			if (esme.getPassword() != null && !(esme.getPassword().equals(bindRequest.getPassword()))) {
-				logger.error(String.format(
-						"Received BIND request with password=%s but password set for ESME=%s for SystemId=%s",
-						bindRequest.getPassword(), esme.getPassword(), bindRequest.getSystemId()));
-				throw new SmppProcessingException(SmppConstants.STATUS_INVPASWD);
-			}
+            if (esme == null) {
+                logger.error(String.format(
+                        "Received BIND request but no ESME configured for SystemId=%s Host=%s Port=%d SmppBindType=%s",
+                        bindRequest.getSystemId(), sessionConfiguration.getHost(), sessionConfiguration.getPort(),
+                        smppBindType));
+                throw new SmppProcessingException(SmppConstants.STATUS_INVSYSID);
+            }
 
-			// Check if TON, NPI and Address Range matches
-			Address bindRequestAddressRange = bindRequest.getAddressRange();
+            if (!esme.isStarted()) {
+                logger.error(String.format("Received BIND request but ESME is not yet started for name %s", esme.getName()));
+                throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
+            }
 
-			if (esme.getEsmeTon() != -1 && esme.getEsmeTon() != bindRequestAddressRange.getTon()) {
-				logger.error(String.format("Received BIND request with TON=%d but configured TON=%d",
-						bindRequestAddressRange.getTon(), esme.getEsmeTon()));
-				throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
-			}
+            if (!esme.getStateName().equals(com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED])) {
+                logger.error(String.format(
+                        "Received BIND request but ESME Already in Bound State Name=%s SystemId=%s Host=%s Port=%d",
+                        esme.getName(), bindRequest.getSystemId(), esme.getHost(), esme.getPort()));
+                throw new SmppProcessingException(SmppConstants.STATUS_ALYBND);
+            }
 
-			if (esme.getEsmeNpi() != -1 && esme.getEsmeNpi() != bindRequestAddressRange.getNpi()) {
-				logger.error(String.format("Received BIND request with NPI=%d but configured NPI=%d",
-						bindRequestAddressRange.getNpi(), esme.getEsmeNpi()));
-				throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
-			}
+            if (esme.getPassword() != null && !(esme.getPassword().equals(bindRequest.getPassword()))) {
+                logger.error(
+                        String.format("Received BIND request with password=%s but password set for ESME=%s for SystemId=%s",
+                                bindRequest.getPassword(), esme.getPassword(), bindRequest.getSystemId()));
+                throw new SmppProcessingException(SmppConstants.STATUS_INVPASWD);
+            }
 
-			// TODO : we are checking with empty String, is this correct?
+            // Check if TON, NPI and Address Range matches
+            Address bindRequestAddressRange = bindRequest.getAddressRange();
 
-			if (bindRequestAddressRange.getAddress() == null || bindRequestAddressRange.getAddress() == "") {
-				// If ESME doesn't know we set it up from our config
-				bindRequestAddressRange.setAddress(esme.getEsmeAddressRange());
-			} else if (!bindRequestAddressRange.getAddress().equals(esme.getEsmeAddressRange())) {
-				logger.error(String.format(
-						"Received BIND request with Address_Range=%s but configured Address_Range=%s",
-						bindRequestAddressRange.getAddress(), esme.getEsmeAddressRange()));
-				throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
-			}
+            if (esme.getEsmeTon() != -1 && esme.getEsmeTon() != bindRequestAddressRange.getTon()) {
+                logger.error(String.format("Received BIND request with TON=%d but configured TON=%d",
+                        bindRequestAddressRange.getTon(), esme.getEsmeTon()));
+                throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+            }
 
-			sessionConfiguration.setAddressRange(bindRequestAddressRange);
+            if (esme.getEsmeNpi() != -1 && esme.getEsmeNpi() != bindRequestAddressRange.getNpi()) {
+                logger.error(String.format("Received BIND request with NPI=%d but configured NPI=%d",
+                        bindRequestAddressRange.getNpi(), esme.getEsmeNpi()));
+                throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+            }
 
-			sessionConfiguration.setCountersEnabled(esme.isCountersEnabled());
+            // TODO : we are checking with empty String, is this correct?
 
-			// TODO More parameters to compare
+            if (bindRequestAddressRange.getAddress() == null || bindRequestAddressRange.getAddress() == "") {
+                // If ESME doesn't know we set it up from our config
+                bindRequestAddressRange.setAddress(esme.getEsmeAddressRange());
+            } else if (!bindRequestAddressRange.getAddress().equals(esme.getEsmeAddressRange())) {
+                logger.error(String.format("Received BIND request with Address_Range=%s but configured Address_Range=%s",
+                        bindRequestAddressRange.getAddress(), esme.getEsmeAddressRange()));
+                throw new SmppProcessingException(SmppConstants.STATUS_INVBNDSTS);
+            }
 
-			// test name change of sessions
-			// this name actually shows up as thread context....
-			sessionConfiguration.setName(esme.getName());
+            sessionConfiguration.setAddressRange(bindRequestAddressRange);
+
+            sessionConfiguration.setCountersEnabled(esme.isCountersEnabled());
+
+            // TODO More parameters to compare
+
+            // test name change of sessions
+            // this name actually shows up as thread context....
+            sessionConfiguration.setName(esme.getName());
 
             sessionConfiguration.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
 
-			esme.setStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
-			esme.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
+            esme.setStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
+            esme.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_INITIAL]));
 
-			// throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL,
-			// null);
-		} finally {
+            // throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL,
+            // null);
+        } finally {
             accessSemaphore.release();
         }
 	}
@@ -198,58 +198,61 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			esme.nextLocalSessionId();
 			esmeManagement.sessionCreated(new SessionKey(esme.getName(), sessionId));
             esme.setSmppSession((DefaultSmppSession) session);
-			
-			if (!logger.isDebugEnabled()) {
-				session.getConfiguration().getLoggingOptions().setLogBytes(false);
-				session.getConfiguration().getLoggingOptions().setLogPdu(false);
-			}
 
-			SmppSessionHandler smppSessionHandler = this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme);
-			// need to do something it now (flag we're ready)
-			session.serverReady(smppSessionHandler);
+            if (!logger.isDebugEnabled()) {
+                session.getConfiguration().getLoggingOptions().setLogBytes(false);
+                session.getConfiguration().getLoggingOptions().setLogPdu(false);
+            }
 
-			// set esme server bound
-			esme.setServerBound(true);
+            SmppSessionHandler smppSessionHandler = this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme);
+            // need to do something it now (flag we're ready)
+            session.serverReady(smppSessionHandler);
 
-			// set link start flag
-			esme.setLinkStartFirstTime(true);
+            // set esme server bound
+            esme.setServerBound(true);
 
-			// start enquire message imedialtely
-			this.smppServerOpsThread.scheduleList(esme.getName(), 0L);
-		} finally {
+            // set link start flag
+            esme.setLinkStartFirstTime(true);
+
+            // start enquire message imedialtely
+            this.smppServerOpsThread.scheduleList(esme.getName(), 0L);
+        } finally {
             accessSemaphore.release();
         }
-	}
+    }
 
-	@Override
-	public void sessionDestroyed(Long sessionId, SmppServerSession session) {
-		this.sessionDestroyed(session);
-	}
+    @Override
+    public void sessionDestroyed(Long sessionId, SmppServerSession session) {
+        this.sessionDestroyed(session);
+    }
 
-	public void sessionDestroyed(SmppSession session) {
+    public void sessionDestroyed(SmppSession session) {
 
-	    try {
-            accessSemaphore.acquire();
-        } catch(InterruptedException e) {}
-        
         try {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Session destroyed: %s", session.getConfiguration().getSystemId()));
-			}
+            accessSemaphore.acquire();
+        } catch (InterruptedException e) {
+        }
 
-			// print out final stats
-			if (session.hasCounters()) {
-				logger.info(String.format("final session rx-submitSM: %s", session.getCounters().getRxSubmitSM()));
-			}
+        try {
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Session destroyed: SystemId=%s", session.getConfiguration().getSystemId()));
+            }
 
-			// remove esmeServer out of enquire list
-			String esmeName = session.getConfiguration().getName();
-			Esme esmeServer = this.esmeManagement.getEsmeByName(esmeName);			
-			esmeServer.setServerBound(false);
-			esmeServer.resetEnquireLinkFail();
-			this.smppServerOpsThread.removeEnquireList(esmeName);
-			this.smppSessionHandlerInterface.destroySmppSessionHandler(esmeServer);
-			
+            // print out final stats
+            if (session.hasCounters()) {
+                logger.info(String.format("final session rx-submitSM: %s", session.getCounters().getRxSubmitSM()));
+            }
+
+            // remove esmeServer out of enquire list
+            String esmeName = session.getConfiguration().getName();
+            Esme esmeServer = this.esmeManagement.getEsmeByName(esmeName);
+            esmeServer.setServerBound(false);
+            esmeServer.resetEnquireLinkFail();
+            this.smppServerOpsThread.removeEnquireList(esmeName);
+            this.smppSessionHandlerInterface.destroySmppSessionHandler(esmeServer);
+            // bringing back to close
+            esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
+
             DefaultSmppSession defaultSession = (DefaultSmppSession) session;
 
             // firing of onPduRequestTimeout() for sent messages for which we do not have responses
@@ -265,23 +268,21 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 			// make sure it's really shutdown
 			session.destroy();
 
-			//bringing back to close
-			esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
-		} finally {
+        } finally {
             accessSemaphore.release();
         }
-	}
+    }
 
-	private SmppBindType getSmppBindType(int commandId) {
-		switch (commandId) {
-		case SmppConstants.CMD_ID_BIND_RECEIVER:
-			return SmppBindType.RECEIVER;
-		case SmppConstants.CMD_ID_BIND_TRANSMITTER:
-			return SmppBindType.TRANSMITTER;
-		case SmppConstants.CMD_ID_BIND_TRANSCEIVER:
-			return SmppBindType.TRANSCEIVER;
-		}
+    private SmppBindType getSmppBindType(int commandId) {
+        switch (commandId) {
+            case SmppConstants.CMD_ID_BIND_RECEIVER:
+                return SmppBindType.RECEIVER;
+            case SmppConstants.CMD_ID_BIND_TRANSMITTER:
+                return SmppBindType.TRANSMITTER;
+            case SmppConstants.CMD_ID_BIND_TRANSCEIVER:
+                return SmppBindType.TRANSCEIVER;
+        }
 
-		return null;
-	}
+        return null;
+    }
 }
