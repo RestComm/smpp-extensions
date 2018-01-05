@@ -1,0 +1,7 @@
+[[_configuring_standalone]]
+= Configuring as a Standalone library
+
+If you intend to use the Stack as a standalone library without using JBoss Application Server or JSLEE RAs, then you must make your own implementation of classes that was implemented at SMPP RA level.
+ 
+For this case you need to implement `org.restcomm.smpp.SmppSessionHandlerInterface` (it is implemented at SMPP RA), set it to `SmppManagement` before starting of `SmppManagement` stack.
+

@@ -1,0 +1,46 @@
+= Introduction
+
+[[_smpp_extensions_overview]]
+== {this-platform} {this-application} 
+
+{this-platform} {this-application} is extensions to cloudhopper smpp stack with adding of management for ESMEs and ESME clusters with CLI and GUI access.
+
+The Open Source Software gives you the flexibility to understand the readily available source code and customise the product for your Enterprise needs. 
+
+This guide provides details on configuring and using the platform and information regarding the supported protocols and compliant standards.
+For installation instructions, please refer to the Installation Guide published along with this.
+ 
+
+[[_smpp_extensions_implemented_protocols]]
+== Implemented Protocols and Standards Compliance
+
+{this-platform} {this-application} is a software based implementation of the SMPP protocol.
+
+SMPP stack supports versions of SMPP 3.3, 3.4 and 5.0.
+
+
+[[_major_features]]
+== Major Features of {this-platform} {this-application} 
+
+
+Java-based:::
+  {this-platform} {this-application} is based on JAVA.
+  It is robust and reliable and can be installed on any Operating System that supports Java (JDK 7).
+
+Open Source:::
+  The Software is open-source, giving you the freedom the understand the code and customise it to your enterprise needs.
+  It is supported by a vibrant Open source community.
+
+Standalone or JSLEE RA:::
+  You can use it as a standalone library or make use of JSLEE RA (Resource Adaptors) that come with it to manage the Stack and develop applications effectively.
+
+Easy Configuration and Management:::
+  {this-platform} {this-application} comes with an efficient Command Line Interface (CLI) tool allowing you to completely configure the Stack at run-time and manage it using simple commands rather than do everything manually. {this-platform} {this-application} also comes with a Graphical User Interface that will allow you to configure, monitor and manage the Stack through a convenient user-friendly interface. 
+
+Scalability:::
+  {this-platform} {this-application} is easily scalable with a configurable load-balancing architecture.
+
+Technical Specifications:::
+{this-platform} {this-application} is not restricted by any license or Transaction Per Second model.
+The only restricting factor is memory + CPU capacity of the host servers.
+ 

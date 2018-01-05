@@ -1,0 +1,128 @@
+[[_setup_running]]
+= Installing {this-platform} {this-application} 
+
+== Installation Options
+
+{this-platform} {this-application} can be installed to function as a standalone component if you do not wish to use JBoss Application Server.
+
+In this case you need to make your own implementation of classes that was implemented at SMPP RA level and this way is not recommneted. For this case you need to implement `org.restcomm.smpp.SmppSessionHandlerInterface` (it is implemented at SMPP RA), set it to `SmppManagement` before starting of `SmppManagement` stack.
+
+However if you intend to use JSLEE Resource Adaptors or Shell (CLI) and GUI, then you must deploy it as a JBoss AS Service.
+The sections below provide instructions for installing the Stack for use with JBoss AS or as a standalone component. 
+
+[[_running_with_jboss]]
+=== {this-platform} {this-application}  as a JBoss AS Service
+
+{this-platform} {this-application} can be deployed in any container that supports `JMX` and exposes `JNDI`.
+By using the {this-platform} {this-application} you will be able to configure the {this-application} using CLI (Command Line Interface) commands and WEB GUI interface.
+
+
+.Procedure: Installing {this-platform} {this-application} to JBoss 5.1.0.GA
+
+. Pre-Requisites:
++
+* The {this-platform} {this-application} binary requires that you have JBoss Application Server installed and `JBOSS_HOME` Environment variable set properly. The latest binaries of JBoss Application Server can by obtained from {slee2-binary-url}. For more details on setting the `JBOSS_HOME` variable, please refer to the section <<_jboss_home_setup>>.
+* `Ant 1.9` (or higher) must be used to install the binary.
+  Instructions for using Ant, including install, can be found at http://ant.apache.org/.
+
+. Deploying the {this-application}:
++
+* You can now deploy the service using the `ant deploy` command as shown below: 
++
+[source,subs="attributes"]
+----
+[usr1]$ cd {path}/jboss5
+[usr1]$ ant deploy
+----      
+
+. Result:
++
+* If the service has been deployed successfully, you will find the below message appear on screen:
++
+[source,subs="attributes"]
+----
+
+Buildfile: ../{path}/jboss5/build.xml
+
+deploy:
+     [copy] Copying 13 files to JBOSS_HOME\server\default\deploy\restco
+mm-smpp-server
+     [copy] Copying 2 files to JBOSS_HOME\bin
+     [copy] Copying 6 files to JBOSS_HOME\lib
+     [copy] Copying 2 files to JBOSS_HOME\server\default\deploy
+
+BUILD SUCCESSFUL
+----
+
+* You have now deployed {this-platform} {this-application} successfully.
+  Note that this procedure will also install the Shell Components (shell scripts and libraries) on this machine.
+
+.Procedure: Installing {this-platform} {this-application} to WildFly 10.1.0.Final
+
+. Pre-Requisites:
++
+* The {this-platform} {this-application} binary requires that you have WildFly installed and `JBOSS_HOME` Environment variable set properly. The latest binaries of WildFly can by obtained from {slee7-binary-url}. For more details on setting the `JBOSS_HOME` variable, please refer to the section <<_jboss_home_setup>>.
+* `Ant 1.9` (or higher) must be used to install the binary.
+  Instructions for using Ant, including install, can be found at http://ant.apache.org/.
+
+. Deploying the {this-application}:
++
+* You can now deploy the service using the `ant deploy` command as shown below:
++
+[source,subs="attributes"]
+----
+[usr1]$ cd {path}/wildfly
+[usr1]$ ant deploy
+----
+
+. Result:
++
+* If the service has been deployed successfully, you will find the below message appear on screen:
++
+[source,subs="attributes"]
+----
+
+Buildfile: ../{path}/wildfly/build.xml
+
+deploy:
+     [copy] Copying 8 files to JBOSS_HOME\modules\system\layers\base\org
+\restcomm\smpp\bootstrap
+     [copy] Copying 2 files to JBOSS_HOME\bin
+     [copy] Copying 6 files to JBOSS_HOME\lib
+     [copy] Copying 2 files to JBOSS_HOME\standalone\deployments
+     [copy] Copying 6 files to JBOSS_HOME\modules\system\layers\base\org
+\mobicents\ss7\commons
+
+BUILD SUCCESSFUL
+----
+
+* You have now deployed {this-platform} {this-application} successfully.
+  Note that this procedure will also install the Shell Components (shell scripts and libraries) on this machine.
+
+
+[[_restcomm_smpp_extensions_shell]]
+=== Shell - Command Line Interface (CLI)
+
+Once you have installed {this-platform} {this-application} , you can configure and manage it using Shell commands. {this-platform} {this-application} comes with a Shell Management Interface that enables easy run-time configuration.
+You can install the Shell (CLI) Component on any machine (usually remote) and easily connect to and manage the Stack on a remote machine with simple commands.
+For more details on using the Shell and the commands available, please refer to the {this-platform} {this-application} User Guide. 
+
+Installation of a CLI client part is the same procedure as installation of SMPP extensions into a JBOSS or WildFly server. We will not run the server itself but will run only a CLI client part.
+
+
+[[_setup_configuration]]
+== Post Installation Configuration
+
+Now that you have installed {this-platform} {this-application} to suit your needs, you can go ahead and configure the Stack to meet your requirements.
+The User Guide (available along with this Installation Guide) in the [path]_{this-platform}-{this-application}-{project-version}/docs_ folder will assist you in configuring and managing the Stack.
+The Shell Management module will enable you to easily configure the Stack using the Command Line Interface (CLI) tool. 
+
+=== Memory Settings
+
+You should fine tune the JVM memory settings based on your needs but we recommend you allocate a minimum of 3 GB for initial and maximum heap size. 
+
+-Xms3072m::
+  Initial heap size, set in megabytes
+
+-Xmx3072m::
+  Maximum heap size, set in megabytes

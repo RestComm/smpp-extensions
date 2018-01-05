@@ -1,0 +1,130 @@
+[[_setup_downloading]]
+
+= Downloading
+
+Installing {this-platform} {this-application} is easy and quick with the binary download.
+You can either download the binary release or download the source code and set up from source.
+
+[[_downloading_binary]]
+== Binary Download
+
+The binary release is available for download at the following link: {this-release-binary-url}
+
+.Procedure: Binary Download
+. Download the zip file _{path}.zip_ to any folder of your choice.
+. Extract the contents of the zip file. 
++
+
+[source,subs="attributes"]
+----
+Downloads]$ unzip {path}.zip
+----						
+. Verify the contents of the newly created directory.
+
+When you download the binary release, you will notice that the top level directory is named _{path}_ and immediately below this are several sub-directories named _docs_, _oam_, _shell_, _jboss5_, and _wildfly_ encompassing the major services and libraries that make up {this-platform}  {this-application} .
+For details on what is included in the sub-directories, please refer to the {this-platform}  {this-application}  User Guide. 
+
+The major functional modules of the {this-application} are: 
+
+. SMPP Service fo JBOSS server [dir: _jboss5_]
+. SMPP Service fo WildFly server [dir: _wildfly_]
+. Shell [dir: _shell_]
+
+[subs="attributes"]
+----
+
+|- {this-folder}-smpp-extensions-{project-version}
+		|- _docs
+	
+		|- oam
+	
+		|- shell
+
+		|- jboss5
+				|+ {this-folder}-smpp-server
+
+		|- wildfly
+				|+ commons
+				|+ {this-folder}-smpp-server
+				|+ template
+
+----
+
+[[_source_code]]
+== Setup from Source 
+
+{this-platform} {this-application} is an open source project and you have the freedom to build from source.
+Building from source means you can stay on top with the latest features.
+Whilst aspects of {this-platform} {this-application} are quite  complicated, you may find ways to become contributors.
+
+{this-platform} {this-application} works with JDK1.7 or above.
+In addition you must have the following tools installed.
+
+.Pre-Requisites for Building from Source
+
+* `Git Client` : Instructions for using GIT, including install, can be found at http://git-scm.com/book
+* `Maven 3.2.X` : Instructions for using Maven, including install, can be found at http://maven.apache.org/
+* `Ant 1.9.X` : Instructions for using Ant, including install, can be found at http://ant.apache.org
+
+[[_source_building]]
+=== Release Source Code Building
+
+
+. Downloading the source code
++
+Checkout a specific release source using GIT.
+The base URL to clone from is {this-release-source-code-url}.
+Then add the specific release version, in the below example we are downloading the version {project-version}.
++
+[source,subs="attributes"]
+----
+[usr]$ git clone {this-release-source-code-url} smpp-extensions
+[usr]$ cd smpp-extensions
+[usr]$ git checkout <version>
+----
+
+. Building the source code
++
+Now that we have the source code, the next step is to build and install the source. {this-platform} {this-application} uses Maven 3 to build the system.
+
+There are two extra build profiles namely _deploy-module-jboss5_ and _deploy-module-wildfly_ needed for deploying of built binaries into a local jboss ot WildFly server. Usage of such profiles demands of `JBOSS_HOME` environment variable is set properly. There is also a special _all_ profile that allows to build a manual in a PDF form as addition to a web form.
+
+* Building using "default" Build profile
++
+To build {this-platform} {this-application} without depoying and PDF manual use the default profile as shown below.
++
+[source,subs="attributes"]
+----
+[usr]$ cd smpp-extensions
+[usr]$ mvn install
+----
+
+* Building using additional profiles. An example is for depoying to a WildFly server and compiling of a PDF manual.
++
+[source,subs="attributes"]
+----
+[usr]$ cd smpp-extensions
+[usr]$ mvn install -Pdeploy-module-wildfly -Pall
+----
+
+
+. Use Ant to build the binary.
++
+[source,subs="attributes"]
+----
+[usr]$ cd smpp-extensions/release
+[usr]$ ant
+----
+
+
+[[_trunk_source_building]]
+=== Development Trunk Source Building
+
+To build from development trunk source, follow the same procedure as above but at the time of checkout do not switch to the specific release tag. 
+[source,subs="attributes"]
+----
+[usr]$ git clone {this-release-source-code-url} smpp-extensions
+[usr]$ cd smpp-extensions
+[usr]$ git checkout
+----  
+The rest of the steps are as outlined in the above section <<_source_building>>		 

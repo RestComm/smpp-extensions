@@ -1,0 +1,129 @@
+[[_configuring_smpp_extensions]]
+= Configuring of server settings
+
+[[_configuring_smpp_extensions]]
+== Configuring jboss-beans.xml for JBoss 5.1 AS
+
+Configuration is done through an XML descriptor file named [path]_jboss-beans.xml_ located at [path]_$JBOSS_HOME/server/profile_name/deploy/{this-folder}-smpp-service/META-INF_, where  `profile_name` is the name of the server profile.
+
+
+[[_configuring_SmppManagement]]
+=== Configuring SmppManagement
+
+You must configure `SmppManagement` service as a base SMPP service.
+
+Scroll down to the section for SmppManagement in the _jboss-beans.xml_ file and define the properties to suit your requirements.
+[source,xml]
+----
+
+	<bean name="SS7Clock" class="org.mobicents.protocols.ss7.scheduler.DefaultClock">
+	</bean>
+
+	<bean name="SS7Scheduler" class="org.mobicents.protocols.ss7.scheduler.Scheduler">
+		<property name="clock">
+			<inject bean="SS7Clock" />
+		</property>
+	</bean>
+
+    <!-- ==================================================================== -->
+    <!-- SMPP -->
+    <!-- SmppManagement is managing SMPP part -->
+    <!-- ==================================================================== -->
+    <bean name="SmppManagement" class="org.restcomm.smpp.SmppManagement">
+        <constructor factoryClass="org.restcomm.smpp.SmppManagement"
+            factoryMethod="getInstance">
+            <parameter>SmppManagement</parameter>
+        </constructor>
+        <annotation>@org.jboss.aop.microcontainer.aspects.jmx.JMX(name="org.restcomm.smpp:name=SmppManagement",exposedInterface=org.restcomm.smpp.SmppManagementMBean.class,registerDirectly=true)</annotation>
+        <property name="persistDir">${jboss.server.data.dir}</property>
+    </bean>
+----
+
+.[class]`org.mobicents.protocols.ss7.scheduler.DefaultClock`
+.[class]`org.mobicents.protocols.ss7.scheduler.Scheduler`
+DefaultClock and Scheduler are service beans that are needed for SmppManagement service.
+
+.[class]`org.restcomm.smpp.SmppManagement`
+This SmppManagement Management Bean is created by a factory class `SmppManagement`. A constructor argument of SmppManagement Management Bean is a [class]`String`. This is a productName parameter.
+
+This XML file is stored in the path specified by the property `persistDir`.
+For example, in the above case, when {this-platform}  SmppManagement is started, files named _SmppManagement_esme.xml_ and _SmppManagement_smppserver.xml_ will be created at _$JBOSS_HOME/server/profile_name/data_ directory.
+The other properties of the Stack are defined below:
+
+persistDir::
+  As explained above
+
+=== Configuring ShellExecutor and SmppShellExecutor
+
+`ShellExecutor` is responsible for listening incoming CLI commands.
+Received commands are executed on local resources to  perform actions like  ESME creation and `SmppManagement` stack management. If an SS7 library is used along with SMPP lib then you will need only one `ShellExecutor` class configured for both services.
+
+[source,xml]
+----
+    <!-- ==================================================================== -->
+    <!-- Shell Service -->
+    <!-- ==================================================================== -->
+    <!-- Define Shell Executor -->
+	<bean name="ShellExecutor" class="com.mobicents.ss7.management.console.ShellServer">
+		<constructor>
+			<parameter>
+				<inject bean="SS7Scheduler" />
+			</parameter>
+			<parameter>
+				<list class="javolution.util.FastList" elementClass="org.mobicents.ss7.management.console.ShellExecutor">
+					<inject bean="SmppShellExecutor" />
+				</list>
+			</parameter>
+		</constructor>
+
+		<property name="address">${jboss.bind.address}</property>
+		<property name="port">3435</property>
+		<property name="securityDomain">java:/jaas/jmx-console</property>
+	</bean>
+
+    <bean name="SmppShellExecutor" class="org.restcomm.smpp.oam.SmppShellExecutor">
+        <property name="smppManagement">
+            <inject bean="SmppManagement" />
+        </property>
+    </bean>
+----
+
+By default ShellExecutor listens at `jboss.bind.address` and port `3435`. (This is used when you use CLI access after running of ss7-cli command). You may set the `address` property to any valid IP address that your host is assigned.
+The shell commands are exchanged over TCP/IP.
+
+NOTE: To understand JBoss bind options look at  http://docs.jboss.org/jbossas/docs/Installation_And_Getting_Started_Guide/5/html_single/index.html[Installation_And_Getting_Started_Guide]
+
+`SmppShellExecutor` is a CLI command processor for `SmppManagement`.
+
+[[_configuring_smpp_extensions_wildfly]]
+== Configuring beans for WildFly 5.1 AS
+
+For working under a WildFly server we need to deploy:
+
+* `org.mobicents.ss7.commons` module that contains a base code for CLI interface 
+* `org.restcomm.smpp.bootstrap` module that contains SMPP server staff
+
+`org.mobicents.ss7.commons` module is used also for SS7 library. If you use SMPP library along with SS7 library you need to deploy this module only once.
+
+_$JBOSS_HOME/standalone/configuration/standalone.xml_ file (or other appropriate config if you use another profile) must contain a dscription of `org.restcomm:smpp-extensions` subsystem.
+
+Below is a default example of a subsystem description:
+
+[source,xml]
+----
+        <subsystem xmlns="urn:org.restcomm:smpp-extensions:1.0">
+            <mbean name="SS7Clock" type="SS7Clock"/>
+            <mbean name="SS7Scheduler" type="SS7Scheduler"/>
+            <mbean name="SmppManagement" type="SmppManagement"/>
+            <mbean name="SmppShellExecutor" type="SmppShellExecutor"/>
+            <mbean name="ShellExecutor" type="ShellExecutor">
+                <property name="address" type="String" value="127.0.0.1"/>
+                <property name="port" type="int" value="3436"/>
+                <property name="securityDomain" type="String" value="jmx-console"/>
+            </mbean>
+        </subsystem>
+----
+
+`ShellExecutor` has properies for configuring. By default ShellExecutor listens at `jboss.bind.address` and port `3435`. (This is used when you use CLI access after running of ss7-cli command). You may set the `address` property to any valid IP address that your host is assigned and the `port` property for a needed port.
+The shell commands are exchanged over TCP/IP.
+

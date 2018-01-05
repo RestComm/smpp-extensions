@@ -1,0 +1,19 @@
+= Pre-Requisites
+
+{this-platform} {this-application} 's core requirement is Java.
+The following table details the Hardware, Operating System and Software requirements for a clean installation of {this-platform} {this-application} .
+ 
+
+.Installation Pre-Requisites
+[cols="1,1,1", frame="all", options="header"]
+|===
+| Component | Requirement | Notes
+| System Requirements | Intel Pentium 1 GHz or faster for simple applications. Hard disk space of at least 20MB. RAM of at least 1.5 GB | Higher the RAM and processing power, better is the throughput
+| Operating System | The platform can be installed on any OS that supports Java.|
+| Java | You must have a working Java Runtime Environment (JRE) or Java Development Kit (JDK) installed on your system and it must be version 7 or higher. | For usage of JBOSS 5.1 you may use JAVA 7 only, For usage of WildFly 10.1 you may use JAVA 8 or higher
+| JBoss Application Server | {this-platform} SMPP Extensions can work as a standalone library if you do not require JSLEE Resource Adaptors and the Shell Management Tool (Command Line Interface) for run-time configuration of the platform. But if you wish to avail of these, then you must have JBoss Application Server (version 5.1.0.GA) or WildFly server (version 10) installed on your machine. | Refer to the appendix section for more details.
+|===
+
+
+IMPORTANT: You must ensure that the `JAVA_HOME` and `JBOSS_HOME` Environment variables are set properly for the user account(s) that will run the server.
+For more details on setting these variables, please refer to the sections <<_jdk_installing_configuring_and_running>> and <<_jboss_home_setup>>. 
