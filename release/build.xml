@@ -31,9 +31,9 @@
 		</classpath>
 	</taskdef>
 
-	<target name="release" depends="clean,get-restcomm-jss7,extract-restcomm-jss7,build-smpp,copy-smpp,make-final-zip" />
+	<target name="release" depends="clean,get-restcomm-jss7,extract-restcomm-jss7,build-smpp,build-docs,copy-smpp,copy-documentation,make-final-zip" />
 
-  	<target name="release-restcomm" depends="clean,get-restcomm-jss7,extract-restcomm-jss7,copy-smpp,make-final-zip" />
+  	<target name="release-restcomm" depends="clean,get-restcomm-jss7,extract-restcomm-jss7,build-docs,copy-smpp,copy-documentation,make-final-zip" />
 
 
 	<available file="${restcomm-jss7.distro.zip.path}" property="got.restcomm-jss7" />
@@ -118,13 +118,11 @@
 		</exec>
 	</target>
 
-<!--
 	<target name="build-docs">
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.dir}/../docs">
 			<arg line="clean install -Prestcomm -Pall" />
 		</exec>
 	</target>
--->
 
 
 	<target name="make-final-zip" depends="set-time-stamp">
@@ -141,67 +139,37 @@
 		</tstamp>
 	</target>
 
-<!--
 	<target name="copy-documentation" >
 		<echo>copying documentation</echo>
 		<mkdir dir="${docs.dir}"/>
-
-		<mkdir dir="${docs.dir}/ASNLibrary"/>
-		<mkdir dir="${docs.dir}/ASNLibrary/html-book"/>
-		<copy todir="${docs.dir}/ASNLibrary/html-book" failonerror="true">
-			<fileset dir="${checkout.asn.dir}/docs/sources-asciidoc/target/generated-docs/html-book/">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<mkdir dir="${docs.dir}/ASNLibrary/pdf"/>
-		<copy todir="${docs.dir}/ASNLibrary/pdf" failonerror="true">
-			<fileset dir="${checkout.asn.dir}/docs/sources-asciidoc/target/generated-docs/pdf/">
-				<include name="**.pdf" />
-			</fileset>
-		</copy>
-
-		<mkdir dir="${docs.dir}/SCTPLibrary"/>
-		<mkdir dir="${docs.dir}/SCTPLibrary/html-book"/>
-		<copy todir="${docs.dir}/SCTPLibrary/html-book" failonerror="true">
-			<fileset dir="${checkout.sctp.dir}/docs/sources-asciidoc/target/generated-docs/html-book/">
-				<include name="**" />
-			</fileset>
-		</copy>
-		<mkdir dir="${docs.dir}/SCTPLibrary/pdf"/>
-		<copy todir="${docs.dir}/SCTPLibrary/pdf" failonerror="true">
-			<fileset dir="${checkout.sctp.dir}/docs/sources-asciidoc/target/generated-docs/pdf/">
-				<include name="**.pdf" />
-			</fileset>
-		</copy>
 
 		<mkdir dir="${docs.dir}/userguide"/>
 		<mkdir dir="${docs.dir}/installationguide"/>
 		<mkdir dir="${docs.dir}/userguide/html-book"/>
 		<copy todir="${docs.dir}/userguide/html-book" failonerror="true">
-			<fileset dir="${jss7.dir}/docs/userguide/sources-asciidoc/target/generated-docs/html-book/">
+			<fileset dir="${smpp.dir}/docs/userguide/sources-asciidoc/target/generated-docs/html-book/">
 				<include name="**" />
 			</fileset>
 		</copy>
 		<mkdir dir="${docs.dir}/installationguide/html-book"/>
 		<copy todir="${docs.dir}/installationguide/html-book" failonerror="true">
-			<fileset dir="${jss7.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/html-book/">
+			<fileset dir="${smpp.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/html-book/">
 			<include name="**" />
 		</fileset>
 		</copy>
 		<mkdir dir="${docs.dir}/userguide/pdf"/>
 		<copy todir="${docs.dir}/userguide/pdf" failonerror="true">
-			<fileset dir="${jss7.dir}/docs/userguide/sources-asciidoc/target/generated-docs/pdf/">
+			<fileset dir="${smpp.dir}/docs/userguide/sources-asciidoc/target/generated-docs/pdf/">
 				<include name="**.pdf" />
 			</fileset>
 		</copy>
 		<mkdir dir="${docs.dir}/installationguide/pdf"/>
 		<copy todir="${docs.dir}/installationguide/pdf" failonerror="true">
-			<fileset dir="${jss7.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/pdf/">
+			<fileset dir="${smpp.dir}/docs/installationguide/sources-asciidoc/target/generated-docs/pdf/">
 				<include name="**.pdf" />
 			</fileset>
 		</copy>
 	</target>
--->
 
 
 
