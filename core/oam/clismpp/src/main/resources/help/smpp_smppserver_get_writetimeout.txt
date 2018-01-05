@@ -15,4 +15,4 @@ EXAMPLE
 	smpp smppserver get
 
 SEE ALSO
-	smpp esme create, smsc get bindtimeout, smsc get writetimeout
+	smpp esme create, smpp get bindtimeout, smpp get writetimeout

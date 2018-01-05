@@ -33,9 +33,9 @@ PARAMETERS
 	Optional Parameters
 
 	Password		- Specify the new password.
-				  It is used by the SMSC to authenticate the identity of 
+				  It is used by the SMPP Server to authenticate the identity of 
 				  the binding ESME. The Service Provider may require 
-				  ESMEs to provide a password when binding to the SMSC.
+				  ESMEs to provide a password when binding to the SMPP Server.
 
 				  The new value takes effect when SMPP is restarted.
 
@@ -54,7 +54,7 @@ PARAMETERS
 				  this TON will be used in the BIND request. If the SMPP
 				  Session Type is SERVER, the incoming BIND request should
 				  have the same TON as configured here. If the configured 
-				  value is null (-1), SMSC will ignore it in both cases.
+				  value is null (-1), SMPP Server will ignore it in both cases.
 
 				  The new value takes effect when SMPP is restarted.
 
@@ -63,7 +63,7 @@ PARAMETERS
 				  this NPI will be used in the BIND request. If the SMPP
 				  Session Type is SERVER, the incoming BIND request should
 				  have the same NPI as configured here. If the configured 
-				  value is null (-1), SMSC will ignore it in both cases.		
+				  value is null (-1), SMPP Server will ignore it in both cases.		
 
 				  The new value takes effect when SMPP is restarted.
 
@@ -73,7 +73,7 @@ PARAMETERS
 				  request. If the SMPP Session Type is SERVER, the 
 				  incoming BIND request should have the same Address Range
 				  as configured here. If the configured value is 
-				  null (-1), SMSC will ignore it in both cases.
+				  null (-1), SMPP Server will ignore it in both cases.
 
 				  The new value takes effect when SMPP is restarted.
 
@@ -92,7 +92,7 @@ PARAMETERS
 	  
 	connect-timeout		- Default value is 10000 milli seconds. 
 				  This parameter is used to specify the time within which 
-				  the connection to a remote SMSC server should be 
+				  the connection to a remote SMPP Server should be 
 				  established.
 
 				  This is useful only when ESME is defined as Client Side. 
@@ -145,7 +145,7 @@ PARAMETERS
 				  The new value takes effect when SMPP is restarted.
 
 	counters-enabled 	- Default value is true. 
-				  When this is enabled, SMSC exposes the statistics for
+				  When this is enabled, SMPP Server exposes the statistics for
 				  SMPP connections.
 
 				  This is useful only when ESME is defined as Client Side. 
@@ -155,25 +155,25 @@ PARAMETERS
 				  The new value takes effect when SMPP is restarted.
 
 	enquire-link-delay	- Default value is 30000 milli seconds. 
-				  When SMSC connects to a remote server as CLIENT, it 
+				  When SMPP Server connects to a remote server as CLIENT, it 
 				  sends an 'ENQUIRE_LINK' after every configured 
 				  enquire-link-delay.
 
-				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+				  0 means disabled. SMPP Server will not send ENQUIRE_LINK.
 
 				  The new value takes effect immediately.
 
     enquire-link-delay-server - Default value is 0 milli seconds. 
-				  When SMSC connects to a remote server as SERVER, it 
+				  When SMPP Server connects to a remote server as SERVER, it 
 				  sends an 'ENQUIRE_LINK' after every configured 
 				  enquire-link-delay-server.
 
-				  0 means disabled. SMSC will not send ENQUIRE_LINK.
+				  0 means disabled. SMPP Server will not send ENQUIRE_LINK.
 
 				  The new value takes effect immediately.
 
 	link-drop-server - Time in milliseconds after which if ESME plays a SERVER role 
-				  and this option is enabled (> 0) SMSC GW will drop the esme
+				  and this option is enabled (> 0) SMPP Server will drop the esme
 				  session if for this time there is no traffic in the ESME
 				  (no incoming SMPP messages).
 				  Values 0 or <0 disable the option.
@@ -186,43 +186,43 @@ PARAMETERS
 
 				  The new value takes effect immediately.
 
-	source-ton		- Every SMS coming into the SMSC via this ESME should have
+	source-ton		- Every SMS coming into the SMPP Server via this ESME should have
 				  the same 'source_addr_ton' as the value configured here.
 
 				  If this configured value is null(-1) or not null and 
-				  matches, the SMSC will compare the
+				  matches, the SMPP Server will compare the
 				  'source_addr_npi' and 'source_addr_range' as explained 
 				  below. 
 
-				  If it doesn't match, the SMSC will reject this SMS with 
+				  If it doesn't match, the SMPP Server will reject this SMS with 
 				  an error code '0x0000000A' indicating 
 				  Invalid Source Address.
 
 				  The new value takes effect immediately.
 
-	source-npi		- Every SMS coming into the SMSC via this ESME should have
+	source-npi		- Every SMS coming into the SMPP Server via this ESME should have
 				  the same 'source_addr_npi' as the value configured here.
 				  configured here. 
 
 				  If this configured value is null(-1)
-				  or not null and matches, the SMSC will compare the 
+				  or not null and matches, the SMPP Server will compare the 
 				  'source_addr_range' as below. 
 
-				  If it doesn't match, the SMSC will reject this 
+				  If it doesn't match, the SMPP Server will reject this 
 				  SMS with an error code '0x0000000A' indicating 
 				  Invalid Source Address.
 
 				  The new value takes effect immediately.
 
-	source-range		- Every SMS coming into the SMSC via this ESME should have
+	source-range		- Every SMS coming into the SMPP Server via this ESME should have
 				  the same 'source_addr_range' as the value configured 
 				  here.This is a regular java expression and 
 				  default value is ^[0-9a-zA-Z]*. 
 
-				  If it matches, the SMSC will accept the incoming SMS 
+				  If it matches, the SMPP Server will accept the incoming SMS 
 				  and process further.
 
-				  If it doesn't match, the SMSC will reject this 
+				  If it doesn't match, the SMPP Server will reject this 
 				  SMS with an error code '0x0000000A' indicating 
 				  Invalid Source Address.
 
@@ -231,9 +231,9 @@ PARAMETERS
 	routing-ton		- The DefaultSmsRoutingRule will try to match the 
 				  'dest_addr_ton' of outgoing SMS with the value 
 				  configured here. If this configured value is null(-1) 
-				  or not null and matches, the SMSC will compare the
+				  or not null and matches, the SMPP Server will compare the
 				  'dest_addr_npi' and 'destination_addr' as explained 
-				  below. If it doesn't match, the SMSC will select the 
+				  below. If it doesn't match, the SMPP Server will select the 
 				  next ESME in the list for matching routing rule.
 
 				  DefaultSmsRoutingRule will consider ESME for routing 
@@ -249,9 +249,9 @@ PARAMETERS
 	routing-npi		- The DefaultSmsRoutingRule will try to match the 
 				  'dest_addr_npi' of outgoing SMS with the value
 				  configured here. If this configured value is null(-1)
-				  or not null and matches, the SMSC will compare the 
+				  or not null and matches, the SMPP Server will compare the 
 				  'destination_addr' as below. If it doesn't match, the 
-				  SMSC will select the next ESME in the list for matching 
+				  SMPP Server will select the next ESME in the list for matching 
 				  routing rule.
 
 				  DefaultSmsRoutingRule will consider ESME for routing 
@@ -267,9 +267,9 @@ PARAMETERS
 	routing-range		- The DefaultSmsRoutingRule will try to match the 
 				  'destination_addr' of outgoing SMS with the value
 				  configured here. This is a regular java expression and 
-				  default value is ^[0-9a-zA-Z]*. If it matches, the SMSC
+				  default value is ^[0-9a-zA-Z]*. If it matches, the SMPP Server
 				  will send the SMS out over this SMPP connection. If it 
-				  doesn't match, the SMSC will select the next ESME in 
+				  doesn't match, the SMPP Server will select the next ESME in 
 				  the list for matching routing rule.
 
 				  DefaultSmsRoutingRule will consider ESME for routing 
@@ -283,52 +283,52 @@ PARAMETERS
 				  The new value takes effect immediately.
 				  				  
     ratelimit_second    - This parameter is used to specify a maximum limit
-    				of messages that the SMSC will accept from this ESME 
+    				of messages that the SMPP Server will accept from this ESME 
     				during any one second. 
     				
     				If the ESME sends more messages (per second) 
     				than the maximum limit specified by 'ratelimit_second',
 					these additional messages will be rejected by the 
-					SMSC GW along with an error code - "throttled".
+					SMPP Server along with an error code - "throttled".
 					
 					The default value for this parameter is "0" and it
 					implies "no restrictions". If this parameter is not
 					specified it implies "no restrictions".
 	
 	ratelimit_minute    - This parameter is used to specify a maximum limit
-    				of messages that the SMSC will accept from this ESME 
+    				of messages that the SMPP Server will accept from this ESME 
     				during any one minute. 
     				
     				If the ESME sends more messages (per minute) 
     				than the maximum limit specified by 'ratelimit_minute',
 					these additional messages will be rejected by the 
-					SMSC GW along with an error code - "throttled".
+					SMPP Server along with an error code - "throttled".
 					
 					The default value for this parameter is "0" and it
 					implies "no restrictions". If this parameter is not
 					specified it implies "no restrictions".
 
 	ratelimit_hour    - This parameter is used to specify a maximum limit
-    				of messages that the SMSC will accept from this ESME 
+    				of messages that the SMPP Server will accept from this ESME 
     				during any one hour. 
     				
     				If the ESME sends more messages (per hour) 
     				than the maximum limit specified by 'ratelimit_hour',
 					these additional messages will be rejected by the 
-					SMSC GW along with an error code - "throttled".
+					SMPP Server along with an error code - "throttled".
 					
 					The default value for this parameter is "0" and it
 					implies "no restrictions". If this parameter is not
 					specified it implies "no restrictions".
 
 	ratelimit_day    - This parameter is used to specify a maximum limit
-    				of messages that the SMSC will accept from this ESME 
+    				of messages that the SMPP Server will accept from this ESME 
     				during any one day. 
     				
     				If the ESME sends more messages (per day) 
     				than the maximum limit specified by 'ratelimit_day',
 					these additional messages will be rejected by the 
-					SMSC GW along with an error code - "throttled".
+					SMPP Server along with an error code - "throttled".
 					
 					The default value for this parameter is "0" and it
 					implies "no restrictions". If this parameter is not
@@ -342,7 +342,7 @@ PARAMETERS
                        = 13 : urdu (arabic) national language shift table
                        = 1  : the national language locking shift value must be 
                               obtained from the option national-language-single-shift 
-                              that is defined at SMSC GW general level.
+                              that is defined at SMPP Server general level.
 	
 	
 	national-language-locking-shift - National language locking shift table can be 
@@ -353,21 +353,21 @@ PARAMETERS
                        = 13 : urdu (arabic) national language shift table
                        = 1  : the national language locking shift value must be 
                               obtained from the option national-language-locking-shift 
-                              that is defined at SMSC GW general level.							
+                              that is defined at SMPP Server general level.							
 	
 	dest-addr-send-limit - This command is used to set the value of Destination
 					Address Sending Limit table. destaddrsendlimit will be
 					used to limit the sent unconfirmed messages for a 
-					destination address for an ESME. This is SMSC Gw level
+					destination address for an ESME. This is SMPP Server level
 					and can be overwritten for each ESME created.
 					Default value: 0 - no limitations
 							  
 	min-message-length    - This paramter is used to specify the minimum
 					message length (in characters) acceptable to
-					the SMSC GW, for messages coming from this ESME.
+					the SMPP Server, for messages coming from this ESME.
 					
 					If an incoming message length is less than the
-					min-message-length it will be rejected by SMSC GW.
+					min-message-length it will be rejected by SMPP Server.
 					
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
@@ -375,10 +375,10 @@ PARAMETERS
 					
 	max-message-length    - This paramter is used to specify the maximum
 					message length (in characters) acceptable to
-					the SMSC GW, for messages coming from this ESME.
+					the SMPP Server, for messages coming from this ESME.
 					
 					If an incoming message length is more than the
-					max-message-length it will be rejected by SMSC GW.
+					max-message-length it will be rejected by SMPP Server.
 					
 					The default value for this parameter is "-1" and it
 					implies "no limitations". Any other negative value
@@ -402,6 +402,5 @@ EXAMPLES
 	smpp esme modify test password yyyy
 
 SEE ALSO
-	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
-	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
-	smsc set maxmapv, smpp esme create
+	smpp esme create, smpp esme show, smpp esme delete
+	smpp esme start, smpp esme stop

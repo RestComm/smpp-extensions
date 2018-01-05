@@ -17,4 +17,4 @@ EXAMPLE
 	smpp smppserver set writetimeout 2000
 
 SEE ALSO
-	smpp esme create, smsc set bindtimeout, smsc set writetimeout
+	smpp esme create, smpp set bindtimeout, smpp set writetimeout

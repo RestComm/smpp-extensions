@@ -5,10 +5,10 @@ SYNOPSIS
 	smpp smppserver get bindipaddress
 
 DESCRIPTION
-	This command is used to get the IP that SMSC GW used to bind SMPP server.
+	This command is used to get the IP that SMPP Server used to bind SMPP server.
 
 EXAMPLE
 	smpp smppserver get bindipaddress
 
 SEE ALSO
-	smpp esme create, smsc get bindtimeout, smsc get writetimeout
+	smpp esme create, smpp get bindtimeout, smpp get writetimeout

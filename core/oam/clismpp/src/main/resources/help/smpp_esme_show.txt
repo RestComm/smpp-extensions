@@ -13,9 +13,8 @@ PARAMETERS
 	no esmeName is specified.
 
 SEE ALSO
-	smsc get scgt, smsc set scgt, smsc get scssn, smsc set scssn, smsc get hlrssn,
-	smsc set hlrssn, smsc get mscssn, smsc set mscssn, smsc get maxmapv, 
-	smsc set maxmapv
+	smpp esme create, smpp esme modify, smpp esme delete
+	smpp esme start, smpp esme stop
 
 
 
