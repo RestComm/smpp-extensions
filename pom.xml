@@ -4,7 +4,7 @@
     <parent>
         <artifactId>restcomm-parent</artifactId>
         <groupId>org.restcomm</groupId>
-        <version>4.0.1</version> <!-- 3.0.5 4.1.0-6 -->
+        <version>4.0.1</version>  <!-- parent pom version -->
     </parent>
 
     <artifactId>smpp-extensions-parent</artifactId>
@@ -35,6 +35,8 @@
         <jss7.restcomm.version>7.4.0-102</jss7.restcomm.version>
         <slf4j.version>1.5.5</slf4j.version>
         <junit.version>4.1</junit.version>
+
+		<!-- lic dep -->
     </properties>
 
     <modules>
@@ -220,6 +222,8 @@
                 <updatePolicy>never</updatePolicy>
             </snapshots>
         </repository>
+
+		<!-- the place to extra repos -->
     </repositories>
 
     <dependencyManagement>
