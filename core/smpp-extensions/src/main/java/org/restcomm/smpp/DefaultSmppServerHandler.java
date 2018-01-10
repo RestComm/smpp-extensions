@@ -194,9 +194,9 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
 			}
 
-			esmeManagement.sessionClosed(new SessionKey(esme.getName(), sessionId));
+			esmeManagement.sessionClosed(new SessionKey(esme.getName(), esme.getLocalSessionId()));
 			esme.nextLocalSessionId();
-			esmeManagement.sessionCreated(new SessionKey(esme.getName(), sessionId));
+			esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
             esme.setSmppSession((DefaultSmppSession) session);
 
             if (!logger.isDebugEnabled()) {

@@ -25,8 +25,8 @@ public class SessionKey {
     
     public String getSessionKeyName() {
         if (sessionId == null) {
-            return esmeName + "-";
+            return esmeName + "_";
         }
-        return esmeName + "-" + sessionId;
+        return esmeName + "_" + sessionId;
     }
 }
