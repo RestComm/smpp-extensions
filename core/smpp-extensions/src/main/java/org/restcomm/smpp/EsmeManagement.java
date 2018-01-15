@@ -169,6 +169,16 @@ public class EsmeManagement implements EsmeManagementMBean {
         return null;
     }
 
+    @Override
+    public String getClusterNameByEsmeName(String esmeName) {
+        Esme esme = getEsmeByName(esmeName);
+        if (esme == null) {
+            return null;
+        } else {
+            return esme.getClusterName();
+        }
+    }
+
     protected Esme getEsmeByPrimaryKey(String SystemId, String host, int port, SmppBindType smppBindType) {
 
         // Check for actual SystemId, host and port
@@ -374,10 +384,10 @@ public class EsmeManagement implements EsmeManagementMBean {
 	@Override
 	public void stopEsme(String esmeName) throws Exception {
 		Esme esme = this.getEsmeByName(esmeName);
-		Long currSessionId = esme.getLocalSessionId();
 		if (esme == null) {
 			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
 		}
+		Long currSessionId = esme.getLocalSessionId();
 
         esme.setStarted(false);
 

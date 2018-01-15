@@ -2,6 +2,8 @@ package org.restcomm.smpp.oam;
 
 public class SessionKey {
     
+    public static final String SESSION_KEY_SEPARATOR = "_";
+    
     private String esmeName;
     private Long sessionId;
     
@@ -25,8 +27,8 @@ public class SessionKey {
     
     public String getSessionKeyName() {
         if (sessionId == null) {
-            return esmeName + "_";
+            return esmeName + SESSION_KEY_SEPARATOR;
         }
-        return esmeName + "_" + sessionId;
+        return esmeName + SESSION_KEY_SEPARATOR + sessionId;
     }
 }
