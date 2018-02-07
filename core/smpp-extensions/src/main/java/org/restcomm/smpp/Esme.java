@@ -1886,6 +1886,14 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     public void setOverloaded(boolean overloaded) {
         this.overloaded = overloaded;
     }
+    
+    public void updateRequestQueueSize(int value) {
+        esmeManagement.updateRequestQueueSize(name, clusterName, value);
+    }
+    
+    public void updateResponseQueueSize(int value) {
+        esmeManagement.updateResponseQueueSize(name, clusterName, value);
+    }
 
     @Override
     public int hashCode() {

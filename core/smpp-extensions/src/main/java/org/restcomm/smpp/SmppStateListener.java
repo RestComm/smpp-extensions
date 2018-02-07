@@ -8,4 +8,12 @@ public interface SmppStateListener {
 
     void sessionCreated(SessionKey key);
     void sessionClosed(SessionKey key);
+    
+    void esmeStartedNotConnected(String esmeName, String clusterName, int value);
+    
+    void updateRequestQueueSize(String esmeName, String clusterName, int value);
+    void updateResponseQueueSize(String esmeName, String clusterName, int value);
+    
+    void esmeReconnectSuccessfulIncrement(String esmeName, String clusterName);
+    void esmeReconnectFailedIncrement(String esmeName, String clusterName);
 }

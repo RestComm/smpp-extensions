@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -147,6 +148,16 @@ public class EsmeManagement implements EsmeManagementMBean {
     @Override
     public FastList<Esme> getEsmes() {
         return esmes;
+    }
+    
+    public ArrayList<Esme> getClientEsmes() {
+        ArrayList<Esme> res = new ArrayList<Esme>();
+        for (Esme esme : esmes) {
+            if (esme.getSmppSessionType().equals(SmppSession.Type.CLIENT)) {
+                res.add(esme);
+            }
+        };
+        return res;
     }
 
     @Override
@@ -438,6 +449,35 @@ public class EsmeManagement implements EsmeManagementMBean {
 	    this.listener = listener;	
 	    updateListener();
 	}
+
+	public void esmeReconnectSuccessfulIncrement(String esmeName, String clusterName) {
+	    if (listener != null) {
+	        listener.esmeReconnectSuccessfulIncrement(esmeName, clusterName);
+	    }
+	}
+    public void esmeReconnectFailedIncrement(String esmeName, String clusterName) {
+        if (listener != null) {
+            listener.esmeReconnectFailedIncrement(esmeName, clusterName);
+        }
+    }
+    
+    public void esmeStartedNotConnected(String esmeName, String clusterName, int value) {
+        if (listener != null) {
+            listener.esmeStartedNotConnected(esmeName, clusterName, value);
+        }
+    }
+    
+    public void updateRequestQueueSize(String esmeName, String clusterName, int value) {
+        if (listener != null) {
+            listener.updateRequestQueueSize(esmeName, clusterName, value);
+        }
+    }
+    
+    public void updateResponseQueueSize(String esmeName, String clusterName, int value) {
+        if (listener != null) {
+            listener.updateResponseQueueSize(esmeName, clusterName, value);
+        }
+    }
 
 	public void start() throws Exception {
         try {

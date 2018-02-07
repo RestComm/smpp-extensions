@@ -68,6 +68,8 @@ public class SmppClientOpsThread implements Runnable {
 	private final DefaultSmppClient clientBootstrap;
 	private final SmppSessionHandlerInterface smppSessionHandlerInterface;
 	private final EsmeManagement esmeManagement;
+	
+	private SmppStateListener listener;
 
 	/**
 	 * 
@@ -90,6 +92,11 @@ public class SmppClientOpsThread implements Runnable {
 			this.waitObject.notify();
 		}
 	}
+	
+	public void setListener(SmppStateListener listener) {
+        this.listener = listener;   
+//        updateListener();
+    }
 
 	protected void scheduleConnect(Esme esme) {
 
@@ -254,6 +261,7 @@ public class SmppClientOpsThread implements Runnable {
 					logger.error(String.format("Failed to close smpp client session for %s.",
 							smppSession.getConfiguration().getName()));
 				}
+				esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), 1);
 				this.scheduleConnect(esme);
 			}
 
@@ -350,6 +358,11 @@ public class SmppClientOpsThread implements Runnable {
 			esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
 			session0 = clientBootstrap.bind(config0, sessionHandler);
 
+			if (listener != null) {
+	            listener.esmeReconnectSuccessfulIncrement(esme.getName(), esme.getClusterName());
+	        }
+			esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), -1);
+			
 			// Set in ESME
 			logger.debug("SMPP session has been created for ESME: " + esme.getName());
 			esme.setSmppSession((DefaultSmppSession) session0);
@@ -357,6 +370,9 @@ public class SmppClientOpsThread implements Runnable {
 			// Finally set Enquire Link schedule
 			this.scheduleEnquireLink(esme);
 		} catch (Throwable e) {
+		    if (listener != null) {
+                listener.esmeReconnectFailedIncrement(esme.getName(), esme.getClusterName());
+            }
 			logger.error(
 					String.format("Exception when trying to bind client SMPP connection for ESME systemId=%s",
 							esme.getSystemId()) + " name = " + esme.getName(), e);
@@ -367,6 +383,70 @@ public class SmppClientOpsThread implements Runnable {
 		}
 	}
 
+	public int getClientEsmesInConnectQueue() {
+	    int res = 0;
+	    for (ChangeRequest changeRequest : futureSet) {
+            if (changeRequest.getType() == ChangeRequest.CONNECT) {
+                res++;
+            }
+        }
+	    for (ChangeRequest changeRequest : workingSet) {
+            if (changeRequest.getType() == ChangeRequest.CONNECT) {
+                res++;
+            }
+        }
+	    return res;
+	}
+	
+	public int getClientEsmesInConnectQueue(String clusterName) {
+        int res = 0;
+        for (ChangeRequest changeRequest : futureSet) {
+            if (changeRequest.getType() == ChangeRequest.CONNECT) {
+                if (changeRequest.getEsme().getClusterName().equals(clusterName)) {
+                    res++;
+                }
+            }
+        }
+        for (ChangeRequest changeRequest : workingSet) {
+            if (changeRequest.getType() == ChangeRequest.CONNECT) {
+                res++;
+            }
+        }
+        return res;
+    }
+	
+	public int getClientEsmesEnquireLinkQueue() {
+        int res = 0;
+        for (ChangeRequest changeRequest : futureSet) {
+            if (changeRequest.getType() == ChangeRequest.ENQUIRE_LINK) {
+                res++;
+            }
+        }
+        for (ChangeRequest changeRequest : workingSet) {
+            if (changeRequest.getType() == ChangeRequest.ENQUIRE_LINK) {
+                res++;
+            }
+        }
+        return res;
+    }
+	
+	public int getClientEsmesEnquireLinkQueue(String clusterName) {
+        int res = 0;
+        for (ChangeRequest changeRequest : futureSet) {
+            if (changeRequest.getType() == ChangeRequest.ENQUIRE_LINK) {
+                if (changeRequest.getEsme().getClusterName().equals(clusterName)) {
+                    res++;
+                }
+            }
+        }
+        for (ChangeRequest changeRequest : workingSet) {
+            if (changeRequest.getType() == ChangeRequest.ENQUIRE_LINK) {
+                res++;
+            }
+        }
+        return res;
+    }
+	
 	protected class ClientSmppSessionHandler implements SmppSessionHandler {
 
 		private final Esme esme;

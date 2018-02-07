@@ -185,4 +185,24 @@ public class SmppClientManagement implements SmppClientManagementMBean {
 	public void setExpectedSessions(int expectedSessions) {
 		this.expectedSessions = expectedSessions;
 	}
+	
+	public int getClientEsmesInConnectQueue() {
+        return smppClientOpsThread.getClientEsmesInConnectQueue();
+    }
+    
+	public int getClientEsmesInConnectQueue(String clusterName) {
+        return smppClientOpsThread.getClientEsmesInConnectQueue(clusterName);
+    }
+    
+	public int getClientEsmesEnquireLinkQueue() {
+        return smppClientOpsThread.getClientEsmesEnquireLinkQueue();
+    }
+    
+	public int getClientEsmesEnquireLinkQueue(String clusterName) {
+        return smppClientOpsThread.getClientEsmesEnquireLinkQueue(clusterName);
+    }
+    
+    public void setListener(SmppStateListener listener) {
+        this.smppClientOpsThread.setListener(listener);
+    }
 }

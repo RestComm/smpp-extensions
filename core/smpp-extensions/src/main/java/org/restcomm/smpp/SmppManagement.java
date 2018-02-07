@@ -132,8 +132,35 @@ public class SmppManagement implements SmppManagementMBean {
         if (this.esmeManagement != null) {
             this.esmeManagement.setListener(listener);
         }
+        if (this.smppClientManagement != null) {
+            this.smppClientManagement.setListener(listener);
+        }
     }
-
+    
+    public int getClientEsmesInConnectQueue() {
+        if (smppClientManagement != null)
+            return smppClientManagement.getClientEsmesInConnectQueue();
+        return -1;
+    }
+    
+    public int getClientEsmesInConnectQueue(String clusterName) {
+        if (smppClientManagement != null)
+            return smppClientManagement.getClientEsmesInConnectQueue(clusterName);
+        return -1;
+    }
+    
+    public int getClientEsmesEnquireLinkQueue() {
+        if (smppClientManagement != null)
+            return smppClientManagement.getClientEsmesEnquireLinkQueue();
+        return -1;
+    }
+    
+    public int getClientEsmesEnquireLinkQueue(String clusterName) {
+        if (smppClientManagement != null)
+            return smppClientManagement.getClientEsmesEnquireLinkQueue(clusterName);
+        return -1;
+    }
+    
     public void start() {
         this.isStarted = true;
     }
