@@ -9,7 +9,7 @@
 
     <artifactId>smpp-extensions-parent</artifactId>
     <groupId>org.restcomm.smpp</groupId>
-    <version>7.1.0-SNAPSHOT</version>
+    <version>7.1.0-134</version>
 
     <packaging>pom</packaging>
 
