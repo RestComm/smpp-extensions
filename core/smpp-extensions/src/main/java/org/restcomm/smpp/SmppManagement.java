@@ -67,7 +67,7 @@ public class SmppManagement implements SmppManagementMBean {
 
     private SmppServerManagement smppServerManagement = null;
     private SmppClientManagement smppClientManagement = null;
-    
+
     private SmppStateListener listener;
 
     private SmppManagement(String name) {
@@ -110,7 +110,6 @@ public class SmppManagement implements SmppManagementMBean {
         this.persistDir = persistDir;
     }
 
-
     public EsmeManagement getEsmeManagement() {
         return esmeManagement;
     }
@@ -126,7 +125,7 @@ public class SmppManagement implements SmppManagementMBean {
     public void setMbeanServer(MBeanServer mbeanServer) {
         this.mbeanServer = mbeanServer;
     }
-    
+
     public void setListener(SmppStateListener listener) {
         this.listener = listener;
         if (this.esmeManagement != null) {
@@ -136,31 +135,31 @@ public class SmppManagement implements SmppManagementMBean {
             this.smppClientManagement.setListener(listener);
         }
     }
-    
+
     public int getClientEsmesInConnectQueue() {
         if (smppClientManagement != null)
             return smppClientManagement.getClientEsmesInConnectQueue();
         return -1;
     }
-    
+
     public int getClientEsmesInConnectQueue(String clusterName) {
         if (smppClientManagement != null)
             return smppClientManagement.getClientEsmesInConnectQueue(clusterName);
         return -1;
     }
-    
+
     public int getClientEsmesEnquireLinkQueue() {
         if (smppClientManagement != null)
             return smppClientManagement.getClientEsmesEnquireLinkQueue();
         return -1;
     }
-    
+
     public int getClientEsmesEnquireLinkQueue(String clusterName) {
         if (smppClientManagement != null)
             return smppClientManagement.getClientEsmesEnquireLinkQueue(clusterName);
         return -1;
     }
-    
+
     public void start() {
         this.isStarted = true;
     }
@@ -182,49 +181,47 @@ public class SmppManagement implements SmppManagementMBean {
             this.esmeManagement.setListener(listener);
         }
 
-        ObjectName esmeObjNname = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT
-                + ",name=" + this.getName());
+        ObjectName esmeObjNname = new ObjectName(
+                JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.esmeManagement, EsmeManagementMBean.class, false, esmeObjNname);
 
         logger.info("Started SmppManagement");
 
         // Step 6 Start SMPP Server
-        this.smppServerManagement = new SmppServerManagement(this.name, this.esmeManagement,
-                this.smppSessionHandlerInterface);
+        this.smppServerManagement = new SmppServerManagement(this.name, this.esmeManagement, this.smppSessionHandlerInterface);
         this.smppServerManagement.setPersistDir(this.persistDir);
         this.smppServerManagement.start();
 
-        ObjectName smppServerManaObjName = new ObjectName(JMX_DOMAIN + ":layer="
-                + JMX_LAYER_SMPP_SERVER_MANAGEMENT + ",name=" + this.getName());
+        ObjectName smppServerManaObjName = new ObjectName(
+                JMX_DOMAIN + ":layer=" + JMX_LAYER_SMPP_SERVER_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.smppServerManagement, SmppServerManagementMBean.class, true, smppServerManaObjName);
 
         // Step 7 Start SMPP Clients
-        this.smppClientManagement = new SmppClientManagement(this.name, this.esmeManagement,
-                this.smppSessionHandlerInterface);
+        this.smppClientManagement = new SmppClientManagement(this.name, this.esmeManagement, this.smppSessionHandlerInterface);
 
         this.esmeManagement.setSmppClient(this.smppClientManagement);
         this.smppClientManagement.start();
 
-        ObjectName smppClientManaObjName = new ObjectName(JMX_DOMAIN + ":layer="
-                + JMX_LAYER_SMPP_CLIENT_MANAGEMENT + ",name=" + this.getName());
+        ObjectName smppClientManaObjName = new ObjectName(
+                JMX_DOMAIN + ":layer=" + JMX_LAYER_SMPP_CLIENT_MANAGEMENT + ",name=" + this.getName());
         this.registerMBean(this.smppClientManagement, SmppClientManagementMBean.class, true, smppClientManaObjName);
     }
 
     public void stopSmppManagement() throws Exception {
 
         this.esmeManagement.stop();
-        ObjectName esmeObjNname = new ObjectName(JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT
-                + ",name=" + this.getName());
+        ObjectName esmeObjNname = new ObjectName(
+                JMX_DOMAIN + ":layer=" + JMX_LAYER_ESME_MANAGEMENT + ",name=" + this.getName());
         this.unregisterMbean(esmeObjNname);
 
         this.smppServerManagement.stop();
-        ObjectName smppServerManaObjName = new ObjectName(JMX_DOMAIN + ":layer="
-                + JMX_LAYER_SMPP_SERVER_MANAGEMENT + ",name=" + this.getName());
+        ObjectName smppServerManaObjName = new ObjectName(
+                JMX_DOMAIN + ":layer=" + JMX_LAYER_SMPP_SERVER_MANAGEMENT + ",name=" + this.getName());
         this.unregisterMbean(smppServerManaObjName);
 
         this.smppClientManagement.stop();
-        ObjectName smppClientManaObjName = new ObjectName(JMX_DOMAIN + ":layer="
-                + JMX_LAYER_SMPP_CLIENT_MANAGEMENT + ",name=" + this.getName());
+        ObjectName smppClientManaObjName = new ObjectName(
+                JMX_DOMAIN + ":layer=" + JMX_LAYER_SMPP_CLIENT_MANAGEMENT + ",name=" + this.getName());
         this.unregisterMbean(smppClientManaObjName);
 
     }

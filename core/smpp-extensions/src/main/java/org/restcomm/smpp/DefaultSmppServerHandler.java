@@ -171,44 +171,45 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
         } finally {
             accessSemaphore.release();
         }
-	}
+    }
 
-	@Override
-	public void sessionCreated(Long sessionId, SmppServerSession session, BaseBindResp preparedBindResponse)
-			throws SmppProcessingException {
-		try {
-		    accessSemaphore.acquire();
-		} catch(InterruptedException e) {}
-		
-		try {
-			if (logger.isInfoEnabled()) {
-				logger.info(String.format("Session created: Name=%s SystemId=%s", session.getConfiguration().getName(),
-						session.getConfiguration().getSystemId()));
-			}
+    @Override
+    public void sessionCreated(Long sessionId, SmppServerSession session, BaseBindResp preparedBindResponse)
+            throws SmppProcessingException {
+        try {
+            accessSemaphore.acquire();
+        } catch (InterruptedException e) {
+        }
 
-			if (this.smppSessionHandlerInterface == null) {
-				logger.error("No SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
-				esmeManagement.esmeReconnectFailedIncrement(null, null);
-				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
-			}
+        try {
+            if (logger.isInfoEnabled()) {
+                logger.info(String.format("Session created: Name=%s SystemId=%s", session.getConfiguration().getName(),
+                        session.getConfiguration().getSystemId()));
+            }
 
-			SmppSessionConfiguration sessionConfiguration = session.getConfiguration();
+            if (this.smppSessionHandlerInterface == null) {
+                logger.error("No SmppSessionHandlerInterface registered yet! Will close SmppServerSession");
+                esmeManagement.esmeReconnectFailedIncrement(null, null);
+                throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
+            }
 
-			Esme esme = this.esmeManagement.getEsmeByName(sessionConfiguration.getName());
+            SmppSessionConfiguration sessionConfiguration = session.getConfiguration();
 
-			if (esme == null) {
-				logger.error(String.format("No ESME for Name=%s SystemId=%s Host=%s Port=%d SmppBindType=%s",
-						sessionConfiguration.getSystemId(), sessionConfiguration.getHost(),
-						sessionConfiguration.getPort(), sessionConfiguration.getType()));
-				esmeManagement.esmeReconnectFailedIncrement(null, null);
-				throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
-			}
+            Esme esme = this.esmeManagement.getEsmeByName(sessionConfiguration.getName());
 
-			esmeManagement.sessionClosed(new SessionKey(esme.getName(), esme.getLocalSessionId()));
-			esme.nextLocalSessionId();
-			esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
+            if (esme == null) {
+                logger.error(String.format("No ESME for Name=%s SystemId=%s Host=%s Port=%d SmppBindType=%s",
+                        sessionConfiguration.getSystemId(), sessionConfiguration.getHost(), sessionConfiguration.getPort(),
+                        sessionConfiguration.getType()));
+                esmeManagement.esmeReconnectFailedIncrement(null, null);
+                throw new SmppProcessingException(SmppConstants.STATUS_BINDFAIL);
+            }
+
+            esmeManagement.sessionClosed(new SessionKey(esme.getName(), esme.getLocalSessionId()));
+            esme.nextLocalSessionId();
+            esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
             esme.setSmppSession((DefaultSmppSession) session);
-            
+
             esmeManagement.esmeReconnectSuccessfulIncrement(esme.getName(), esme.getClusterName());
 
             if (!logger.isDebugEnabled()) {
@@ -225,7 +226,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
             // set link start flag
             esme.setLinkStartFirstTime(true);
-            
+
             esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), -1);
 
             // start enquire message imedialtely
@@ -264,7 +265,7 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             esmeServer.resetEnquireLinkFail();
             this.smppServerOpsThread.removeEnquireList(esmeName);
             this.smppSessionHandlerInterface.destroySmppSessionHandler(esmeServer);
-            
+
             // bringing back to close
             esmeServer.setLocalStateName((com.cloudhopper.smpp.SmppSession.STATES[SmppSession.STATE_CLOSED]));
 
@@ -281,8 +282,8 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
 
             esmeManagement.sessionClosed(new SessionKey(esmeServer.getName(), esmeServer.getLocalSessionId()));
             esmeManagement.esmeStartedNotConnected(esmeServer.getName(), esmeServer.getClusterName(), 1);
-			// make sure it's really shutdown
-			session.destroy();
+            // make sure it's really shutdown
+            session.destroy();
 
         } finally {
             accessSemaphore.release();

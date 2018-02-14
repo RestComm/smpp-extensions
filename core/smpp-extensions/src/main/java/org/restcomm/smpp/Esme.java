@@ -92,13 +92,13 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private static final String WINDOW_MONITOR_INTERVAL = "windowMonitorInterval";
     private static final String WINDOW_WAIT_TIMEOUT = "windowWaitTimeout";
 
-	private static final String ENQUIRE_LINK_DELAY = "enquireLinkDelay";
-	private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";
-	private static final String LINK_DROP_SERVER = "linkDropServer";
-	private static final String COUNTERS_ENABLED = "countersEnabled";
-	private static final String ESME_ERROR_COUNTERS_ENABLED = "esmeErrorCountersEnabled";
-	private static final String ESME_MAINTENANCE_COUNTERS_ENABLED = "esmeMaintenanceCountersEnabled";
-	private static final String SESSION_ERROR_COUNTERS_ENABLED = "sessionErrorCountersEnabled";
+    private static final String ENQUIRE_LINK_DELAY = "enquireLinkDelay";
+    private static final String ENQUIRE_LINK_DELAY_SERVER = "enquireLinkDelayServer";
+    private static final String LINK_DROP_SERVER = "linkDropServer";
+    private static final String COUNTERS_ENABLED = "countersEnabled";
+    private static final String ESME_ERROR_COUNTERS_ENABLED = "esmeErrorCountersEnabled";
+    private static final String ESME_MAINTENANCE_COUNTERS_ENABLED = "esmeMaintenanceCountersEnabled";
+    private static final String SESSION_ERROR_COUNTERS_ENABLED = "sessionErrorCountersEnabled";
 
     private static final String RATE_LIMIT_PER_SECOND = "rateLimitPerSecond";
     private static final String RATE_LIMIT_PER_MINUTE = "rateLimitPerMinute";
@@ -128,51 +128,51 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     // long messages will be split before sending to this destination
     private boolean splitLongMessages;
 
-	// These are configured ESME TON, NPI and Address Range. If ESME is acting
-	// as Server, incoming BIND request should match there TON, NPI and address
-	// range. If ESME is acting as Client, these values will be set in outgoing
-	// BIND request. if TON and NPI are -1 or esmeAddressRange is null they are
-	// ignored
-	private int esmeTon = -1;
-	private int esmeNpi = -1;
-	private String esmeAddressRange = null;
+    // These are configured ESME TON, NPI and Address Range. If ESME is acting
+    // as Server, incoming BIND request should match there TON, NPI and address
+    // range. If ESME is acting as Client, these values will be set in outgoing
+    // BIND request. if TON and NPI are -1 or esmeAddressRange is null they are
+    // ignored
+    private int esmeTon = -1;
+    private int esmeNpi = -1;
+    private String esmeAddressRange = null;
 
-	// Incoming SMS should match these TON, NPI and addressRange. TON and NPI
-	// can be -1 which means SMSC doesn't care for these fields and only
-	// addressRange (pattern) should match
-	private int sourceTon = -1;
-	private int sourceNpi = -1;
-	private String sourceAddressRange = "^[0-9a-zA-Z]*";
-	private Pattern sourceAddressRangePattern = null;
+    // Incoming SMS should match these TON, NPI and addressRange. TON and NPI
+    // can be -1 which means SMSC doesn't care for these fields and only
+    // addressRange (pattern) should match
+    private int sourceTon = -1;
+    private int sourceNpi = -1;
+    private String sourceAddressRange = "^[0-9a-zA-Z]*";
+    private Pattern sourceAddressRangePattern = null;
 
-	// Outgoing SMS should match these TON, NPI and addressRange. TON and NPI
-	// can be -1 which means SMSC doesn't care for these fields and only
-	// addressRange (pattern) should match
-	private int routingTon;
-	private int routingNpi;
-	private String routingAddressRange;
-	private Pattern routingAddressRangePattern;
+    // Outgoing SMS should match these TON, NPI and addressRange. TON and NPI
+    // can be -1 which means SMSC doesn't care for these fields and only
+    // addressRange (pattern) should match
+    private int routingTon;
+    private int routingNpi;
+    private String routingAddressRange;
+    private Pattern routingAddressRangePattern;
 
-	private SmppBindType smppBindType;
-	private boolean chargingEnabled = false;
+    private SmppBindType smppBindType;
+    private boolean chargingEnabled = false;
 
-	private boolean countersEnabled = true;
-	private Boolean esmeErrorCountersEnabled = null;
-	private Boolean esmeMaintenanceCountersEnabled = null;
-	private Boolean sessionErrorCountersEnabled = null;
-	
-	private int enquireLinkDelay = 30000;
-	private int enquireLinkDelayServer = 0;
+    private boolean countersEnabled = true;
+    private Boolean esmeErrorCountersEnabled = null;
+    private Boolean esmeMaintenanceCountersEnabled = null;
+    private Boolean sessionErrorCountersEnabled = null;
 
-	private long linkDropServer = 0L;
-	private boolean linkRecvMessCheck = false;
-	private boolean linkStartFirstTime = false;
+    private int enquireLinkDelay = 30000;
+    private int enquireLinkDelayServer = 0;
 
-	private AtomicBoolean inConnectingQueue = new AtomicBoolean(false);
-	private AtomicLong localSessionId = new AtomicLong(0L);
+    private long linkDropServer = 0L;
+    private boolean linkRecvMessCheck = false;
+    private boolean linkStartFirstTime = false;
 
-	// Default Server
-	private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
+    private AtomicBoolean inConnectingQueue = new AtomicBoolean(false);
+    private AtomicLong localSessionId = new AtomicLong(0L);
+
+    // Default Server
+    private SmppSession.Type smppSessionType = SmppSession.Type.SERVER;
 
     // national single and locking shift tables for the case when a message is SMPP originated and does not have included UDH
     // 0 means gsm7 default table
@@ -301,12 +301,12 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
             SmppBindType smppBindType, Type smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout,
             long clientBindTimeout, long windowMonitorInterval, long windowWaitTimeout, String clusterName,
-            boolean countersEnabled, Boolean esmeErrorCountersEnabled, Boolean esmeMaintenanceCountersEnabled, 
-            Boolean sessionErrorCountersEnabled, int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon,
-            int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
+            boolean countersEnabled, Boolean esmeErrorCountersEnabled, Boolean esmeMaintenanceCountersEnabled,
+            Boolean sessionErrorCountersEnabled, int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer,
+            int sourceTon, int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange,
             int networkId, boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
-            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit, int minMessageLength,
-            int maxMessageLength, int overloadThreshold, int normalThreshold
+            long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
+            int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold
 
     ) {
         this.name = name;
@@ -337,10 +337,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
         this.clusterName = clusterName;
 
-		this.countersEnabled = countersEnabled;
-		this.esmeErrorCountersEnabled = esmeErrorCountersEnabled;
-		this.esmeMaintenanceCountersEnabled = esmeMaintenanceCountersEnabled;
-		this.sessionErrorCountersEnabled = sessionErrorCountersEnabled;
+        this.countersEnabled = countersEnabled;
+        this.esmeErrorCountersEnabled = esmeErrorCountersEnabled;
+        this.esmeMaintenanceCountersEnabled = esmeMaintenanceCountersEnabled;
+        this.sessionErrorCountersEnabled = sessionErrorCountersEnabled;
 
         this.enquireLinkDelay = enquireLinkDelay;
         this.enquireLinkDelayServer = enquireLinkDelayServer;
@@ -879,64 +879,63 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     }
 
     /**
-	 * @return the smppSession
-	 */
-	public DefaultSmppSession getSmppSession() {
-		return defaultSmppSession;
-	}
+     * @return the smppSession
+     */
+    public DefaultSmppSession getSmppSession() {
+        return defaultSmppSession;
+    }
 
-	/**
-	 * @param smppSession
-	 *            the smppSession to set
-	 */
-	public void setSmppSession(DefaultSmppSession smppSession) {
-		this.defaultSmppSession = smppSession;
-	}
+    /**
+     * @param smppSession the smppSession to set
+     */
+    public void setSmppSession(DefaultSmppSession smppSession) {
+        this.defaultSmppSession = smppSession;
+    }
 
-	@Override
-	public int getEnquireLinkDelay() {
-		return enquireLinkDelay;
-	}
+    @Override
+    public int getEnquireLinkDelay() {
+        return enquireLinkDelay;
+    }
 
-	@Override
-	public void setEnquireLinkDelay(int enquireLinkDelay) {
-		this.enquireLinkDelay = enquireLinkDelay;
-		this.store();
-	}
+    @Override
+    public void setEnquireLinkDelay(int enquireLinkDelay) {
+        this.enquireLinkDelay = enquireLinkDelay;
+        this.store();
+    }
 
-	@Override
-	public int getEnquireLinkDelayServer() {
-		return this.enquireLinkDelayServer;
-	}
+    @Override
+    public int getEnquireLinkDelayServer() {
+        return this.enquireLinkDelayServer;
+    }
 
-	@Override
-	public void setEnquireLinkDelayServer(int enquireLinkDelayServer) {
-		this.enquireLinkDelayServer = enquireLinkDelayServer;
-		this.store();
-	}
+    @Override
+    public void setEnquireLinkDelayServer(int enquireLinkDelayServer) {
+        this.enquireLinkDelayServer = enquireLinkDelayServer;
+        this.store();
+    }
 
-	@Override
-	public long getLinkDropServer() {
-		return this.linkDropServer;
-	}
+    @Override
+    public long getLinkDropServer() {
+        return this.linkDropServer;
+    }
 
-	@Override
-	public void setLinkDropServer(long linkDropServer) {
-		this.linkDropServer = linkDropServer;
-		this.store();
-	}
+    @Override
+    public void setLinkDropServer(long linkDropServer) {
+        this.linkDropServer = linkDropServer;
+        this.store();
+    }
 
-	@Override
-	public boolean isCountersEnabled() {
-		return countersEnabled;
-	}
+    @Override
+    public boolean isCountersEnabled() {
+        return countersEnabled;
+    }
 
-	@Override
-	public void setCountersEnabled(boolean countersEnabled) {
-		this.countersEnabled = countersEnabled;
-	}
-	
-	@Override
+    @Override
+    public void setCountersEnabled(boolean countersEnabled) {
+        this.countersEnabled = countersEnabled;
+    }
+
+    @Override
     public Boolean getEsmeErrorCountersEnabled() {
         return esmeErrorCountersEnabled;
     }
@@ -946,7 +945,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         this.esmeErrorCountersEnabled = esmeErrorCountersEnabled;
         this.store();
     }
-    
+
     @Override
     public Boolean getEsmeMaintenanceCountersEnabled() {
         return esmeMaintenanceCountersEnabled;
@@ -957,7 +956,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         this.esmeMaintenanceCountersEnabled = esmeMaintenanceCountersEnabled;
         this.store();
     }
-    
+
     @Override
     public Boolean getSessionErrorCountersEnabled() {
         return sessionErrorCountersEnabled;
@@ -967,80 +966,80 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     public void setSessionErrorCountersEnabled(Boolean sessionErrorCountersEnabled) {
         this.sessionErrorCountersEnabled = sessionErrorCountersEnabled;
         this.store();
-    }    
+    }
 
-	@Override
-	public boolean isChargingEnabled() {
-		return chargingEnabled;
-	}
+    @Override
+    public boolean isChargingEnabled() {
+        return chargingEnabled;
+    }
 
-	@Override
-	public void setChargingEnabled(boolean chargingEnabled) {
-		this.chargingEnabled = chargingEnabled;
-		this.store();
-	}
+    @Override
+    public void setChargingEnabled(boolean chargingEnabled) {
+        this.chargingEnabled = chargingEnabled;
+        this.store();
+    }
 
-	public boolean isSourceAddressMatching(Address sourceAddress) {
+    public boolean isSourceAddressMatching(Address sourceAddress) {
 
-		// Check sourceTon
-		if (this.sourceTon != -1 && this.sourceTon != sourceAddress.getTon()) {
-			return false;
-		}
+        // Check sourceTon
+        if (this.sourceTon != -1 && this.sourceTon != sourceAddress.getTon()) {
+            return false;
+        }
 
-		// Check sourceNpi
-		if (this.sourceNpi != -1 && this.sourceNpi != sourceAddress.getNpi()) {
-			return false;
-		}
+        // Check sourceNpi
+        if (this.sourceNpi != -1 && this.sourceNpi != sourceAddress.getNpi()) {
+            return false;
+        }
 
-		// Check sourceAddress
-		Matcher m = this.sourceAddressRangePattern.matcher(sourceAddress.getAddress());
-		if (m.matches()) {
-			return true;
-		}
+        // Check sourceAddress
+        Matcher m = this.sourceAddressRangePattern.matcher(sourceAddress.getAddress());
+        if (m.matches()) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public boolean isRoutingAddressMatching(int destTon, int destNpi, String destAddress) {
+    public boolean isRoutingAddressMatching(int destTon, int destNpi, String destAddress) {
 
-		// Check sourceTon
-		if (this.routingTon != -1 && this.routingTon != destTon) {
-			return false;
-		}
+        // Check sourceTon
+        if (this.routingTon != -1 && this.routingTon != destTon) {
+            return false;
+        }
 
-		// Check sourceNpi
-		if (this.routingNpi != -1 && this.routingNpi != destNpi) {
-			return false;
-		}
+        // Check sourceNpi
+        if (this.routingNpi != -1 && this.routingNpi != destNpi) {
+            return false;
+        }
 
-		// Check sourceAddress
-		Matcher m = this.routingAddressRangePattern.matcher(destAddress);
-		if (m.matches()) {
-			return true;
-		}
+        // Check sourceAddress
+        Matcher m = this.routingAddressRangePattern.matcher(destAddress);
+        if (m.matches()) {
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public int getEnquireLinkFail() {
-		return this.enquireLinkFailCnt;
-	}
+    public int getEnquireLinkFail() {
+        return this.enquireLinkFailCnt;
+    }
 
-	public void resetEnquireLinkFail() {
-		this.enquireLinkFailCnt = 0;
-	}
+    public void resetEnquireLinkFail() {
+        this.enquireLinkFailCnt = 0;
+    }
 
-	public void incEnquireLinkFail() {
-		this.enquireLinkFailCnt ++;
-	}
+    public void incEnquireLinkFail() {
+        this.enquireLinkFailCnt++;
+    }
 
-	public boolean getEnquireClientEnabled() {
-		if (this.enquireLinkDelay <= 0) {
-			return false;
-		}
+    public boolean getEnquireClientEnabled() {
+        if (this.enquireLinkDelay <= 0) {
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
     public boolean getEnquireServerEnabled() {
         if (this.enquireLinkDelayServer <= 0) {
@@ -1118,65 +1117,64 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             esme.rateLimitPerHour = xml.getAttribute(RATE_LIMIT_PER_HOUR, 0L);
             esme.rateLimitPerDay = xml.getAttribute(RATE_LIMIT_PER_DAY, 0L);
 
-			String smppBindTypeStr = xml.getAttribute(SMPP_BIND_TYPE, "TRANSCEIVER");
+            String smppBindTypeStr = xml.getAttribute(SMPP_BIND_TYPE, "TRANSCEIVER");
 
-			if (SmppBindType.TRANSCEIVER.toString().equals(smppBindTypeStr)) {
-				esme.smppBindType = SmppBindType.TRANSCEIVER;
-			} else if (SmppBindType.TRANSMITTER.toString().equals(smppBindTypeStr)) {
-				esme.smppBindType = SmppBindType.TRANSMITTER;
-			} else if (SmppBindType.RECEIVER.toString().equals(smppBindTypeStr)) {
-				esme.smppBindType = SmppBindType.RECEIVER;
-			}
+            if (SmppBindType.TRANSCEIVER.toString().equals(smppBindTypeStr)) {
+                esme.smppBindType = SmppBindType.TRANSCEIVER;
+            } else if (SmppBindType.TRANSMITTER.toString().equals(smppBindTypeStr)) {
+                esme.smppBindType = SmppBindType.TRANSMITTER;
+            } else if (SmppBindType.RECEIVER.toString().equals(smppBindTypeStr)) {
+                esme.smppBindType = SmppBindType.RECEIVER;
+            }
 
-			String smppSessionTypeStr = xml.getAttribute(SMPP_SESSION_TYPE, "SERVER");
-			esme.smppSessionType = SmppSession.Type.valueOf(smppSessionTypeStr);
+            String smppSessionTypeStr = xml.getAttribute(SMPP_SESSION_TYPE, "SERVER");
+            esme.smppSessionType = SmppSession.Type.valueOf(smppSessionTypeStr);
 
-			esme.started = xml.getAttribute(STARTED, false);
+            esme.started = xml.getAttribute(STARTED, false);
 
-			esme.systemType = xml.getAttribute(ESME_SYSTEM_TYPE, "");
-			esme.smppVersion = SmppInterfaceVersionType.getInterfaceVersionType(xml.getAttribute(
-					ESME_INTERFACE_VERSION, ""));
+            esme.systemType = xml.getAttribute(ESME_SYSTEM_TYPE, "");
+            esme.smppVersion = SmppInterfaceVersionType.getInterfaceVersionType(xml.getAttribute(ESME_INTERFACE_VERSION, ""));
 
-			esme.esmeTon = xml.getAttribute(ESME_TON, (byte) 0);
-			esme.esmeNpi = xml.getAttribute(ESME_NPI, (byte) 0);
-			esme.esmeAddressRange = xml.getAttribute(ESME_ADDRESS_RANGE, null);
+            esme.esmeTon = xml.getAttribute(ESME_TON, (byte) 0);
+            esme.esmeNpi = xml.getAttribute(ESME_NPI, (byte) 0);
+            esme.esmeAddressRange = xml.getAttribute(ESME_ADDRESS_RANGE, null);
 
-			esme.windowSize = xml.getAttribute(WINDOW_SIZE, 0);
-			esme.connectTimeout = xml.getAttribute(CONNECT_TIMEOUT, 0L);
-			esme.requestExpiryTimeout = xml.getAttribute(REQUEST_EXPIRY_TIMEOUT, 0L);
-			esme.clientBindTimeout = xml.getAttribute(CLIENT_BIND_TIMEOUT, SmppConstants.DEFAULT_BIND_TIMEOUT);
+            esme.windowSize = xml.getAttribute(WINDOW_SIZE, 0);
+            esme.connectTimeout = xml.getAttribute(CONNECT_TIMEOUT, 0L);
+            esme.requestExpiryTimeout = xml.getAttribute(REQUEST_EXPIRY_TIMEOUT, 0L);
+            esme.clientBindTimeout = xml.getAttribute(CLIENT_BIND_TIMEOUT, SmppConstants.DEFAULT_BIND_TIMEOUT);
 
-			esme.windowMonitorInterval = xml.getAttribute(WINDOW_MONITOR_INTERVAL, 0L);
-			esme.windowWaitTimeout = xml.getAttribute(WINDOW_WAIT_TIMEOUT, 0L);
-			esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
-			Boolean nullBoolean = null;
-			
-			if(xml.getAttribute(ESME_ERROR_COUNTERS_ENABLED) != null)
-			    esme.esmeErrorCountersEnabled = xml.getAttribute(ESME_ERROR_COUNTERS_ENABLED, false);
-			if(xml.getAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED) != null)
-			    esme.esmeMaintenanceCountersEnabled = xml.getAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED, false);
-			if(xml.getAttribute(SESSION_ERROR_COUNTERS_ENABLED) != null)
-			    esme.sessionErrorCountersEnabled = xml.getAttribute(SESSION_ERROR_COUNTERS_ENABLED, false);
-			
-			esme.enquireLinkDelay = xml.getAttribute(ENQUIRE_LINK_DELAY, 30000);
-			esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
-			esme.linkDropServer = xml.getAttribute(LINK_DROP_SERVER, 0L);
+            esme.windowMonitorInterval = xml.getAttribute(WINDOW_MONITOR_INTERVAL, 0L);
+            esme.windowWaitTimeout = xml.getAttribute(WINDOW_WAIT_TIMEOUT, 0L);
+            esme.countersEnabled = xml.getAttribute(COUNTERS_ENABLED, true);
+            Boolean nullBoolean = null;
 
-			esme.chargingEnabled = xml.getAttribute(CHARGING_ENABLED, false);
+            if (xml.getAttribute(ESME_ERROR_COUNTERS_ENABLED) != null)
+                esme.esmeErrorCountersEnabled = xml.getAttribute(ESME_ERROR_COUNTERS_ENABLED, false);
+            if (xml.getAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED) != null)
+                esme.esmeMaintenanceCountersEnabled = xml.getAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED, false);
+            if (xml.getAttribute(SESSION_ERROR_COUNTERS_ENABLED) != null)
+                esme.sessionErrorCountersEnabled = xml.getAttribute(SESSION_ERROR_COUNTERS_ENABLED, false);
 
-			esme.sourceTon = xml.getAttribute(SOURCE_TON, -1);
-			esme.sourceNpi = xml.getAttribute(SOURCE_NPI, -1);
-			esme.sourceAddressRange = xml.getAttribute(SOURCE_ADDRESS_RANGE, "^[0-9a-zA-Z]*");
-			esme.sourceAddressRangePattern = Pattern.compile(esme.sourceAddressRange);
+            esme.enquireLinkDelay = xml.getAttribute(ENQUIRE_LINK_DELAY, 30000);
+            esme.enquireLinkDelayServer = xml.getAttribute(ENQUIRE_LINK_DELAY_SERVER, 0);
+            esme.linkDropServer = xml.getAttribute(LINK_DROP_SERVER, 0L);
 
-			esme.routingTon = xml.getAttribute(ROUTING_TON, -1);
-			esme.routingNpi = xml.getAttribute(ROUTING_NPI, -1);
-			// default value we are using here is esme.esmeAddressRange to be
-			// backward compatible
-			esme.routingAddressRange = xml.getAttribute(ROUTING_ADDRESS_RANGE, esme.esmeAddressRange);
-			if (esme.routingAddressRange != null) {
-				esme.routingAddressRangePattern = Pattern.compile(esme.routingAddressRange);
-			}
+            esme.chargingEnabled = xml.getAttribute(CHARGING_ENABLED, false);
+
+            esme.sourceTon = xml.getAttribute(SOURCE_TON, -1);
+            esme.sourceNpi = xml.getAttribute(SOURCE_NPI, -1);
+            esme.sourceAddressRange = xml.getAttribute(SOURCE_ADDRESS_RANGE, "^[0-9a-zA-Z]*");
+            esme.sourceAddressRangePattern = Pattern.compile(esme.sourceAddressRange);
+
+            esme.routingTon = xml.getAttribute(ROUTING_TON, -1);
+            esme.routingNpi = xml.getAttribute(ROUTING_NPI, -1);
+            // default value we are using here is esme.esmeAddressRange to be
+            // backward compatible
+            esme.routingAddressRange = xml.getAttribute(ROUTING_ADDRESS_RANGE, esme.esmeAddressRange);
+            if (esme.routingAddressRange != null) {
+                esme.routingAddressRangePattern = Pattern.compile(esme.routingAddressRange);
+            }
 
             esme.nationalLanguageSingleShift = xml.getAttribute(NATIONAL_LANGUAGE_SINGLE_SHIFT, -1);
             esme.nationalLanguageLockingShift = xml.getAttribute(NATIONAL_LANGUAGE_LOCKING_SHIFT, -1);
@@ -1254,68 +1252,68 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             xml.setAttribute(MIN_MESSAGE_LENGTH, esme.minMessageLength);
             xml.setAttribute(MAX_MESSAGE_LENGTH, esme.maxMessageLength);
 
-			xml.setAttribute(WINDOW_SIZE, esme.windowSize);
-			xml.setAttribute(CONNECT_TIMEOUT, esme.connectTimeout);
-			xml.setAttribute(REQUEST_EXPIRY_TIMEOUT, esme.requestExpiryTimeout);
-			xml.setAttribute(CLIENT_BIND_TIMEOUT, esme.clientBindTimeout);
+            xml.setAttribute(WINDOW_SIZE, esme.windowSize);
+            xml.setAttribute(CONNECT_TIMEOUT, esme.connectTimeout);
+            xml.setAttribute(REQUEST_EXPIRY_TIMEOUT, esme.requestExpiryTimeout);
+            xml.setAttribute(CLIENT_BIND_TIMEOUT, esme.clientBindTimeout);
 
-			xml.setAttribute(WINDOW_MONITOR_INTERVAL, esme.windowMonitorInterval);
-			xml.setAttribute(WINDOW_WAIT_TIMEOUT, esme.windowWaitTimeout);
-			xml.setAttribute(COUNTERS_ENABLED, esme.countersEnabled);
-			xml.setAttribute(ESME_ERROR_COUNTERS_ENABLED, esme.esmeErrorCountersEnabled);
-			xml.setAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED, esme.esmeMaintenanceCountersEnabled);
-			xml.setAttribute(SESSION_ERROR_COUNTERS_ENABLED, esme.sessionErrorCountersEnabled);
-			xml.setAttribute(ENQUIRE_LINK_DELAY, esme.enquireLinkDelay);
-			xml.setAttribute(ENQUIRE_LINK_DELAY_SERVER, esme.enquireLinkDelayServer);
-			xml.setAttribute(LINK_DROP_SERVER, esme.linkDropServer);
+            xml.setAttribute(WINDOW_MONITOR_INTERVAL, esme.windowMonitorInterval);
+            xml.setAttribute(WINDOW_WAIT_TIMEOUT, esme.windowWaitTimeout);
+            xml.setAttribute(COUNTERS_ENABLED, esme.countersEnabled);
+            xml.setAttribute(ESME_ERROR_COUNTERS_ENABLED, esme.esmeErrorCountersEnabled);
+            xml.setAttribute(ESME_MAINTENANCE_COUNTERS_ENABLED, esme.esmeMaintenanceCountersEnabled);
+            xml.setAttribute(SESSION_ERROR_COUNTERS_ENABLED, esme.sessionErrorCountersEnabled);
+            xml.setAttribute(ENQUIRE_LINK_DELAY, esme.enquireLinkDelay);
+            xml.setAttribute(ENQUIRE_LINK_DELAY_SERVER, esme.enquireLinkDelayServer);
+            xml.setAttribute(LINK_DROP_SERVER, esme.linkDropServer);
 
-			xml.setAttribute(CHARGING_ENABLED, esme.chargingEnabled);
+            xml.setAttribute(CHARGING_ENABLED, esme.chargingEnabled);
 
-			xml.setAttribute(SOURCE_TON, esme.sourceTon);
-			xml.setAttribute(SOURCE_NPI, esme.sourceNpi);
-			xml.setAttribute(SOURCE_ADDRESS_RANGE, esme.sourceAddressRange);
+            xml.setAttribute(SOURCE_TON, esme.sourceTon);
+            xml.setAttribute(SOURCE_NPI, esme.sourceNpi);
+            xml.setAttribute(SOURCE_ADDRESS_RANGE, esme.sourceAddressRange);
 
-			xml.setAttribute(ROUTING_TON, esme.routingTon);
-			xml.setAttribute(ROUTING_NPI, esme.routingNpi);
-			xml.setAttribute(ROUTING_ADDRESS_RANGE, esme.routingAddressRange);
+            xml.setAttribute(ROUTING_TON, esme.routingTon);
+            xml.setAttribute(ROUTING_NPI, esme.routingNpi);
+            xml.setAttribute(ROUTING_ADDRESS_RANGE, esme.routingAddressRange);
 
             xml.setAttribute(OVERLOAD_THRESHOLD, esme.overloadThreshold);
             xml.setAttribute(NORMAL_THRESHOLD, esme.normalThreshold);
 
-			// SSl
-			xml.setAttribute(USE_SSL, esme.useSsl);
-			xml.setAttribute(CERT_ALIAS, esme.wrappedSslConfig.getCertAlias());
-			xml.setAttribute(CRL_PATH, esme.wrappedSslConfig.getCrlPath());
-			xml.setAttribute(KEY_MANAGER_FACTORY_ALGORITHM, esme.wrappedSslConfig.getKeyManagerFactoryAlgorithm());
-			xml.setAttribute(KEY_MANAGER_PASSWORD, esme.wrappedSslConfig.getKeyManagerPassword());
-			xml.setAttribute(KEY_STORE_PASSWORD, esme.wrappedSslConfig.getKeyStorePassword());
-			xml.setAttribute(KEY_STORE_PROVIDER, esme.wrappedSslConfig.getKeyStoreProvider());
-			xml.setAttribute(KEY_STORE_PATH, esme.wrappedSslConfig.getKeyStorePath());
-			xml.setAttribute(KEY_STORE_TYPE, esme.wrappedSslConfig.getKeyStoreType());
-			xml.setAttribute(MAX_CERT_PATH_LENGTH, esme.wrappedSslConfig.getMaxCertPathLength());
-			xml.setAttribute(NEED_CLIENT_AUTH, esme.wrappedSslConfig.getNeedClientAuth());
-			xml.setAttribute(OCS_RESPONDER_URL, esme.wrappedSslConfig.getOcspResponderURL());
-			xml.setAttribute(PROTOCOL, esme.wrappedSslConfig.getProtocol());
-			xml.setAttribute(PROVIDER, esme.wrappedSslConfig.getProvider());
-			xml.setAttribute(SECURE_RANDOM_ALGORITHM, esme.wrappedSslConfig.getSecureRandomAlgorithm());
-			xml.setAttribute(SSL_SESSION_CACHE_SIZE, esme.wrappedSslConfig.getSslSessionCacheSize());
-			xml.setAttribute(SSL_SESSION_TIMEOUT, esme.wrappedSslConfig.getSslSessionTimeout());
-			xml.setAttribute(TRUST_MANAGER_FACTORY_ALGORITHM, esme.wrappedSslConfig.getTrustManagerFactoryAlgorithm());
-			xml.setAttribute(TRUST_STORE_PASSWORD, esme.wrappedSslConfig.getTrustStorePassword());
-			xml.setAttribute(TRUST_STORE_PATH, esme.wrappedSslConfig.getTrustStorePath());
-			xml.setAttribute(TRUST_STORE_PROVIDER, esme.wrappedSslConfig.getTrustStoreProvider());
-			xml.setAttribute(TRUST_STORE_TYPE, esme.wrappedSslConfig.getTrustStoreType());
-			xml.setAttribute(WANT_CLIENT_AUTH, esme.wrappedSslConfig.getWantClientAuth());
-			xml.setAttribute(ALLOW_RENEGOTIATE, esme.wrappedSslConfig.isAllowRenegotiate());
-			xml.setAttribute(ENABLE_CRLDP, esme.wrappedSslConfig.isEnableCRLDP());
-			xml.setAttribute(SESSION_CACHING_ENABLED, esme.wrappedSslConfig.isSessionCachingEnabled());
-			xml.setAttribute(TRUST_ALL, esme.wrappedSslConfig.isTrustAll());
-			xml.setAttribute(VALIDATE_CERTS, esme.wrappedSslConfig.isValidateCerts());
-			xml.setAttribute(VALIDATE_PEER_CERTS, esme.wrappedSslConfig.isValidatePeerCerts());
-		}
-	};
+            // SSl
+            xml.setAttribute(USE_SSL, esme.useSsl);
+            xml.setAttribute(CERT_ALIAS, esme.wrappedSslConfig.getCertAlias());
+            xml.setAttribute(CRL_PATH, esme.wrappedSslConfig.getCrlPath());
+            xml.setAttribute(KEY_MANAGER_FACTORY_ALGORITHM, esme.wrappedSslConfig.getKeyManagerFactoryAlgorithm());
+            xml.setAttribute(KEY_MANAGER_PASSWORD, esme.wrappedSslConfig.getKeyManagerPassword());
+            xml.setAttribute(KEY_STORE_PASSWORD, esme.wrappedSslConfig.getKeyStorePassword());
+            xml.setAttribute(KEY_STORE_PROVIDER, esme.wrappedSslConfig.getKeyStoreProvider());
+            xml.setAttribute(KEY_STORE_PATH, esme.wrappedSslConfig.getKeyStorePath());
+            xml.setAttribute(KEY_STORE_TYPE, esme.wrappedSslConfig.getKeyStoreType());
+            xml.setAttribute(MAX_CERT_PATH_LENGTH, esme.wrappedSslConfig.getMaxCertPathLength());
+            xml.setAttribute(NEED_CLIENT_AUTH, esme.wrappedSslConfig.getNeedClientAuth());
+            xml.setAttribute(OCS_RESPONDER_URL, esme.wrappedSslConfig.getOcspResponderURL());
+            xml.setAttribute(PROTOCOL, esme.wrappedSslConfig.getProtocol());
+            xml.setAttribute(PROVIDER, esme.wrappedSslConfig.getProvider());
+            xml.setAttribute(SECURE_RANDOM_ALGORITHM, esme.wrappedSslConfig.getSecureRandomAlgorithm());
+            xml.setAttribute(SSL_SESSION_CACHE_SIZE, esme.wrappedSslConfig.getSslSessionCacheSize());
+            xml.setAttribute(SSL_SESSION_TIMEOUT, esme.wrappedSslConfig.getSslSessionTimeout());
+            xml.setAttribute(TRUST_MANAGER_FACTORY_ALGORITHM, esme.wrappedSslConfig.getTrustManagerFactoryAlgorithm());
+            xml.setAttribute(TRUST_STORE_PASSWORD, esme.wrappedSslConfig.getTrustStorePassword());
+            xml.setAttribute(TRUST_STORE_PATH, esme.wrappedSslConfig.getTrustStorePath());
+            xml.setAttribute(TRUST_STORE_PROVIDER, esme.wrappedSslConfig.getTrustStoreProvider());
+            xml.setAttribute(TRUST_STORE_TYPE, esme.wrappedSslConfig.getTrustStoreType());
+            xml.setAttribute(WANT_CLIENT_AUTH, esme.wrappedSslConfig.getWantClientAuth());
+            xml.setAttribute(ALLOW_RENEGOTIATE, esme.wrappedSslConfig.isAllowRenegotiate());
+            xml.setAttribute(ENABLE_CRLDP, esme.wrappedSslConfig.isEnableCRLDP());
+            xml.setAttribute(SESSION_CACHING_ENABLED, esme.wrappedSslConfig.isSessionCachingEnabled());
+            xml.setAttribute(TRUST_ALL, esme.wrappedSslConfig.isTrustAll());
+            xml.setAttribute(VALIDATE_CERTS, esme.wrappedSslConfig.isValidateCerts());
+            xml.setAttribute(VALIDATE_PEER_CERTS, esme.wrappedSslConfig.isValidatePeerCerts());
+        }
+    };
 
-	public void show(StringBuffer sb) {
+    public void show(StringBuffer sb) {
         sb.append(SmppOamMessages.SHOW_ESME_NAME).append(this.name).append(SmppOamMessages.SHOW_ESME_SYSTEM_ID)
                 .append(this.systemId).append(SmppOamMessages.SHOW_ESME_STATE).append(this.getStateName())
                 .append(SmppOamMessages.SHOW_ESME_PASSWORD).append(this.password).append(SmppOamMessages.SHOW_ESME_HOST)
@@ -1870,7 +1868,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         } else if (normalThreshold == -1 && overloadThreshold == -1) {
             update = true;
         }
-        
+
         if (update) {
             this.normalThreshold = normalThreshold;
             this.store();
@@ -1886,11 +1884,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     public void setOverloaded(boolean overloaded) {
         this.overloaded = overloaded;
     }
-    
+
     public void updateRequestQueueSize(int value) {
         esmeManagement.updateRequestQueueSize(name, clusterName, value);
     }
-    
+
     public void updateResponseQueueSize(int value) {
         esmeManagement.updateResponseQueueSize(name, clusterName, value);
     }

@@ -29,50 +29,47 @@ import com.cloudhopper.smpp.jmx.DefaultSmppSessionMXBean;
  * 
  */
 public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWrapperMBean {
-	boolean isStarted();
+    boolean isStarted();
 
-	String getClusterName();
+    String getClusterName();
 
-	/**
-	 * Defines ESME TON. if SMPP Session Type is CLIENT this TON will be used in
-	 * BIND request, if SMPP Session Type is SERVER, incoming BIND request
-	 * should have same TON as configured here. If configured is null(-1), SMSC
-	 * will ignore in both the cases
-	 * 
-	 * @return
-	 */
-	int getEsmeTon();
+    /**
+     * Defines ESME TON. if SMPP Session Type is CLIENT this TON will be used in BIND request, if SMPP Session Type is SERVER,
+     * incoming BIND request should have same TON as configured here. If configured is null(-1), SMSC will ignore in both the
+     * cases
+     * 
+     * @return
+     */
+    int getEsmeTon();
 
-	void setEsmeTon(int esmeTon);
+    void setEsmeTon(int esmeTon);
 
-	/**
-	 * Defines ESME NPI. if SMPP Session Type is CLIENT this NPI will be used in
-	 * BIND request, if SMPP Session Type is SERVER, incoming BIND request
-	 * should have same NPI as configured here. If configured is null(-1), SMSC
-	 * will ignore in both the cases
-	 * 
-	 * @return
-	 */
-	int getEsmeNpi();
+    /**
+     * Defines ESME NPI. if SMPP Session Type is CLIENT this NPI will be used in BIND request, if SMPP Session Type is SERVER,
+     * incoming BIND request should have same NPI as configured here. If configured is null(-1), SMSC will ignore in both the
+     * cases
+     * 
+     * @return
+     */
+    int getEsmeNpi();
 
-	void setEsmeNpi(int esmeNpi);
+    void setEsmeNpi(int esmeNpi);
 
-	/**
-	 * Defines ESME Address Range. if SMPP Session Type is CLIENT this address
-	 * range will be used in BIND request, if SMPP Session Type is SERVER,
-	 * incoming BIND request should have same address range as configured here.
-	 * If configured is null, SMSC will ignore in both the cases
-	 * 
-	 * @return
-	 */
-	String getEsmeAddressRange();
+    /**
+     * Defines ESME Address Range. if SMPP Session Type is CLIENT this address range will be used in BIND request, if SMPP
+     * Session Type is SERVER, incoming BIND request should have same address range as configured here. If configured is null,
+     * SMSC will ignore in both the cases
+     * 
+     * @return
+     */
+    String getEsmeAddressRange();
 
-	void setEsmeAddressRange(String sourceAddressRange);
+    void setEsmeAddressRange(String sourceAddressRange);
 
-	String getHost();
+    String getHost();
 
     int getPort();
-    
+
     void setNetworkId(int networkId);
 
     int getNetworkId();
@@ -81,192 +78,171 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     void setSplitLongMessages(boolean splitLongMessages);
 
-	/**
-	 * Sets charging for this ESME. If charging is enabled, SMSC will try to deduct the units from charging server. If charging server returns negative response or error, SMS will be dropped and CDR will be logged
-	 * 
-	 * @param chargingEnabled
-	 */
-	void setChargingEnabled(boolean chargingEnabled);
+    /**
+     * Sets charging for this ESME. If charging is enabled, SMSC will try to deduct the units from charging server. If charging
+     * server returns negative response or error, SMS will be dropped and CDR will be logged
+     * 
+     * @param chargingEnabled
+     */
+    void setChargingEnabled(boolean chargingEnabled);
 
-	boolean isChargingEnabled();
+    boolean isChargingEnabled();
 
-	/**
-	 * every SMS coming into SMSC via this ESME should have same source_addr_ton
-	 * as configured here. If the value here is null(-1) or it's not null and
-	 * match's, SMSC will compare source_addr_npi and source_addr as mentioned
-	 * below. If it doesn't match SMSC will reject this SMS with error code
-	 * "0x0000000A" - Invalid Source Address.
-	 * 
-	 * @return
-	 */
-	int getSourceTon();
+    /**
+     * every SMS coming into SMSC via this ESME should have same source_addr_ton as configured here. If the value here is
+     * null(-1) or it's not null and match's, SMSC will compare source_addr_npi and source_addr as mentioned below. If it
+     * doesn't match SMSC will reject this SMS with error code "0x0000000A" - Invalid Source Address.
+     * 
+     * @return
+     */
+    int getSourceTon();
 
-	void setSourceTon(int sourceTon);
+    void setSourceTon(int sourceTon);
 
-	/**
-	 * every SMS coming into SMSC via this ESME should have same source_addr_npi
-	 * as configured here. If the value here is null(-1)or it's not null and
-	 * match's, SMSC will compare source_addr as mentioned below. If it doesn't
-	 * match SMSC will reject this SMS with error code "0x0000000A" - Invalid
-	 * Source Address.
-	 * 
-	 * @return
-	 */
-	int getSourceNpi();
+    /**
+     * every SMS coming into SMSC via this ESME should have same source_addr_npi as configured here. If the value here is
+     * null(-1)or it's not null and match's, SMSC will compare source_addr as mentioned below. If it doesn't match SMSC will
+     * reject this SMS with error code "0x0000000A" - Invalid Source Address.
+     * 
+     * @return
+     */
+    int getSourceNpi();
 
-	void setSourceNpi(int sourceNpi);
+    void setSourceNpi(int sourceNpi);
 
-	/**
-	 * every SMS coming into SMSC via this ESME should have same source_addr as
-	 * mentioned here. This is regular java expression. Default value is
-	 * ^[0-9a-zA-Z]* If it match's, SMSC will accept incoming SMS and process
-	 * further. If it doesn't match SMSC will reject this SMS with error code
-	 * "0x0000000A" - Invalid Source Address.
-	 * 
-	 * @return
-	 */
-	String getSourceAddressRange();
+    /**
+     * every SMS coming into SMSC via this ESME should have same source_addr as mentioned here. This is regular java expression.
+     * Default value is ^[0-9a-zA-Z]* If it match's, SMSC will accept incoming SMS and process further. If it doesn't match SMSC
+     * will reject this SMS with error code "0x0000000A" - Invalid Source Address.
+     * 
+     * @return
+     */
+    String getSourceAddressRange();
 
-	void setSourceAddressRange(String sourceAddressRange);
+    void setSourceAddressRange(String sourceAddressRange);
 
-	/**
-	 * The {@link DefaultSmsRoutingRule} will try to match the dest_addr_ton of
-	 * outgoing SMS with one configured here. If configured value is null(-1) or
-	 * it's not null and match's, SMSC will compare dest_addr_npi and
-	 * destination_addr as below. It it doesn't match, SMSC will select next
-	 * ESME in list for matching routing rule
-	 * 
-	 * @return
-	 */
-	int getRoutingTon();
+    /**
+     * The {@link DefaultSmsRoutingRule} will try to match the dest_addr_ton of outgoing SMS with one configured here. If
+     * configured value is null(-1) or it's not null and match's, SMSC will compare dest_addr_npi and destination_addr as below.
+     * It it doesn't match, SMSC will select next ESME in list for matching routing rule
+     * 
+     * @return
+     */
+    int getRoutingTon();
 
-	void setRoutingTon(int routingTon);
+    void setRoutingTon(int routingTon);
 
-	/**
-	 * The {@link DefaultSmsRoutingRule} will try to match the dest_addr_npi
-	 * with one configured here. If configured value is null(-1)or it's not null
-	 * and match's, SMSC will compare destination_addr as below. It it doesn't
-	 * match, SMSC will select next ESME in list for matching routing rule
-	 * 
-	 * @return
-	 */
-	int getRoutingNpi();
+    /**
+     * The {@link DefaultSmsRoutingRule} will try to match the dest_addr_npi with one configured here. If configured value is
+     * null(-1)or it's not null and match's, SMSC will compare destination_addr as below. It it doesn't match, SMSC will select
+     * next ESME in list for matching routing rule
+     * 
+     * @return
+     */
+    int getRoutingNpi();
 
-	void setRoutingNpi(int sourceNpi);
+    void setRoutingNpi(int sourceNpi);
 
-	/**
-	 * The {@link DefaultSmsRoutingRule} will try to match destination_addr
-	 * here. This is regular java expression. Default value is ^[0-9a-zA-Z]*. If
-	 * it match's, SMSC will send the SMS out over this SMPP connection. If it
-	 * doesn't match, SMSC will select next ESME in list for matching routing
-	 * rule
-	 * 
-	 * @return
-	 */
-	String getRoutingAddressRange();
+    /**
+     * The {@link DefaultSmsRoutingRule} will try to match destination_addr here. This is regular java expression. Default value
+     * is ^[0-9a-zA-Z]*. If it match's, SMSC will send the SMS out over this SMPP connection. If it doesn't match, SMSC will
+     * select next ESME in list for matching routing rule
+     * 
+     * @return
+     */
+    String getRoutingAddressRange();
 
-	void setRoutingAddressRange(String sourceAddressRange);
+    void setRoutingAddressRange(String sourceAddressRange);
 
-	/**
-	 * Returns true if counters is enabled else false
-	 * 
-	 * @return
-	 */
-	boolean isCountersEnabled();
+    /**
+     * Returns true if counters is enabled else false
+     * 
+     * @return
+     */
+    boolean isCountersEnabled();
 
-	/**
-	 * Set to true if counters is to be enabled. Value takes effect only when
-	 * ESME is restarted
-	 * 
-	 * @param countersEnabled
-	 */
-	void setCountersEnabled(boolean countersEnabled);
-	
-	/**
-     * Returns null if this esmeErrorCountersEnabled for this esme is not set, 
-     * otherwise it's boolean value
+    /**
+     * Set to true if counters is to be enabled. Value takes effect only when ESME is restarted
+     * 
+     * @param countersEnabled
+     */
+    void setCountersEnabled(boolean countersEnabled);
+
+    /**
+     * Returns null if this esmeErrorCountersEnabled for this esme is not set, otherwise it's boolean value
      * 
      * @return
      */
     public Boolean getEsmeErrorCountersEnabled();
-    
-    
+
     /**
-     * Set to null to unset this property for this esme. Value takes 
-     * effect only when ESME is restarted
+     * Set to null to unset this property for this esme. Value takes effect only when ESME is restarted
      * 
      * @param esmeErrorCountersEnabled
      */
     public void setEsmeErrorCountersEnabled(Boolean esmeErrorCountersEnabled);
-    
+
     /**
-     * Returns null if this esmeMaintenanceCountersEnabled for this esme is not set, 
-     * otherwise it's boolean value
+     * Returns null if this esmeMaintenanceCountersEnabled for this esme is not set, otherwise it's boolean value
      * 
      * @return
      */
     public Boolean getEsmeMaintenanceCountersEnabled();
-    
+
     /**
-     * Set to null to unset this property for this esme. Value takes 
-     * effect only when ESME is restarted
+     * Set to null to unset this property for this esme. Value takes effect only when ESME is restarted
      * 
      * @param esmeMaintenanceCountersEnabled
      */
     public void setEsmeMaintenanceCountersEnabled(Boolean esmeMaintenanceCountersEnabled);
-    
+
     /**
-     * Returns null if this sessionErrorCountersEnabled for this esme is not set, 
-     * otherwise it's boolean value
+     * Returns null if this sessionErrorCountersEnabled for this esme is not set, otherwise it's boolean value
      * 
      * @return
      */
     public Boolean getSessionErrorCountersEnabled();
-    
+
     /**
-     * Set to null to unset this property for this esme. Value takes 
-     * effect only when ESME is restarted
+     * Set to null to unset this property for this esme. Value takes effect only when ESME is restarted
      * 
      * @param sessionErrorCountersEnabled
      */
     public void setSessionErrorCountersEnabled(Boolean sessionErrorCountersEnabled);
 
-	/**
-	 * Sets the default window size. Value takes effect only when ESME is
-	 * restarted.
-	 * 
-	 * The window size is the amount of unacknowledged requests that are
-	 * permitted to be outstanding/unacknowledged at any given time. If more
-	 * requests are added, the underlying stack will throw an exception.
-	 * 
-	 * This value is set only when ESME is defined as Client side. For Server
-	 * side this value is taken from the 'SMPP Server Settings'.
-	 * 
-	 * @param windowSize
-	 */
-	void setWindowSize(int windowSize);
+    /**
+     * Sets the default window size. Value takes effect only when ESME is restarted.
+     * 
+     * The window size is the amount of unacknowledged requests that are permitted to be outstanding/unacknowledged at any given
+     * time. If more requests are added, the underlying stack will throw an exception.
+     * 
+     * This value is set only when ESME is defined as Client side. For Server side this value is taken from the 'SMPP Server
+     * Settings'.
+     * 
+     * @param windowSize
+     */
+    void setWindowSize(int windowSize);
 
-	/**
-	 * Value takes effect only when ESME is restarted.
-	 * 
-	 * Default value is 10000 milli seconds. This parameter is used to specify
-	 * the time within which the connection to a remote SMSC server should be
-	 * established.
-	 * 
-	 * This is useful only when ESME is defined as Client Side. For Server side
-	 * this value is taken from the the 'SMPP Server Settings'.
-	 * 
-	 * @param connectTimeout
-	 */
-	void setConnectTimeout(long connectTimeout);
-
-	long getConnectTimeout();
-
-	/**
+    /**
      * Value takes effect only when ESME is restarted.
      * 
-     * Default value is 5000 milli seconds. This parameter is used to specify
-     * the length of time to wait for a bind response when the client connecting
+     * Default value is 10000 milli seconds. This parameter is used to specify the time within which the connection to a remote
+     * SMSC server should be established.
+     * 
+     * This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the 'SMPP Server
+     * Settings'.
+     * 
+     * @param connectTimeout
+     */
+    void setConnectTimeout(long connectTimeout);
+
+    long getConnectTimeout();
+
+    /**
+     * Value takes effect only when ESME is restarted.
+     * 
+     * Default value is 5000 milli seconds. This parameter is used to specify the length of time to wait for a bind response
+     * when the client connecting
      * 
      * This is useful only when ESME is defined as Client Side
      * 
@@ -276,85 +252,79 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     long getClientBindTimeout();
 
-	/**
-	 * Value takes effect only when ESME is restarted.
-	 * 
-	 * Default value is -1 (disabled). This parameter is used to specify the
-	 * time to wait in milli seconds for an endpoint to respond to before it
-	 * expires. This is useful only when ESME is defined as Client Side. For
-	 * Server side this value is taken from the the 'SMPP Server Settings'.
-	 * 
-	 * @param requestExpiryTimeout
-	 */
-	void setRequestExpiryTimeout(long requestExpiryTimeout);
+    /**
+     * Value takes effect only when ESME is restarted.
+     * 
+     * Default value is -1 (disabled). This parameter is used to specify the time to wait in milli seconds for an endpoint to
+     * respond to before it expires. This is useful only when ESME is defined as Client Side. For Server side this value is
+     * taken from the the 'SMPP Server Settings'.
+     * 
+     * @param requestExpiryTimeout
+     */
+    void setRequestExpiryTimeout(long requestExpiryTimeout);
 
-	/**
-	 * Value takes effect only when ESME is restarted.
-	 * 
-	 * Default value is -1 (disabled). This parameter is used to specify the
-	 * time between executions of monitoring the window for requests that
-	 * expire. It is recommended that this value, generally, either matches or
-	 * is half the value of 'request-expiry-timeout'. Therefore, in the worst
-	 * case scenario, a request could take upto 1.5 times the
-	 * 'requestExpiryTimeout' to clear out.
-	 * 
-	 * This is useful only when ESME is defined as Client Side. For Server side
-	 * this value is taken from the the 'SMPP Server Settings'.
-	 * 
-	 * @param windowMonitorInterval
-	 */
-	void setWindowMonitorInterval(long windowMonitorInterval);
+    /**
+     * Value takes effect only when ESME is restarted.
+     * 
+     * Default value is -1 (disabled). This parameter is used to specify the time between executions of monitoring the window
+     * for requests that expire. It is recommended that this value, generally, either matches or is half the value of
+     * 'request-expiry-timeout'. Therefore, in the worst case scenario, a request could take upto 1.5 times the
+     * 'requestExpiryTimeout' to clear out.
+     * 
+     * This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the 'SMPP Server
+     * Settings'.
+     * 
+     * @param windowMonitorInterval
+     */
+    void setWindowMonitorInterval(long windowMonitorInterval);
 
-	/**
-	 * Value takes effect only when ESME is restarted.
-	 * 
-	 * Default value is 60000 milli seconds. This parameter is used to specify
-	 * the time to wait until a slot opens up in the 'sendWindow'.
-	 * 
-	 * This is useful only when ESME is defined as Client Side. For Server side
-	 * this value is taken from the the 'SMPP Server Settings'.
-	 * 
-	 * @param windowWaitTimeout
-	 */
-	void setWindowWaitTimeout(long windowWaitTimeout);
+    /**
+     * Value takes effect only when ESME is restarted.
+     * 
+     * Default value is 60000 milli seconds. This parameter is used to specify the time to wait until a slot opens up in the
+     * 'sendWindow'.
+     * 
+     * This is useful only when ESME is defined as Client Side. For Server side this value is taken from the the 'SMPP Server
+     * Settings'.
+     * 
+     * @param windowWaitTimeout
+     */
+    void setWindowWaitTimeout(long windowWaitTimeout);
 
-	/**
-	 * Default value is 30000 milli seconds. When SMSC connects to a remote
-	 * server as CLIENT, it sends an 'ENQUIRE_LINK' after every configured
-	 * enquire-link-delay.
-	 * 
-	 * @param enquireLinkDelay
-	 */
-	void setEnquireLinkDelay(int enquireLinkDelay);
+    /**
+     * Default value is 30000 milli seconds. When SMSC connects to a remote server as CLIENT, it sends an 'ENQUIRE_LINK' after
+     * every configured enquire-link-delay.
+     * 
+     * @param enquireLinkDelay
+     */
+    void setEnquireLinkDelay(int enquireLinkDelay);
 
-	int getEnquireLinkDelay();
+    int getEnquireLinkDelay();
 
-	/**
-	 * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote
-	 * client as SERVER, it sends an 'ENQUIRE_LINK' after every configured
-	 * enquire-link-delay-server.
-	 * 
-	 * @param enquireLinkDelayServer
-	 */
+    /**
+     * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote client as SERVER, it sends an
+     * 'ENQUIRE_LINK' after every configured enquire-link-delay-server.
+     * 
+     * @param enquireLinkDelayServer
+     */
 
-	void setEnquireLinkDelayServer(int enquireLinkDelay);
+    void setEnquireLinkDelayServer(int enquireLinkDelay);
 
-	int getEnquireLinkDelayServer();
+    int getEnquireLinkDelayServer();
 
-	/**
-	 * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote client
-	 * as SERVER and SMSC is not received any data during configured time, SMSC will close this
-	 * session. If enquireLinkDelayServer is enabled then linkDropServer is always disabled.
-	 *
-	 * @param linkDropServer
-	 */
+    /**
+     * Default value is 0 milli seconds (means disabled). When SMSC connects to a remote client as SERVER and SMSC is not
+     * received any data during configured time, SMSC will close this session. If enquireLinkDelayServer is enabled then
+     * linkDropServer is always disabled.
+     *
+     * @param linkDropServer
+     */
 
-	long getLinkDropServer();
+    long getLinkDropServer();
 
-	void setLinkDropServer(long linkDropServer);
+    void setLinkDropServer(long linkDropServer);
 
     void setPassword(String password);
-
 
     long getRateLimitPerSecond();
 
@@ -389,9 +359,9 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
     void setNationalLanguageLockingShift(int nationalLanguageLockingShift);
 
     int getDestAddrSendLimit();
-    
+
     void setDestAddrSendLimit(int destAddrSendLimit);
-    
+
     int getMinMessageLength();
 
     void setMinMessageLength(int minMessageLength);
@@ -399,11 +369,11 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
     int getMaxMessageLength();
 
     void setMaxMessageLength(int maxMessageLength);
-    
+
     int getOverloadThreshold();
 
     void setOverloadThreshold(int overloadThreshold);
-    
+
     int getNormalThreshold();
 
     void setNormalThreshold(int normalThreshold);

@@ -99,7 +99,6 @@ public class EsmeManagement implements EsmeManagementMBean {
 
     private static EsmeManagement instance = null;
 
-
     protected EsmeManagement(String name) {
         this.name = name;
 
@@ -149,14 +148,15 @@ public class EsmeManagement implements EsmeManagementMBean {
     public FastList<Esme> getEsmes() {
         return esmes;
     }
-    
+
     public ArrayList<Esme> getClientEsmes() {
         ArrayList<Esme> res = new ArrayList<Esme>();
         for (Esme esme : esmes) {
             if (esme.getSmppSessionType().equals(SmppSession.Type.CLIENT)) {
                 res.add(esme);
             }
-        };
+        }
+        ;
         return res;
     }
 
@@ -234,8 +234,8 @@ public class EsmeManagement implements EsmeManagementMBean {
     public Esme createEsme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
             String smppBindType, String systemType, String smppIntVersion, byte ton, byte npi, String address,
             String smppSessionType, int windowSize, long connectTimeout, long requestExpiryTimeout, long clientBindTimeout,
-            long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled, Boolean esmeErrorCountersEnabled,
-            Boolean esmeMaintenanceCountersEnabled, Boolean sessionErrorCountersEnabled, 
+            long windowMonitorInterval, long windowWaitTimeout, String clusterName, boolean countersEnabled,
+            Boolean esmeErrorCountersEnabled, Boolean esmeMaintenanceCountersEnabled, Boolean sessionErrorCountersEnabled,
             int enquireLinkDelay, int enquireLinkDelayServer, long linkDropServer, int sourceTon, int sourceNpi,
             String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
@@ -318,7 +318,7 @@ public class EsmeManagement implements EsmeManagementMBean {
 
         Esme esme = new Esme(name, systemId, password, host, port, chargingEnabled, systemType, smppInterfaceVersionTypeObj,
                 ton, npi, address, smppBindTypeOb, smppSessionTypeObj, windowSize, connectTimeout, requestExpiryTimeout,
-                clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, 
+                clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled,
                 esmeErrorCountersEnabled, esmeMaintenanceCountersEnabled, sessionErrorCountersEnabled, enquireLinkDelay,
                 enquireLinkDelayServer, linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi,
                 routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
@@ -383,22 +383,22 @@ public class EsmeManagement implements EsmeManagementMBean {
         esme.setStarted(true);
         this.store();
 
-		if (listener != null)
-		    listener.esmeStarted(esme.getName(), esme.getClusterName());
-		
+        if (listener != null)
+            listener.esmeStarted(esme.getName(), esme.getClusterName());
+
         if (esme.getSmppSessionType().equals(SmppSession.Type.CLIENT)) {
             this.smppClient.startSmppClientSession(esme);
         }
 
     }
 
-	@Override
-	public void stopEsme(String esmeName) throws Exception {
-		Esme esme = this.getEsmeByName(esmeName);
-		if (esme == null) {
-			throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
-		}
-		Long currSessionId = esme.getLocalSessionId();
+    @Override
+    public void stopEsme(String esmeName) throws Exception {
+        Esme esme = this.getEsmeByName(esmeName);
+        if (esme == null) {
+            throw new Exception(String.format(SmppOamMessages.DELETE_ESME_FAILED_NO_ESME_FOUND, esmeName));
+        }
+        Long currSessionId = esme.getLocalSessionId();
 
         esme.setStarted(false);
 
@@ -406,9 +406,9 @@ public class EsmeManagement implements EsmeManagementMBean {
             esme.resetLinkRecvMessage();
         }
 
-		if (listener != null)
+        if (listener != null)
             listener.esmeStopped(esme.getName(), esme.getClusterName(), currSessionId);
-		this.store();
+        this.store();
 
         this.stopWrappedSession(esme);
     }
@@ -437,49 +437,50 @@ public class EsmeManagement implements EsmeManagementMBean {
                 // }
 
                 smppSession.destroy();
-			}
-		} else {
-			if (this.smppClient != null) {
-				this.smppClient.stopSmppClientSession(esme);
-			}
-		}
-	}
-	
-	public void setListener(SmppStateListener listener) {
-	    this.listener = listener;	
-	    updateListener();
-	}
+            }
+        } else {
+            if (this.smppClient != null) {
+                this.smppClient.stopSmppClientSession(esme);
+            }
+        }
+    }
 
-	public void esmeReconnectSuccessfulIncrement(String esmeName, String clusterName) {
-	    if (listener != null) {
-	        listener.esmeReconnectSuccessfulIncrement(esmeName, clusterName);
-	    }
-	}
+    public void setListener(SmppStateListener listener) {
+        this.listener = listener;
+        updateListener();
+    }
+
+    public void esmeReconnectSuccessfulIncrement(String esmeName, String clusterName) {
+        if (listener != null) {
+            listener.esmeReconnectSuccessfulIncrement(esmeName, clusterName);
+        }
+    }
+
     public void esmeReconnectFailedIncrement(String esmeName, String clusterName) {
         if (listener != null) {
             listener.esmeReconnectFailedIncrement(esmeName, clusterName);
         }
     }
-    
+
     public void esmeStartedNotConnected(String esmeName, String clusterName, int value) {
         if (listener != null) {
             listener.esmeStartedNotConnected(esmeName, clusterName, value);
         }
     }
-    
+
     public void updateRequestQueueSize(String esmeName, String clusterName, int value) {
         if (listener != null) {
             listener.updateRequestQueueSize(esmeName, clusterName, value);
         }
     }
-    
+
     public void updateResponseQueueSize(String esmeName, String clusterName, int value) {
         if (listener != null) {
             listener.updateResponseQueueSize(esmeName, clusterName, value);
         }
     }
 
-	public void start() throws Exception {
+    public void start() throws Exception {
         try {
             if (this.mbeanServer == null) {
                 this.mbeanServer = JBossMbeanLocator.locateJBoss();
@@ -498,22 +499,22 @@ public class EsmeManagement implements EsmeManagementMBean {
                     .append(File.separator).append(this.name).append("_").append(PERSIST_FILE_NAME);
         }
 
-		logger.info(String.format("Loading ESME configuration from %s", persistFile.toString()));
-		
-		try {
-			this.load();
-		} catch (FileNotFoundException e) {
-			logger.warn(String.format("Failed to load the ESME configuration file. \n%s", e.getMessage()));
-		}
+        logger.info(String.format("Loading ESME configuration from %s", persistFile.toString()));
 
-		for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+        try {
+            this.load();
+        } catch (FileNotFoundException e) {
+            logger.warn(String.format("Failed to load the ESME configuration file. \n%s", e.getMessage()));
+        }
+
+        for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
             Esme esme = n.getValue();
             this.registerEsmeMbean(esme);
         }
-		
-		if (listener != null) {
-		    updateListener();
-		}
+
+        if (listener != null) {
+            updateListener();
+        }
 
         // setting a timer for cleaning of
         this.clearMessageClearTimer();
@@ -522,17 +523,16 @@ public class EsmeManagement implements EsmeManagementMBean {
         this.timer.scheduleAtFixedRate(timerTask, 0, 1000);
     }
 
-	private void updateListener()
-	{
-	    for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
+    private void updateListener() {
+        for (FastList.Node<Esme> n = esmes.head(), end = esmes.tail(); (n = n.getNext()) != end;) {
             Esme esme = n.getValue();
             if (listener != null && esme.isStarted()) {
                 listener.esmeStarted(esme.getName(), esme.getClusterName());
             }
         }
-	}
-	
-	public void stop() throws Exception {
+    }
+
+    public void stop() throws Exception {
         this.clearMessageClearTimer();
 
         this.store();
@@ -665,18 +665,18 @@ public class EsmeManagement implements EsmeManagementMBean {
         }
     }
 
-	protected void sessionCreated(SessionKey key) {
-	    if (listener != null) {
-	        listener.sessionCreated(key);
-	    }
-	}
-	
-	public void sessionClosed(SessionKey key) {
+    protected void sessionCreated(SessionKey key) {
+        if (listener != null) {
+            listener.sessionCreated(key);
+        }
+    }
+
+    public void sessionClosed(SessionKey key) {
         if (listener != null) {
             listener.sessionClosed(key);
         }
     }
-	
+
     private class MessageCleanerTimerTask extends TimerTask {
 
         private int lastDay = -1;

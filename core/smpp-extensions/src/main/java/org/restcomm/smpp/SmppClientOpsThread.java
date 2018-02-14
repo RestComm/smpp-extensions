@@ -53,129 +53,128 @@ import com.cloudhopper.smpp.type.UnrecoverablePduException;
  */
 public class SmppClientOpsThread implements Runnable {
 
-	private static final Logger logger = Logger.getLogger(SmppClientOpsThread.class);
+    private static final Logger logger = Logger.getLogger(SmppClientOpsThread.class);
 
-	private static final long SCHEDULE_CONNECT_DELAY = 1000 * 30; // 30 sec
-	private final SimpleDateFormat DATE_FORMAT =  new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS"); 
+    private static final long SCHEDULE_CONNECT_DELAY = 1000 * 30; // 30 sec
+    private final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 
-	protected volatile boolean started = true;
+    protected volatile boolean started = true;
 
-	ConcurrentLinkedQueue<ChangeRequest> workingSet = new ConcurrentLinkedQueue<ChangeRequest>();
+    ConcurrentLinkedQueue<ChangeRequest> workingSet = new ConcurrentLinkedQueue<ChangeRequest>();
     ConcurrentLinkedQueue<ChangeRequest> futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
 
-	private Object waitObject = new Object();
+    private Object waitObject = new Object();
 
-	private final DefaultSmppClient clientBootstrap;
-	private final SmppSessionHandlerInterface smppSessionHandlerInterface;
-	private final EsmeManagement esmeManagement;
-	
-	private SmppStateListener listener;
+    private final DefaultSmppClient clientBootstrap;
+    private final SmppSessionHandlerInterface smppSessionHandlerInterface;
+    private final EsmeManagement esmeManagement;
 
-	/**
-	 * 
-	 */
-	public SmppClientOpsThread(DefaultSmppClient clientBootstrap,
-			SmppSessionHandlerInterface smppSessionHandlerInterface, EsmeManagement esmeManagement) {
-		this.clientBootstrap = clientBootstrap;
+    private SmppStateListener listener;
+
+    /**
+     * 
+     */
+    public SmppClientOpsThread(DefaultSmppClient clientBootstrap, SmppSessionHandlerInterface smppSessionHandlerInterface,
+            EsmeManagement esmeManagement) {
+        this.clientBootstrap = clientBootstrap;
         this.smppSessionHandlerInterface = smppSessionHandlerInterface;
         this.esmeManagement = esmeManagement;
-	}
-
-	/**
-	 * @param started
-	 *            the started to set
-	 */
-	protected void setStarted(boolean started) {
-		this.started = started;
-
-		synchronized (this.waitObject) {
-			this.waitObject.notify();
-		}
-	}
-	
-	public void setListener(SmppStateListener listener) {
-        this.listener = listener;   
-//        updateListener();
     }
 
-	protected void scheduleConnect(Esme esme) {
+    /**
+     * @param started the started to set
+     */
+    protected void setStarted(boolean started) {
+        this.started = started;
 
-        logger.debug("Scheduling a Client SMPP connection for ESME: " + esme.getName() 
-                + " systemId=" + esme.getSystemId());
-		
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
+
+    public void setListener(SmppStateListener listener) {
+        this.listener = listener;
+        // updateListener();
+    }
+
+    protected void scheduleConnect(Esme esme) {
+
+        logger.debug("Scheduling a Client SMPP connection for ESME: " + esme.getName() + " systemId=" + esme.getSystemId());
+
         long executionTime = System.currentTimeMillis() + SCHEDULE_CONNECT_DELAY;
         if (esme.getInConnectingQueue().compareAndSet(false, true)) {
             this.futureSet.offer(new ChangeRequest(esme, ChangeRequest.CONNECT, executionTime));
-    		logger.debug("Pending change request CONNECT has been added for esme: " + esme.getName() 
-    		        + " with scheduled execution time on " + DATE_FORMAT.format(new Date(executionTime)));
+            logger.debug("Pending change request CONNECT has been added for esme: " + esme.getName()
+                    + " with scheduled execution time on " + DATE_FORMAT.format(new Date(executionTime)));
         } else {
-            logger.debug("Pending change request CONNECT has NOT been added for esme: " + esme.getName() 
-            + " because it is already in queue");
+            logger.debug("Pending change request CONNECT has NOT been added for esme: " + esme.getName()
+                    + " because it is already in queue");
         }
-		synchronized (this.waitObject) {
-			this.waitObject.notify();
-		}
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
 
-	}
+    }
 
-	protected void scheduleEnquireLink(Esme esme) {
-		this.futureSet.offer(new ChangeRequest(esme, ChangeRequest.ENQUIRE_LINK, System.currentTimeMillis()
-					+ esme.getEnquireLinkDelay()));
+    protected void scheduleEnquireLink(Esme esme) {
+        this.futureSet.offer(
+                new ChangeRequest(esme, ChangeRequest.ENQUIRE_LINK, System.currentTimeMillis() + esme.getEnquireLinkDelay()));
 
-		synchronized (this.waitObject) {
-			this.waitObject.notify();
-		}
-	}
+        synchronized (this.waitObject) {
+            this.waitObject.notify();
+        }
+    }
 
-	@Override
-	public void run() {
+    @Override
+    public void run() {
         FastMap<String, Long> startedClosedTime = new FastMap<String, Long>();
 
-		if (logger.isInfoEnabled()) {
-			logger.info("SmppClientOpsThread started.");
-		}
-		
-		while (this.started) {
-		    workingSet = futureSet;
-		    futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
-		    
-		    FastList<Esme> pendingList = new FastList<Esme>();
-		    
-		    ChangeRequest change = workingSet.poll();
+        if (logger.isInfoEnabled()) {
+            logger.info("SmppClientOpsThread started.");
+        }
+
+        while (this.started) {
+            workingSet = futureSet;
+            futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
+
+            FastList<Esme> pendingList = new FastList<Esme>();
+
+            ChangeRequest change = workingSet.poll();
             while (change != null) {
-			    switch (change.getType()) {
-                case ChangeRequest.CONNECT:
-                    if (!change.getEsme().isStarted()) {
-                        change.getEsme().getInConnectingQueue().set(false);
-                        logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
-                    } else {
-                        if (change.getExecutionTime() <= System.currentTimeMillis()) {
+                switch (change.getType()) {
+                    case ChangeRequest.CONNECT:
+                        if (!change.getEsme().isStarted()) {
                             change.getEsme().getInConnectingQueue().set(false);
-                            initiateConnection(change.getEsme());
+                            logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
                         } else {
-                            futureSet.offer(change);
-                            logger.debug("Change request for ESME " + change.getEsme().getName() + " is scheduled for later: "
-                                    + DATE_FORMAT.format(new Date(change.getExecutionTime())));
-                        }
-                    }
-                    break;
-                case ChangeRequest.ENQUIRE_LINK:
-                    if (change.getEsme().isStarted()) {
-                        if (change.getEsme().getEnquireClientEnabled()) {
                             if (change.getExecutionTime() <= System.currentTimeMillis()) {
-                                pendingList.add(change.getEsme());
+                                change.getEsme().getInConnectingQueue().set(false);
+                                initiateConnection(change.getEsme());
                             } else {
-                                futureSet.offer(change); 
+                                futureSet.offer(change);
+                                logger.debug(
+                                        "Change request for ESME " + change.getEsme().getName() + " is scheduled for later: "
+                                                + DATE_FORMAT.format(new Date(change.getExecutionTime())));
                             }
                         }
-                    }
-                    break;
-			    }
-			    
-			    change = workingSet.poll();
+                        break;
+                    case ChangeRequest.ENQUIRE_LINK:
+                        if (change.getEsme().isStarted()) {
+                            if (change.getEsme().getEnquireClientEnabled()) {
+                                if (change.getExecutionTime() <= System.currentTimeMillis()) {
+                                    pendingList.add(change.getEsme());
+                                } else {
+                                    futureSet.offer(change);
+                                }
+                            }
+                        }
+                        break;
+                }
+
+                change = workingSet.poll();
             }
-	                
-         // Sending Enquire messages
+
+            // Sending Enquire messages
             Iterator<Esme> pendingchanges = pendingList.iterator();
             while (pendingchanges.hasNext()) {
                 Esme esme = pendingchanges.next();
@@ -186,12 +185,12 @@ public class SmppClientOpsThread implements Runnable {
                 synchronized (this.waitObject) {
                     this.waitObject.wait(5000);
                 }
-    
+
                 // checking of ESME CLOSED state
                 try {
                     long curTimeStamp = System.currentTimeMillis();
-                    for (FastList.Node<Esme> n = this.esmeManagement.esmes.head(), end = this.esmeManagement.esmes.tail(); (n = n
-                            .getNext()) != end;) {
+                    for (FastList.Node<Esme> n = this.esmeManagement.esmes.head(), end = this.esmeManagement.esmes
+                            .tail(); (n = n.getNext()) != end;) {
                         Esme esme = n.getValue();
                         if (esme.getSmppSessionType() == Type.CLIENT) {
                             if (esme.isStarted() && esme.isClosed()) {
@@ -216,189 +215,189 @@ public class SmppClientOpsThread implements Runnable {
             } catch (InterruptedException e) {
                 logger.error("Error while looping SmppClientOpsThread thread", e);
             }
-	            
-		}// while
 
-		if (logger.isInfoEnabled()) {
-			logger.info("SmppClientOpsThread for stopped.");
-		}
-	}
+        } // while
 
-	private void enquireLink(Esme esme) {
-		SmppSession smppSession = esme.getSmppSession();
+        if (logger.isInfoEnabled()) {
+            logger.info("SmppClientOpsThread for stopped.");
+        }
+    }
 
-		if (!esme.isStarted()) {
-			return;
-		}
+    private void enquireLink(Esme esme) {
+        SmppSession smppSession = esme.getSmppSession();
 
-		if (smppSession != null && smppSession.isBound()) {
-			try {
-				smppSession.enquireLink(new EnquireLink(), 10000);
+        if (!esme.isStarted()) {
+            return;
+        }
 
-				// all ok lets schedule another ENQUIRE_LINK
-				this.scheduleEnquireLink(esme);
-				return;
+        if (smppSession != null && smppSession.isBound()) {
+            try {
+                smppSession.enquireLink(new EnquireLink(), 10000);
 
-			} catch (RecoverablePduException e) {
-				logger.warn(String.format("RecoverablePduException while sending the ENQURE_LINK for ESME SystemId=%s",
-						esme.getSystemId()), e);
+                // all ok lets schedule another ENQUIRE_LINK
+                this.scheduleEnquireLink(esme);
+                return;
 
-				// Recoverabel exception is ok
-				// all ok lets schedule another ENQUIRE_LINK
-				this.scheduleEnquireLink(esme);
-				return;
+            } catch (RecoverablePduException e) {
+                logger.warn(String.format("RecoverablePduException while sending the ENQURE_LINK for ESME SystemId=%s",
+                        esme.getSystemId()), e);
 
-			} catch (Exception e) {
+                // Recoverabel exception is ok
+                // all ok lets schedule another ENQUIRE_LINK
+                this.scheduleEnquireLink(esme);
+                return;
 
-				logger.error(
-						String.format("Exception while trying to send ENQUIRE_LINK for ESME SystemId=%s",
-								esme.getSystemId()), e);
-				// For all other exceptions lets close session and re-try
-				// connect
-				try {
-					smppSession.close();
-				} catch (Exception ex) {
-					logger.error(String.format("Failed to close smpp client session for %s.",
-							smppSession.getConfiguration().getName()));
-				}
-				esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), 1);
-				this.scheduleConnect(esme);
-			}
+            } catch (Exception e) {
 
-		} else {
-			// This should never happen
-			logger.warn(String.format("Sending ENQURE_LINK failed for ESME SystemId=%s as SmppSession is =%s !",
-					esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
+                logger.error(
+                        String.format("Exception while trying to send ENQUIRE_LINK for ESME SystemId=%s", esme.getSystemId()),
+                        e);
+                // For all other exceptions lets close session and re-try
+                // connect
+                try {
+                    smppSession.close();
+                } catch (Exception ex) {
+                    logger.error(String.format("Failed to close smpp client session for %s.",
+                            smppSession.getConfiguration().getName()));
+                }
+                esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), 1);
+                this.scheduleConnect(esme);
+            }
 
-			if (smppSession != null) {
-				try {
-					smppSession.close();
-				} catch (Exception e) {
-					logger.error(String.format("Failed to close smpp client session for %s.",
-							smppSession.getConfiguration().getName()));
-				}
-			}
-			
-			this.scheduleConnect(esme);
-		}
-	}
+        } else {
+            // This should never happen
+            logger.warn(String.format("Sending ENQURE_LINK failed for ESME SystemId=%s as SmppSession is =%s !",
+                    esme.getSystemId(), (smppSession == null ? null : smppSession.getStateName())));
 
-	private void initiateConnection(Esme esme) {
-	    logger.debug("Initiating connection for esme " + esme.getName() + " is started.");
-	    
-		// If Esme is stopped, don't try to initiate connect
-		if (!esme.isStarted()) {
-		    logger.warn("ESME: " + esme.getName() + " is stopped. Will not try to initiate connection.");
-			return;
-		}
+            if (smppSession != null) {
+                try {
+                    smppSession.close();
+                } catch (Exception e) {
+                    logger.error(String.format("Failed to close smpp client session for %s.",
+                            smppSession.getConfiguration().getName()));
+                }
+            }
 
-		SmppSession smppSession = esme.getSmppSession();
-		if ((smppSession != null && smppSession.isBound()) || (smppSession != null && smppSession.isBinding())) {
-			// If process has already begun lets not do it again
-		    logger.debug("SMPP session is already bound or binding for ESME: " + esme.getName() + ". Will not try to initiate connection");
-			return;
-		}
+            this.scheduleConnect(esme);
+        }
+    }
 
-		SmppSession session0 = null;
-		try {
-		    logger.debug("Creating SMPP Session with ESME " + esme.getName() + " started.");
+    private void initiateConnection(Esme esme) {
+        logger.debug("Initiating connection for esme " + esme.getName() + " is started.");
 
-			SmppSessionConfiguration config0 = new SmppSessionConfiguration();
-			config0.setWindowSize(esme.getWindowSize());
-			config0.setName(esme.getName());
-			config0.setType(esme.getSmppBindType());
-			config0.setBindTimeout(esme.getClientBindTimeout());
-			config0.setHost(esme.getHost());
-			config0.setPort(esme.getPort());
-			config0.setConnectTimeout(esme.getConnectTimeout());
-			config0.setSystemId(esme.getSystemId());
-			config0.setPassword(esme.getPassword());
-			config0.setSystemType(esme.getSystemType());
-			config0.getLoggingOptions().setLogBytes(true);
-			// to enable monitoring (request expiration)
-			config0.setRequestExpiryTimeout(esme.getRequestExpiryTimeout());
-			config0.setWindowMonitorInterval(esme.getWindowMonitorInterval());
-			config0.setCountersEnabled(esme.isCountersEnabled());
-			config0.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
+        // If Esme is stopped, don't try to initiate connect
+        if (!esme.isStarted()) {
+            logger.warn("ESME: " + esme.getName() + " is stopped. Will not try to initiate connection.");
+            return;
+        }
 
-			int addressTon = esme.getEsmeTon();
-			int addressNpi = esme.getEsmeNpi();
-			String addressRange = esme.getEsmeAddressRange();
-			
-			Address addressRangeObj = new Address();
-			if(addressTon!=-1){
-				addressRangeObj.setTon((byte)addressTon);
-			}
-			
-			if(addressNpi != -1){
-				addressRangeObj.setNpi((byte)addressNpi);
-			}
-			
-			if(addressRange != null){
-				addressRangeObj.setAddress(addressRange);
-			}
-			
-			config0.setAddressRange(addressRangeObj);
+        SmppSession smppSession = esme.getSmppSession();
+        if ((smppSession != null && smppSession.isBound()) || (smppSession != null && smppSession.isBinding())) {
+            // If process has already begun lets not do it again
+            logger.debug("SMPP session is already bound or binding for ESME: " + esme.getName()
+                    + ". Will not try to initiate connection");
+            return;
+        }
 
-			SmppSessionHandler sessionHandler = new ClientSmppSessionHandler(esme,
-					this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme));
-			
-			// SSL settings
-			if (esme.isUseSsl()) {
-				logger.info(String.format("%s ESME will use SSL Configuration", esme.getName()));
-				SslConfiguration sslConfiguration = esme.getWrappedSslConfig();
+        SmppSession session0 = null;
+        try {
+            logger.debug("Creating SMPP Session with ESME " + esme.getName() + " started.");
 
-				config0.setUseSsl(true);
-				config0.setSslConfiguration(sslConfiguration);
-			}
+            SmppSessionConfiguration config0 = new SmppSessionConfiguration();
+            config0.setWindowSize(esme.getWindowSize());
+            config0.setName(esme.getName());
+            config0.setType(esme.getSmppBindType());
+            config0.setBindTimeout(esme.getClientBindTimeout());
+            config0.setHost(esme.getHost());
+            config0.setPort(esme.getPort());
+            config0.setConnectTimeout(esme.getConnectTimeout());
+            config0.setSystemId(esme.getSystemId());
+            config0.setPassword(esme.getPassword());
+            config0.setSystemType(esme.getSystemType());
+            config0.getLoggingOptions().setLogBytes(true);
+            // to enable monitoring (request expiration)
+            config0.setRequestExpiryTimeout(esme.getRequestExpiryTimeout());
+            config0.setWindowMonitorInterval(esme.getWindowMonitorInterval());
+            config0.setCountersEnabled(esme.isCountersEnabled());
+            config0.setWriteTimeout(SmppManagement.getInstance().getSmppServerManagement().getWriteTimeout());
 
-			esmeManagement.sessionClosed(new SessionKey(esme.getName(), esme.getLocalSessionId()));
-			logger.debug("Binding with ESME " + esme.getName() + " systemId=" + esme.getSystemId());
-			esme.nextLocalSessionId();
-			esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
-			session0 = clientBootstrap.bind(config0, sessionHandler);
+            int addressTon = esme.getEsmeTon();
+            int addressNpi = esme.getEsmeNpi();
+            String addressRange = esme.getEsmeAddressRange();
 
-			if (listener != null) {
-	            listener.esmeReconnectSuccessfulIncrement(esme.getName(), esme.getClusterName());
-	        }
-			esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), -1);
-			
-			// Set in ESME
-			logger.debug("SMPP session has been created for ESME: " + esme.getName());
-			esme.setSmppSession((DefaultSmppSession) session0);
+            Address addressRangeObj = new Address();
+            if (addressTon != -1) {
+                addressRangeObj.setTon((byte) addressTon);
+            }
 
-			// Finally set Enquire Link schedule
-			this.scheduleEnquireLink(esme);
-		} catch (Throwable e) {
-		    if (listener != null) {
+            if (addressNpi != -1) {
+                addressRangeObj.setNpi((byte) addressNpi);
+            }
+
+            if (addressRange != null) {
+                addressRangeObj.setAddress(addressRange);
+            }
+
+            config0.setAddressRange(addressRangeObj);
+
+            SmppSessionHandler sessionHandler = new ClientSmppSessionHandler(esme,
+                    this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme));
+
+            // SSL settings
+            if (esme.isUseSsl()) {
+                logger.info(String.format("%s ESME will use SSL Configuration", esme.getName()));
+                SslConfiguration sslConfiguration = esme.getWrappedSslConfig();
+
+                config0.setUseSsl(true);
+                config0.setSslConfiguration(sslConfiguration);
+            }
+
+            esmeManagement.sessionClosed(new SessionKey(esme.getName(), esme.getLocalSessionId()));
+            logger.debug("Binding with ESME " + esme.getName() + " systemId=" + esme.getSystemId());
+            esme.nextLocalSessionId();
+            esmeManagement.sessionCreated(new SessionKey(esme.getName(), esme.getLocalSessionId()));
+            session0 = clientBootstrap.bind(config0, sessionHandler);
+
+            if (listener != null) {
+                listener.esmeReconnectSuccessfulIncrement(esme.getName(), esme.getClusterName());
+            }
+            esmeManagement.esmeStartedNotConnected(esme.getName(), esme.getClusterName(), -1);
+
+            // Set in ESME
+            logger.debug("SMPP session has been created for ESME: " + esme.getName());
+            esme.setSmppSession((DefaultSmppSession) session0);
+
+            // Finally set Enquire Link schedule
+            this.scheduleEnquireLink(esme);
+        } catch (Throwable e) {
+            if (listener != null) {
                 listener.esmeReconnectFailedIncrement(esme.getName(), esme.getClusterName());
             }
-			logger.error(
-					String.format("Exception when trying to bind client SMPP connection for ESME systemId=%s",
-							esme.getSystemId()) + " name = " + esme.getName(), e);
-			if (session0 != null) {
-				session0.close();
-			}
-			this.scheduleConnect(esme);
-		}
-	}
+            logger.error(String.format("Exception when trying to bind client SMPP connection for ESME systemId=%s",
+                    esme.getSystemId()) + " name = " + esme.getName(), e);
+            if (session0 != null) {
+                session0.close();
+            }
+            this.scheduleConnect(esme);
+        }
+    }
 
-	public int getClientEsmesInConnectQueue() {
-	    int res = 0;
-	    for (ChangeRequest changeRequest : futureSet) {
+    public int getClientEsmesInConnectQueue() {
+        int res = 0;
+        for (ChangeRequest changeRequest : futureSet) {
             if (changeRequest.getType() == ChangeRequest.CONNECT) {
                 res++;
             }
         }
-	    for (ChangeRequest changeRequest : workingSet) {
+        for (ChangeRequest changeRequest : workingSet) {
             if (changeRequest.getType() == ChangeRequest.CONNECT) {
                 res++;
             }
         }
-	    return res;
-	}
-	
-	public int getClientEsmesInConnectQueue(String clusterName) {
+        return res;
+    }
+
+    public int getClientEsmesInConnectQueue(String clusterName) {
         int res = 0;
         for (ChangeRequest changeRequest : futureSet) {
             if (changeRequest.getType() == ChangeRequest.CONNECT) {
@@ -414,8 +413,8 @@ public class SmppClientOpsThread implements Runnable {
         }
         return res;
     }
-	
-	public int getClientEsmesEnquireLinkQueue() {
+
+    public int getClientEsmesEnquireLinkQueue() {
         int res = 0;
         for (ChangeRequest changeRequest : futureSet) {
             if (changeRequest.getType() == ChangeRequest.ENQUIRE_LINK) {
@@ -429,8 +428,8 @@ public class SmppClientOpsThread implements Runnable {
         }
         return res;
     }
-	
-	public int getClientEsmesEnquireLinkQueue(String clusterName) {
+
+    public int getClientEsmesEnquireLinkQueue(String clusterName) {
         int res = 0;
         for (ChangeRequest changeRequest : futureSet) {
             if (changeRequest.getType() == ChangeRequest.ENQUIRE_LINK) {
@@ -446,95 +445,95 @@ public class SmppClientOpsThread implements Runnable {
         }
         return res;
     }
-	
-	protected class ClientSmppSessionHandler implements SmppSessionHandler {
 
-		private final Esme esme;
-		private final SmppSessionHandler wrappedSmppSessionHandler;
+    protected class ClientSmppSessionHandler implements SmppSessionHandler {
 
-		/**
-		 * @param esme
-		 */
-		public ClientSmppSessionHandler(Esme esme, SmppSessionHandler wrappedSmppSessionHandler) {
-			super();
-			this.esme = esme;
-			this.wrappedSmppSessionHandler = wrappedSmppSessionHandler;
-		}
+        private final Esme esme;
+        private final SmppSessionHandler wrappedSmppSessionHandler;
 
-		@Override
-		public String lookupResultMessage(int arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        /**
+         * @param esme
+         */
+        public ClientSmppSessionHandler(Esme esme, SmppSessionHandler wrappedSmppSessionHandler) {
+            super();
+            this.esme = esme;
+            this.wrappedSmppSessionHandler = wrappedSmppSessionHandler;
+        }
 
-		@Override
-		public String lookupTlvTagName(short arg0) {
-			// TODO Auto-generated method stub
-			return null;
-		}
+        @Override
+        public String lookupResultMessage(int arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-		@Override
-		public void fireChannelUnexpectedlyClosed() {
-			this.wrappedSmppSessionHandler.fireChannelUnexpectedlyClosed();
+        @Override
+        public String lookupTlvTagName(short arg0) {
+            // TODO Auto-generated method stub
+            return null;
+        }
 
-			if (this.esme.getSmppSession() != null) {
+        @Override
+        public void fireChannelUnexpectedlyClosed() {
+            this.wrappedSmppSessionHandler.fireChannelUnexpectedlyClosed();
+
+            if (this.esme.getSmppSession() != null) {
                 this.esme.getSmppSession().close();
             }
 
-			// Schedule the connection again
-			scheduleConnect(this.esme);
-		}
+            // Schedule the connection again
+            scheduleConnect(this.esme);
+        }
 
-		@Override
-		public void fireExpectedPduResponseReceived(PduAsyncResponse pduAsyncResponse) {
-			this.wrappedSmppSessionHandler.fireExpectedPduResponseReceived(pduAsyncResponse);
-		}
+        @Override
+        public void fireExpectedPduResponseReceived(PduAsyncResponse pduAsyncResponse) {
+            this.wrappedSmppSessionHandler.fireExpectedPduResponseReceived(pduAsyncResponse);
+        }
 
-		@Override
-		public void firePduRequestExpired(PduRequest pduRequest) {
-			this.wrappedSmppSessionHandler.firePduRequestExpired(pduRequest);
-		}
+        @Override
+        public void firePduRequestExpired(PduRequest pduRequest) {
+            this.wrappedSmppSessionHandler.firePduRequestExpired(pduRequest);
+        }
 
-		@Override
-		public PduResponse firePduRequestReceived(PduRequest pduRequest) {
-			return this.wrappedSmppSessionHandler.firePduRequestReceived(pduRequest);
-		}
+        @Override
+        public PduResponse firePduRequestReceived(PduRequest pduRequest) {
+            return this.wrappedSmppSessionHandler.firePduRequestReceived(pduRequest);
+        }
 
-		@Override
-		public void fireRecoverablePduException(RecoverablePduException e) {
-			this.wrappedSmppSessionHandler.fireRecoverablePduException(e);
-		}
+        @Override
+        public void fireRecoverablePduException(RecoverablePduException e) {
+            this.wrappedSmppSessionHandler.fireRecoverablePduException(e);
+        }
 
-		@Override
-		public void fireUnexpectedPduResponseReceived(PduResponse pduResponse) {
-			this.wrappedSmppSessionHandler.fireUnexpectedPduResponseReceived(pduResponse);
-		}
+        @Override
+        public void fireUnexpectedPduResponseReceived(PduResponse pduResponse) {
+            this.wrappedSmppSessionHandler.fireUnexpectedPduResponseReceived(pduResponse);
+        }
 
-		@Override
-		public void fireUnknownThrowable(Throwable e) {
-			this.wrappedSmppSessionHandler.fireUnknownThrowable(e);
-			// TODO is this ok?
+        @Override
+        public void fireUnknownThrowable(Throwable e) {
+            this.wrappedSmppSessionHandler.fireUnknownThrowable(e);
+            // TODO is this ok?
 
-			if (this.esme.getSmppSession() != null) {
-			    this.esme.getSmppSession().close();
-			}
+            if (this.esme.getSmppSession() != null) {
+                this.esme.getSmppSession().close();
+            }
 
-			// Schedule the connection again
-			scheduleConnect(this.esme);
+            // Schedule the connection again
+            scheduleConnect(this.esme);
 
-		}
+        }
 
-		@Override
-		public void fireUnrecoverablePduException(UnrecoverablePduException e) {
-			// TODO shall we call wrapped?
-			this.wrappedSmppSessionHandler.fireUnrecoverablePduException(e);
+        @Override
+        public void fireUnrecoverablePduException(UnrecoverablePduException e) {
+            // TODO shall we call wrapped?
+            this.wrappedSmppSessionHandler.fireUnrecoverablePduException(e);
 
-			this.esme.getSmppSession().close();
+            this.esme.getSmppSession().close();
 
-			// Schedule the connection again
-			scheduleConnect(this.esme);
-		}
+            // Schedule the connection again
+            scheduleConnect(this.esme);
+        }
 
-	}
+    }
 
 }
