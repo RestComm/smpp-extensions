@@ -5,7 +5,7 @@
     <parent>
         <artifactId>core</artifactId>
         <groupId>org.restcomm.smpp</groupId>
-        <version>7.1.0-SNAPSHOT</version>
+        <version>7.1.0-136</version>
     </parent>
 
     <artifactId>bootstrap-wildfly</artifactId>
