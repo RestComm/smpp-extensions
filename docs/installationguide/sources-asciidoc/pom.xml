@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.restcomm.smpp.docs.installguide</groupId>
 		<artifactId>restcomm-smpp-extensions-installguide</artifactId>
-		<version>7.1.0-SNAPSHOT</version>
+		<version>7.1.0-147</version>
 	</parent>
 
 	<artifactId>restcomm-smpp-extensions-installguide-sources-asciidoc</artifactId>
