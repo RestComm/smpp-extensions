@@ -28,6 +28,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mobicents.ss7.management.console.ShellExecutor;
 import org.restcomm.smpp.Esme;
+import org.restcomm.smpp.SmppEncodingWithDefault;
 import org.restcomm.smpp.SmppInterfaceVersionType;
 import org.restcomm.smpp.SmppManagement;
 import org.restcomm.smpp.SmppServerManagement;
@@ -81,6 +82,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * enquire-link-delay <30000> enquire-link-delay-server <0> link-drop-server <0> charging-enabled <true | false> source-ton
      * <source address ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address
      * ton> routing-npi <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond>
+     * smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7> smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7>
      * ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
      * national-language-locking-shift <national-language-locking-shift> national-language-single-shift
      * <national-language-single-shift> dest-addr-send-limit <dest-addr-send-limit> min-message-length <min-message-length>
@@ -183,6 +185,29 @@ public class SmppShellExecutor implements ShellExecutor {
                 String routingAddressRange = args[count++];
                 esme.setRoutingAddressRange(routingAddressRange);
 
+            } else if (key.equals("smppencodingforgsm7")) {
+                String smppEncodingForGsm7Str = args[count++];
+                SmppEncodingWithDefault smppEncodingForGsm7 = null;
+                try {
+                    smppEncodingForGsm7 = Enum.valueOf(SmppEncodingWithDefault.class, smppEncodingForGsm7Str);
+                } catch (Exception e) {
+                    return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
+                }
+                if (smppEncodingForGsm7 == null)
+                    return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
+                esme.setSmppEncodingForGsm7(smppEncodingForGsm7);
+            } else if (key.equals("smppencodingforucs2")) {
+                String smppEncodingForUCS2Str = args[count++];
+                SmppEncodingWithDefault smppEncodingForUCS2 = null;
+                try {
+                    smppEncodingForUCS2 = Enum.valueOf(SmppEncodingWithDefault.class, smppEncodingForUCS2Str);
+                } catch (Exception e) {
+                    return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
+                }
+                if (smppEncodingForUCS2 == null)
+                    return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
+                esme.setSmppEncodingForUCS2(smppEncodingForUCS2);
+
             } else if (key.equals("ratelimit-second")) {
                 long val = Long.parseLong(args[count++]);
                 esme.setRateLimitPerSecond(val);
@@ -235,7 +260,8 @@ public class SmppShellExecutor implements ShellExecutor {
      * <windowWaitTimeout> counters-enabled <true | false> enquire-link-delay <30000> enquire-link-delay-server <0>
      * link-drop-server <0> charging-enabled <true | false> source-ton <source address ton> source-npi <source address npi>
      * source-range <source address range> routing-ton <routing address ton> routing-npi <routing address npi> routing-range
-     * <routing address range> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour
+     * <routing address range> smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7> smppencodingforucs2
+     * <ServerDefault|Utf8|Unicode|Gsm7> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour
      * <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
      * max-message-length <max-message-length> overload-threshold <overload-threshold> normal-threshold <normal-threshold>
@@ -323,6 +349,9 @@ public class SmppShellExecutor implements ShellExecutor {
         int routingNpi = -1;
         String routingAddressRange = "^[0-9a-zA-Z]*";
 
+        SmppEncodingWithDefault smppEncodingForGsm7 = SmppEncodingWithDefault.ServerDefault;
+        SmppEncodingWithDefault smppEncodingForUCS2 = SmppEncodingWithDefault.ServerDefault;
+
         int nationalLanguageSingleShift = -1;
         int nationalLanguageLockingShift = -1;
         int destAddrSendLimit = 0;
@@ -392,6 +421,21 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("routing-range")) {
                 routingAddressRange = args[count++];
 
+            } else if (key.equals("smppencodingforgsm7")) {
+                String smppEncodingForGsm7Str = args[count++];
+                try {
+                    smppEncodingForGsm7 = Enum.valueOf(SmppEncodingWithDefault.class, smppEncodingForGsm7Str);
+                } catch (Exception e) {
+                    return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
+                }
+            } else if (key.equals("smppencodingforucs2")) {
+                String smppEncodingForUCS2Str = args[count++];
+                try {
+                    smppEncodingForUCS2 = Enum.valueOf(SmppEncodingWithDefault.class, smppEncodingForUCS2Str);
+                } catch (Exception e) {
+                    return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
+                }
+
             } else if (key.equals("ratelimit-second")) {
                 rateLimitPerSecond = Long.parseLong(args[count++]);
             } else if (key.equals("ratelimit-minute")) {
@@ -428,7 +472,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId, splitLongMessages,
                 rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay, nationalLanguageSingleShift,
                 nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength, overloadThreshold,
-                normalThreshold);
+                normalThreshold, smppEncodingForGsm7, smppEncodingForUCS2);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 

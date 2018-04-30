@@ -15,6 +15,8 @@ SYNOPSIS
 	source-ton <source address ton> source-npi <source address npi>
 	source-range <source address range> routing-ton <routing address ton>
 	routing-npi <routing address npi> routing-range <routing address range>
+	smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7>
+	smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7>
 	ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> 
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-single-shift <national-language-single-shift>
@@ -296,7 +298,17 @@ PARAMETERS
 				  SmppSession.Type is SERVER
 				  3) SmppBindType is TRANSMITTER and 
 				  SmppSession.Type is CLIENT
-				  
+
+	smppencodingforgsm7 - Encoding Scheme at SMPP side for GSM7 encoding (DCS=0)
+				  Possible values are <ServerDefault|Utf8|Unicode|Gsm7>
+				  Default value is "ServerDefault" that means that a server level
+				  Encoding Scheme will be used for this ESME.
+
+	smppencodingforucs2 - Encoding Scheme at SMPP side for UCS2 encoding (DCS=8)
+				  Possible values are <ServerDefault|Utf8|Unicode|Gsm7>
+				  Default value is "ServerDefault" that means that a server level
+				  Encoding Scheme will be used for this ESME.
+
     ratelimit_second    - This parameter is used to specify a maximum limit
     				of messages that the SMPP Server will accept from this ESME 
     				during any one second. 

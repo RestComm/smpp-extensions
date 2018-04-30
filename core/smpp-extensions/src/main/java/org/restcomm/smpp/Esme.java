@@ -83,6 +83,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private static final String ROUTING_NPI = "routingNpi";
     private static final String ROUTING_ADDRESS_RANGE = "routingAddressRange";
 
+    private static final String SMPP_ENCODING_FOR_GSM7 = "smppEncodingForGsm7";
+    private static final String SMPP_ENCODING_FOR_UCS2 = "smppEncodingForUCS2";
+
     private static final String CHARGING_ENABLED = "chargingEnabled";
 
     private static final String WINDOW_SIZE = "windowSize";
@@ -149,6 +152,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private int routingNpi;
     private String routingAddressRange;
     private Pattern routingAddressRangePattern;
+
+    // Encoding type at SMPP part for data coding schema==0 (GSM7)
+    private SmppEncodingWithDefault smppEncodingForGsm7 = SmppEncodingWithDefault.ServerDefault;
+    // Encoding type at SMPP part for data coding schema==8 (UCS2)
+    private SmppEncodingWithDefault smppEncodingForUCS2 = SmppEncodingWithDefault.ServerDefault;
 
     private SmppBindType smppBindType;
     private boolean chargingEnabled = false;
@@ -287,6 +295,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
      * @param destAddrSendLimit
      * @param minMessageLength
      * @param maxMessageLength
+     * @param overloadThreshold
+     * @param normalThreshold
+     * @param smppEncodingForGsm7
+     * @param smppEncodingForUCS2
      */
     public Esme(String name, String systemId, String password, String host, int port, boolean chargingEnabled,
             String systemType, SmppInterfaceVersionType smppVersion, int esmeTon, int esmeNpi, String esmeAddressRange,
@@ -296,8 +308,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             int sourceNpi, String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
-            int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold
-
+            int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold,
+            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2
     ) {
         this.name = name;
 
@@ -348,6 +360,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         if (this.routingAddressRange != null) {
             this.routingAddressRangePattern = Pattern.compile(this.routingAddressRange);
         }
+
+        this.smppEncodingForGsm7 = smppEncodingForGsm7;
+        this.smppEncodingForUCS2 = smppEncodingForUCS2;
 
         this.networkId = networkId;
         this.splitLongMessages = splitLongMessages;
@@ -594,6 +609,28 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
         if (this.routingAddressRange != null) {
             this.routingAddressRangePattern = Pattern.compile(this.routingAddressRange);
         }
+        this.store();
+    }
+
+    @Override
+    public SmppEncodingWithDefault getSmppEncodingForGsm7() {
+        return smppEncodingForGsm7;
+    }
+
+    @Override
+    public void setSmppEncodingForGsm7(SmppEncodingWithDefault smppEncodingForGsm7) {
+        this.smppEncodingForGsm7 = smppEncodingForGsm7;
+        this.store();
+    }
+
+    @Override
+    public SmppEncodingWithDefault getSmppEncodingForUCS2() {
+        return smppEncodingForUCS2;
+    }
+
+    @Override
+    public void setSmppEncodingForUCS2(SmppEncodingWithDefault smppEncodingForUCS2) {
+        this.smppEncodingForUCS2 = smppEncodingForUCS2;
         this.store();
     }
 
@@ -1122,6 +1159,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 esme.routingAddressRangePattern = Pattern.compile(esme.routingAddressRange);
             }
 
+            String vals = xml.getAttribute(SMPP_ENCODING_FOR_GSM7, SmppEncodingWithDefault.ServerDefault.toString());
+            esme.smppEncodingForGsm7 = Enum.valueOf(SmppEncodingWithDefault.class, vals);
+            vals = xml.getAttribute(SMPP_ENCODING_FOR_UCS2, SmppEncodingWithDefault.ServerDefault.toString());
+            esme.smppEncodingForUCS2 = Enum.valueOf(SmppEncodingWithDefault.class, vals);
+
             esme.nationalLanguageSingleShift = xml.getAttribute(NATIONAL_LANGUAGE_SINGLE_SHIFT, -1);
             esme.nationalLanguageLockingShift = xml.getAttribute(NATIONAL_LANGUAGE_LOCKING_SHIFT, -1);
             esme.destAddrSendLimit = xml.getAttribute(DEST_ADDR_SEND_LIMIT, 0);
@@ -1220,6 +1262,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             xml.setAttribute(ROUTING_NPI, esme.routingNpi);
             xml.setAttribute(ROUTING_ADDRESS_RANGE, esme.routingAddressRange);
 
+            xml.setAttribute(SMPP_ENCODING_FOR_GSM7, esme.smppEncodingForGsm7.toString());
+            xml.setAttribute(SMPP_ENCODING_FOR_UCS2, esme.smppEncodingForUCS2.toString());
+
             xml.setAttribute(OVERLOAD_THRESHOLD, esme.overloadThreshold);
             xml.setAttribute(NORMAL_THRESHOLD, esme.normalThreshold);
 
@@ -1274,6 +1319,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 .append(SmppOamMessages.SHOW_ROUTING_ADDRESS_TON).append(this.routingTon)
                 .append(SmppOamMessages.SHOW_ROUTING_ADDRESS_NPI).append(this.routingNpi)
                 .append(SmppOamMessages.SHOW_ROUTING_ADDRESS).append(this.routingAddressRange)
+                .append(SmppOamMessages.SMPP_ENCODING_FOR_GSM7).append(this.smppEncodingForGsm7)
+                .append(SmppOamMessages.SMPP_ENCODING_FOR_UCS2).append(this.smppEncodingForUCS2)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_SECOND).append(this.rateLimitPerSecond)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_MINUTE).append(this.rateLimitPerMinute)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_HOUR).append(this.rateLimitPerHour)

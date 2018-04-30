@@ -167,6 +167,24 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
 	void setRoutingAddressRange(String sourceAddressRange);
 
+    /**
+     * Encoding type at SMPP part for data coding schema==0 (GSM7)
+     *
+     * @return
+     */
+    SmppEncodingWithDefault getSmppEncodingForGsm7();
+
+    void setSmppEncodingForGsm7(SmppEncodingWithDefault smppEncodingForGsm7);
+
+    /**
+     * Encoding type at SMPP part for data coding schema==8 (UCS2)
+     *
+     * @return
+     */
+    SmppEncodingWithDefault getSmppEncodingForUCS2();
+
+    void setSmppEncodingForUCS2(SmppEncodingWithDefault smppEncodingForUCS2);
+
 	/**
 	 * Returns true if counters is enabled else false
 	 * 

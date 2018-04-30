@@ -246,7 +246,7 @@
 						</select>
 					</span>	
 				</div>
-								
+
 				<div id="div-routingNpi" class="control-group">
 					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="DefaultSmsRoutingRule will try to match the dest_addr_npi with one configured here. If configured value is null(-1)or it's not null and match's, SMPP Server will compare destination_addr as below. It it doesn't match, SMPP Server will select next ESME in list for matching routing rule">
 						<span class="add-on">Routing Number plan indicator (NPI)</span>
@@ -441,6 +441,30 @@
 					</span>
 				</div>
 
+				<div id="div-smppEncodingForGsm7" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the SMPP Encoding Scheme for GSM7. SMPP side messages with data coding == 0 [GSM7] accept different encoding schemes [UTF8, UNICODE or GSM7] for both sending and receiving messages. SMSC can be configured to accept for one of them (the one that ESME supports). ServerDefault means that a server level value will be used.">
+						<span class="add-on">SMPP Encoding for GSM7</span>
+						<select id="smppEncodingForGsm7" >
+										<option>ServerDefault</option>
+										<option>Utf8</option>
+										<option>Unicode</option>
+										<option>Gsm7</option>
+						</select>
+					</span>	
+				</div>				
+
+				<div id="div-smppEncodingForUCS2" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="used to set the SMPP Encoding Scheme for UCS2. SMPP side messages with data coding == 8 [UCS2] accept different encoding schemes [UTF8, UNICODE or GSM7] for both sending and receiving messages. SMSC can be configured to accept for one of them (the one that ESME supports). ServerDefault means that a server level value will be used.">
+						<span class="add-on">SMPP Encoding for UCS2</span>
+						<select id="smppEncodingForUCS2" >
+										<option>ServerDefault</option>
+										<option>Utf8</option>
+										<option>Unicode</option>
+										<option>Gsm7</option>
+						</select>
+					</span>	
+				</div>				
+
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createEsme()">Create</button>
 			</span>
 		</p>
@@ -574,6 +598,9 @@
 
 		var networkId = response.value.NetworkId;
 		var splitLongMessages = response.value.SplitLongMessages;
+
+		var smppEncodingForGsm7 = response.value.SmppEncodingForGsm7;
+		var smppEncodingForUCS2 = response.value.SmppEncodingForUCS2;
 
 		var isSmppServerStarted = response.value.Started;
 
@@ -803,6 +830,8 @@
 						'<dt>OverloadThreshold</dt> <dd>' + overloadThreshold + ' </dd>' +
 						'<dt>NormalThreshold</dt> <dd>' + normalThreshold + ' </dd>' +
 					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
+					    '<dt>SmppEncodingForGsm7</dt> <dd>' + smppEncodingForGsm7 + ' </dd>' + 
+					    '<dt>SmppEncodingForUCS2</dt> <dd>' + smppEncodingForUCS2 + ' </dd>' + 
 						'</dl>'+
 		        '    </div>'+	
 		        '<hr style="margin: 5px 0;"/>' +
@@ -1444,6 +1473,37 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SplitLongMessages"+']\').toggle(); $(\'input[id^='+name+"SplitLongMessages"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+																	
+
+											'<tr data-toggle="tooltip" title="used to set the SMPP Encoding Scheme for GSM7. SMPP side messages with data coding == 0 [GSM7] accept different encoding schemes [UTF8, UNICODE or GSM7] for both sending and receiving messages. SMSC can be configured to accept for one of them (the one that ESME supports). ServerDefault means that a server level value will be used. Possible values are: ServerDefault, Utf8, Unicode, Gsm7.">'+
+												'<td style="font-size: 0.9em;">SMPP Encoding for GSM7</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'SmppEncodingForGsm7-input" class="control-group">'+
+													'<span id="' + name +'SmppEncodingForGsm7-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + smppEncodingForGsm7 + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SmppEncodingForGsm7\', \'' + name+"SmppEncodingForGsm7" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SmppEncodingForGsm7"+']\').toggle(); $(\'input[id^='+name+"SmppEncodingForGsm7"+']\').focus();"></i>' + 
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'SmppEncodingForGsm7-text">' + smppEncodingForGsm7 + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SmppEncodingForGsm7"+']\').toggle(); $(\'input[id^='+name+"SmppEncodingForGsm7"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
+											'<tr data-toggle="tooltip" title="used to set the SMPP Encoding Scheme for UCS2. SMPP side messages with data coding == 8 [UCS2] accept different encoding schemes [UTF8, UNICODE or GSM7] for both sending and receiving messages. SMSC can be configured to accept for one of them (the one that ESME supports). ServerDefault means that a server level value will be used. Possible values are: ServerDefault, Utf8, Unicode, Gsm7.">'+
+												'<td style="font-size: 0.9em;">SMPP Encoding for UCS2</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'SmppEncodingForUCS2-input" class="control-group">'+
+													'<span id="' + name +'SmppEncodingForUCS2-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + smppEncodingForUCS2 + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'SmppEncodingForUCS2\', \'' + name+"SmppEncodingForUCS2" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"SmppEncodingForUCS2"+']\').toggle(); $(\'input[id^='+name+"SmppEncodingForUCS2"+']\').focus();"></i>' + 
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'SmppEncodingForUCS2-text">' + smppEncodingForUCS2 + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SmppEncodingForUCS2"+']\').toggle(); $(\'input[id^='+name+"SmppEncodingForUCS2"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
 											
 										'</tbody>' +
 									'</table>' +															
@@ -2103,6 +2163,11 @@
 		var e = document.getElementById("splitLongMessages");
 		var splitLongMessages = e.options[e.selectedIndex].text;
 
+		var e = document.getElementById("smppEncodingForGsm7");
+		var smppEncodingForGsm7 = e.options[e.selectedIndex].text;
+		var e = document.getElementById("smppEncodingForUCS2");
+		var smppEncodingForUCS2 = e.options[e.selectedIndex].text;
+
 		var ipAddress = $("#ipAddress").val();
 		if(ipAddress.trim() == "") {
 			$("#div-ipAddress").addClass("error");		
@@ -2286,7 +2351,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold, 
+		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold,smppEncodingForGsm7,smppEncodingForUCS2, 
 				{
 					success: function(value) {
 						updateEsmes();

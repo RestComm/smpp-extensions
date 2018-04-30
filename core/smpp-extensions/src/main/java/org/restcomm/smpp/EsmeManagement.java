@@ -214,7 +214,8 @@ public class EsmeManagement implements EsmeManagementMBean {
             String sourceAddressRange, int routingTon, int routingNpi, String routingAddressRange, int networkId,
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
-            int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold) throws Exception {
+            int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold,
+            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2) throws Exception {
 
         SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
 
@@ -251,31 +252,6 @@ public class EsmeManagement implements EsmeManagementMBean {
             if (esme.getName().equals(name)) {
                 throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_ALREADY_EXIST, name));
             }
-
-            // SystemId:IP:Port:SmppBindType combination should be unique for
-            // CLIENT. For SERVER it accepts multiple incoming binds as far as
-            // host is anonymous (-1) and/or port is -1
-            // String primaryKey = systemId + smppBindType;
-            // String existingPrimaryKey = esme.getSystemId() + esme.getSmppBindType().name();
-            //
-            // if (smppSessionTypeObj == SmppSession.Type.SERVER) {
-            // if (!host.equals("-1") && port != -1) {
-            // primaryKey = primaryKey + host + port;
-            // existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
-            // } else {
-            // // Let the ESME be created
-            // primaryKey = "X";
-            // existingPrimaryKey = "Y";
-            // }
-            // } else {
-            // primaryKey = primaryKey + host + port;
-            // existingPrimaryKey = existingPrimaryKey + esme.getHost() + esme.getPort();
-            // }
-            //
-            // if (primaryKey.equals(existingPrimaryKey)) {
-            // throw new Exception(String.format(SmppOamMessages.CREATE_EMSE_FAIL_PRIMARY_KEY_ALREADY_EXIST, systemId,
-            // host, port, smppBindType));
-            // }
         } // for loop
 
         EsmeCluster esmeCluster = this.esmeClusters.get(clusterName);
@@ -295,8 +271,9 @@ public class EsmeManagement implements EsmeManagementMBean {
                 clientBindTimeout, windowMonitorInterval, windowWaitTimeout, clusterName, countersEnabled, enquireLinkDelay,
                 enquireLinkDelayServer, linkDropServer, sourceTon, sourceNpi, sourceAddressRange, routingTon, routingNpi,
                 routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
-                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit, minMessageLength,
-                maxMessageLength, overloadThreshold, normalThreshold);
+                rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit,
+                minMessageLength, maxMessageLength, overloadThreshold, normalThreshold, smppEncodingForGsm7,
+                smppEncodingForUCS2);
 
         esme.esmeManagement = this;
 

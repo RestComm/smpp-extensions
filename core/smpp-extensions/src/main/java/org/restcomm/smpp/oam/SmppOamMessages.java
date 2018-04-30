@@ -74,6 +74,8 @@ public interface SmppOamMessages {
 
     public static final String START_ESME_FAILED_ALREADY_STARTED = "Esme with given name %s is already started";
 
+    public static final String BAD_SMPP_ENCODING_VALUE = "Bad SMPP Encodnig value when creating or updating of ESME. Possible values: ServerDefault, Utf8, Unicode, Gsm7";
+
 
     public static final String SHOW_ESME_NAME = "ESME name=";
 
@@ -118,6 +120,10 @@ public interface SmppOamMessages {
     public static final String SHOW_ROUTING_ADDRESS_NPI = " routingNpi=";
 
     public static final String SHOW_ROUTING_ADDRESS = " routingAddress=";
+
+    public static final String SMPP_ENCODING_FOR_GSM7 = " smppEncodingForGsm7=";
+
+    public static final String SMPP_ENCODING_FOR_UCS2 = " smppEncodingForUCS2=";
 
     public static final String SHOW_RATE_LIMIT_PER_SECOND = " rateLimitPerSecond=";
 
