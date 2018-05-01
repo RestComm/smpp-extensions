@@ -361,8 +361,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             this.routingAddressRangePattern = Pattern.compile(this.routingAddressRange);
         }
 
-        this.smppEncodingForGsm7 = smppEncodingForGsm7;
-        this.smppEncodingForUCS2 = smppEncodingForUCS2;
+        if (smppEncodingForGsm7 != null)
+            this.smppEncodingForGsm7 = smppEncodingForGsm7;
+        if (smppEncodingForUCS2 != null)
+            this.smppEncodingForUCS2 = smppEncodingForUCS2;
 
         this.networkId = networkId;
         this.splitLongMessages = splitLongMessages;
@@ -619,8 +621,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
     @Override
     public void setSmppEncodingForGsm7(SmppEncodingWithDefault smppEncodingForGsm7) {
-        this.smppEncodingForGsm7 = smppEncodingForGsm7;
-        this.store();
+        if (smppEncodingForGsm7 != null) {
+            this.smppEncodingForGsm7 = smppEncodingForGsm7;
+            this.store();
+        }
     }
 
     @Override
@@ -630,8 +634,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
     @Override
     public void setSmppEncodingForUCS2(SmppEncodingWithDefault smppEncodingForUCS2) {
-        this.smppEncodingForUCS2 = smppEncodingForUCS2;
-        this.store();
+        if (smppEncodingForUCS2 != null) {
+            this.smppEncodingForUCS2 = smppEncodingForUCS2;
+            this.store();
+        }
     }
 
     @Override
