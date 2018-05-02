@@ -85,6 +85,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
     private static final String SMPP_ENCODING_FOR_GSM7 = "smppEncodingForGsm7";
     private static final String SMPP_ENCODING_FOR_UCS2 = "smppEncodingForUCS2";
+    private static final String INCOMING_DCS_AUTO_DETECT = "incomingDcsAutoDetect";
 
     private static final String CHARGING_ENABLED = "chargingEnabled";
 
@@ -157,6 +158,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private SmppEncodingWithDefault smppEncodingForGsm7 = SmppEncodingWithDefault.ServerDefault;
     // Encoding type at SMPP part for data coding schema==8 (UCS2)
     private SmppEncodingWithDefault smppEncodingForUCS2 = SmppEncodingWithDefault.ServerDefault;
+    // true: for all incoming messages DCS autodetection will be done
+    // when all characters of a message belongs to GSM7 character set then DCS is set to 0, if not - to 8
+    private boolean incomingDcsAutoDetect = false;
 
     private SmppBindType smppBindType;
     private boolean chargingEnabled = false;
@@ -309,7 +313,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
             int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold,
-            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2
+            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2, boolean incomingDcsAutoDetect
     ) {
         this.name = name;
 
@@ -365,6 +369,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             this.smppEncodingForGsm7 = smppEncodingForGsm7;
         if (smppEncodingForUCS2 != null)
             this.smppEncodingForUCS2 = smppEncodingForUCS2;
+        this.incomingDcsAutoDetect = incomingDcsAutoDetect;
 
         this.networkId = networkId;
         this.splitLongMessages = splitLongMessages;
@@ -638,6 +643,17 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             this.smppEncodingForUCS2 = smppEncodingForUCS2;
             this.store();
         }
+    }
+
+    @Override
+    public boolean isIncomingDcsAutoDetect() {
+        return incomingDcsAutoDetect;
+    }
+
+    @Override
+    public void setIncomingDcsAutoDetect(boolean incomingDcsAutoDetect) {
+        this.incomingDcsAutoDetect = incomingDcsAutoDetect;
+        this.store();
     }
 
     @Override
@@ -1169,6 +1185,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             esme.smppEncodingForGsm7 = Enum.valueOf(SmppEncodingWithDefault.class, vals);
             vals = xml.getAttribute(SMPP_ENCODING_FOR_UCS2, SmppEncodingWithDefault.ServerDefault.toString());
             esme.smppEncodingForUCS2 = Enum.valueOf(SmppEncodingWithDefault.class, vals);
+            esme.incomingDcsAutoDetect = xml.getAttribute(INCOMING_DCS_AUTO_DETECT, false);
 
             esme.nationalLanguageSingleShift = xml.getAttribute(NATIONAL_LANGUAGE_SINGLE_SHIFT, -1);
             esme.nationalLanguageLockingShift = xml.getAttribute(NATIONAL_LANGUAGE_LOCKING_SHIFT, -1);
@@ -1270,6 +1287,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
             xml.setAttribute(SMPP_ENCODING_FOR_GSM7, esme.smppEncodingForGsm7.toString());
             xml.setAttribute(SMPP_ENCODING_FOR_UCS2, esme.smppEncodingForUCS2.toString());
+            xml.setAttribute(INCOMING_DCS_AUTO_DETECT, esme.incomingDcsAutoDetect);
 
             xml.setAttribute(OVERLOAD_THRESHOLD, esme.overloadThreshold);
             xml.setAttribute(NORMAL_THRESHOLD, esme.normalThreshold);
@@ -1327,6 +1345,7 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
                 .append(SmppOamMessages.SHOW_ROUTING_ADDRESS).append(this.routingAddressRange)
                 .append(SmppOamMessages.SMPP_ENCODING_FOR_GSM7).append(this.smppEncodingForGsm7)
                 .append(SmppOamMessages.SMPP_ENCODING_FOR_UCS2).append(this.smppEncodingForUCS2)
+                .append(SmppOamMessages.INCOMING_DCS_AUTO_DETECT).append(this.incomingDcsAutoDetect)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_SECOND).append(this.rateLimitPerSecond)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_MINUTE).append(this.rateLimitPerMinute)
                 .append(SmppOamMessages.SHOW_RATE_LIMIT_PER_HOUR).append(this.rateLimitPerHour)

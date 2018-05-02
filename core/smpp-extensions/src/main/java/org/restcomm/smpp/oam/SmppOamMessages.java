@@ -125,6 +125,8 @@ public interface SmppOamMessages {
 
     public static final String SMPP_ENCODING_FOR_UCS2 = " smppEncodingForUCS2=";
 
+    public static final String INCOMING_DCS_AUTO_DETECT = " incomingDcsAutoDetect=";
+
     public static final String SHOW_RATE_LIMIT_PER_SECOND = " rateLimitPerSecond=";
 
     public static final String SHOW_RATE_LIMIT_PER_MINUTE = " rateLimitPerMinute=";

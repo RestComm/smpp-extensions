@@ -465,6 +465,16 @@
 					</span>	
 				</div>				
 
+				<div id="div-incomingDcsAutoDetect" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="true: for all incoming messages DCS autodetection will be done when all characters of a message belongs to GSM7 character set then DCS is set to 0, if not - to 8">
+						<span class="add-on">Incoming messages DCS autodetection</span>
+						<select id="incomingDcsAutoDetect" >
+							<option>false</option>
+							<option>true</option>
+						</select>
+					</span>
+				</div>
+
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createEsme()">Create</button>
 			</span>
 		</p>
@@ -601,6 +611,7 @@
 
 		var smppEncodingForGsm7 = response.value.SmppEncodingForGsm7;
 		var smppEncodingForUCS2 = response.value.SmppEncodingForUCS2;
+		var incomingDcsAutoDetect = response.value.IncomingDcsAutoDetect;
 
 		var isSmppServerStarted = response.value.Started;
 
@@ -832,6 +843,7 @@
 					    '<dt>SplitLongMessages</dt> <dd>' + splitLongMessages + ' </dd>' + 
 					    '<dt>SmppEncodingForGsm7</dt> <dd>' + smppEncodingForGsm7 + ' </dd>' + 
 					    '<dt>SmppEncodingForUCS2</dt> <dd>' + smppEncodingForUCS2 + ' </dd>' + 
+					    '<dt>IncomingDcsAutoDetect</dt> <dd>' + incomingDcsAutoDetect + ' </dd>' + 
 						'</dl>'+
 		        '    </div>'+	
 		        '<hr style="margin: 5px 0;"/>' +
@@ -1504,6 +1516,21 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"SmppEncodingForUCS2"+']\').toggle(); $(\'input[id^='+name+"SmppEncodingForUCS2"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+
+											'<tr data-toggle="tooltip" title="true: for all incoming messages DCS autodetection will be done when all characters of a message belongs to GSM7 character set then DCS is set to 0, if not - to 8">'+
+												'<td style="font-size: 0.9em;">Incoming messages DCS autodetection</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'IncomingDcsAutoDetect-input" class="control-group">'+
+													'<span id="' + name +'IncomingDcsAutoDetect-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + incomingDcsAutoDetect + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'IncomingDcsAutoDetect\', \'' + name+"IncomingDcsAutoDetect" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"IncomingDcsAutoDetect"+']\').toggle(); $(\'input[id^='+name+"IncomingDcsAutoDetect"+']\').focus();"></i>' + 
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'IncomingDcsAutoDetect-text">' + incomingDcsAutoDetect + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"IncomingDcsAutoDetect"+']\').toggle(); $(\'input[id^='+name+"IncomingDcsAutoDetect"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
 											
 										'</tbody>' +
 									'</table>' +															
@@ -2167,6 +2194,8 @@
 		var smppEncodingForGsm7 = e.options[e.selectedIndex].text;
 		var e = document.getElementById("smppEncodingForUCS2");
 		var smppEncodingForUCS2 = e.options[e.selectedIndex].text;
+		var e = document.getElementById("incomingDcsAutoDetect");
+		var incomingDcsAutoDetect = e.options[e.selectedIndex].text;
 
 		var ipAddress = $("#ipAddress").val();
 		if(ipAddress.trim() == "") {
@@ -2351,7 +2380,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold,smppEncodingForGsm7,smppEncodingForUCS2, 
+		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold,smppEncodingForGsm7,smppEncodingForUCS2,incomingDcsAutoDetect, 
 				{
 					success: function(value) {
 						updateEsmes();

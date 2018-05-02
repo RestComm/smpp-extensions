@@ -185,6 +185,16 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     void setSmppEncodingForUCS2(SmppEncodingWithDefault smppEncodingForUCS2);
 
+    /**
+     * true: for all incoming messages DCS autodetection will be done when all characters of a message belongs to GSM7 character
+     * set then DCS is set to 0, if not - to 8
+     *
+     * @return
+     */
+    boolean isIncomingDcsAutoDetect();
+
+    public void setIncomingDcsAutoDetect(boolean incomingDcsAutoDetect);
+
 	/**
 	 * Returns true if counters is enabled else false
 	 * 

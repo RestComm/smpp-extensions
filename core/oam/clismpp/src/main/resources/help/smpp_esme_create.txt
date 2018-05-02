@@ -16,7 +16,7 @@ SYNOPSIS
 	source-range <source address range> routing-ton <routing address ton>
 	routing-npi <routing address npi> routing-range <routing address range>
 	smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7>
-	smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7>
+	smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7> incomingdcsautodetect <false|true>
 	ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> 
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-single-shift <national-language-single-shift>
@@ -308,6 +308,12 @@ PARAMETERS
 				  Possible values are <ServerDefault|Utf8|Unicode|Gsm7>
 				  Default value is "ServerDefault" that means that a server level
 				  Encoding Scheme will be used for this ESME.
+
+	incomingdcsautodetect - if we set this parameter to true then for all incoming
+	              messages DCS autodetection will be done. When all characters of
+	              a message belongs to GSM7 character set then DCS is set to 0,
+	              if not - to 8.
+	              Default value is false, no auto detection is performed.
 
     ratelimit_second    - This parameter is used to specify a maximum limit
     				of messages that the SMPP Server will accept from this ESME 

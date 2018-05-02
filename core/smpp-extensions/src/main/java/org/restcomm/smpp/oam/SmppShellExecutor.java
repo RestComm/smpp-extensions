@@ -83,6 +83,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * <source address ton> source-npi <source address npi> source-range <source address range> routing-ton <routing address
      * ton> routing-npi <routing address npi> routing-range <routing address range> ratelimit-second <ratelimitsecond>
      * smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7> smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7>
+     * incomingdcsautodetect <false|true>
      * ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
      * national-language-locking-shift <national-language-locking-shift> national-language-single-shift
      * <national-language-single-shift> dest-addr-send-limit <dest-addr-send-limit> min-message-length <min-message-length>
@@ -207,6 +208,9 @@ public class SmppShellExecutor implements ShellExecutor {
                 if (smppEncodingForUCS2 == null)
                     return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
                 esme.setSmppEncodingForUCS2(smppEncodingForUCS2);
+            } else if (key.equals("incomingdcsautodetect")) {
+                boolean val = Boolean.parseBoolean(args[count++]);
+                esme.setIncomingDcsAutoDetect(val);
 
             } else if (key.equals("ratelimit-second")) {
                 long val = Long.parseLong(args[count++]);
@@ -261,6 +265,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * link-drop-server <0> charging-enabled <true | false> source-ton <source address ton> source-npi <source address npi>
      * source-range <source address range> routing-ton <routing address ton> routing-npi <routing address npi> routing-range
      * <routing address range> smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7> smppencodingforucs2
+     * incomingdcsautodetect <false|true>
      * <ServerDefault|Utf8|Unicode|Gsm7> ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> ratelimit-hour
      * <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
@@ -351,6 +356,7 @@ public class SmppShellExecutor implements ShellExecutor {
 
         SmppEncodingWithDefault smppEncodingForGsm7 = SmppEncodingWithDefault.ServerDefault;
         SmppEncodingWithDefault smppEncodingForUCS2 = SmppEncodingWithDefault.ServerDefault;
+        boolean incomingDcsAutoDetect = false;
 
         int nationalLanguageSingleShift = -1;
         int nationalLanguageLockingShift = -1;
@@ -435,6 +441,8 @@ public class SmppShellExecutor implements ShellExecutor {
                 } catch (Exception e) {
                     return SmppOamMessages.BAD_SMPP_ENCODING_VALUE;
                 }
+            } else if (key.equals("incomingdcsautodetect")) {
+                incomingDcsAutoDetect = Boolean.parseBoolean(args[count++]);
 
             } else if (key.equals("ratelimit-second")) {
                 rateLimitPerSecond = Long.parseLong(args[count++]);
@@ -472,7 +480,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId, splitLongMessages,
                 rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay, nationalLanguageSingleShift,
                 nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength, overloadThreshold,
-                normalThreshold, smppEncodingForGsm7, smppEncodingForUCS2);
+                normalThreshold, smppEncodingForGsm7, smppEncodingForUCS2, incomingDcsAutoDetect);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 

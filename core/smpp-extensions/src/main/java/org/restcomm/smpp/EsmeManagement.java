@@ -215,7 +215,7 @@ public class EsmeManagement implements EsmeManagementMBean {
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
             int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold,
-            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2) throws Exception {
+            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2, boolean incomingDcsAutoDetect) throws Exception {
 
         SmppBindType smppBindTypeOb = SmppBindType.valueOf(smppBindType);
 
@@ -273,7 +273,7 @@ public class EsmeManagement implements EsmeManagementMBean {
                 routingAddressRange, networkId, splitLongMessages, rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour,
                 rateLimitPerDay, nationalLanguageSingleShift, nationalLanguageLockingShift, destAddrSendLimit,
                 minMessageLength, maxMessageLength, overloadThreshold, normalThreshold, smppEncodingForGsm7,
-                smppEncodingForUCS2);
+                smppEncodingForUCS2, incomingDcsAutoDetect);
 
         esme.esmeManagement = this;
 
