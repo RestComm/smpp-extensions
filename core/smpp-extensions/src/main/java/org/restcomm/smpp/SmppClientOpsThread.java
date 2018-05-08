@@ -59,8 +59,7 @@ public class SmppClientOpsThread implements Runnable {
 
 	protected volatile boolean started = true;
 
-	ConcurrentLinkedQueue<ChangeRequest> workingSet = new ConcurrentLinkedQueue<ChangeRequest>();
-    ConcurrentLinkedQueue<ChangeRequest> futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
+	private ConcurrentLinkedQueue<ChangeRequest> futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
 
 	private Object waitObject = new Object();
 
@@ -128,49 +127,54 @@ public class SmppClientOpsThread implements Runnable {
 		}
 		
 		while (this.started) {
-		    workingSet = futureSet;
-		    futureSet = new ConcurrentLinkedQueue<ChangeRequest>();
-		    
+		    FastList<ChangeRequest> newSet = new FastList<ChangeRequest>();
 		    FastList<Esme> pendingList = new FastList<Esme>();
-		    
-		    ChangeRequest change = workingSet.poll();
+
+            ChangeRequest change = futureSet.poll();
             while (change != null) {
-			    switch (change.getType()) {
-                case ChangeRequest.CONNECT:
-                    if (!change.getEsme().isStarted()) {
-                        change.getEsme().getInConnectingQueue().set(false);
-                        logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
-                    } else {
-                        if (change.getExecutionTime() <= System.currentTimeMillis()) {
+                switch (change.getType()) {
+                    case ChangeRequest.CONNECT:
+                        if (!change.getEsme().isStarted()) {
                             change.getEsme().getInConnectingQueue().set(false);
-                            initiateConnection(change.getEsme());
+                            logger.warn("ESME " + change.getEsme().getName() + " is stopped. Removing change request.");
                         } else {
-                            futureSet.offer(change);
-                            logger.debug("Change request for ESME " + change.getEsme().getName() + " is scheduled for later: "
-                                    + DATE_FORMAT.format(new Date(change.getExecutionTime())));
-                        }
-                    }
-                    break;
-                case ChangeRequest.ENQUIRE_LINK:
-                    if (change.getEsme().isStarted()) {
-                        if (change.getEsme().getEnquireClientEnabled()) {
                             if (change.getExecutionTime() <= System.currentTimeMillis()) {
-                                pendingList.add(change.getEsme());
+                                change.getEsme().getInConnectingQueue().set(false);
+                                initiateConnection(change.getEsme());
                             } else {
-                                futureSet.offer(change); 
+                                newSet.add(change);
+                                logger.debug("Change request for ESME " + change.getEsme().getName()
+                                        + " is scheduled for later: " + DATE_FORMAT.format(new Date(change.getExecutionTime())));
                             }
                         }
-                    }
-                    break;
-			    }
-			    
-			    change = workingSet.poll();
+                        break;
+                    case ChangeRequest.ENQUIRE_LINK:
+                        if (change.getEsme().isStarted()) {
+                            if (change.getEsme().getEnquireClientEnabled()) {
+                                if (change.getExecutionTime() <= System.currentTimeMillis()) {
+                                    pendingList.add(change.getEsme());
+                                } else {
+                                    newSet.add(change);
+                                }
+                            }
+                        }
+                        break;
+                }
+
+                change = futureSet.poll();
             }
-	                
-         // Sending Enquire messages
-            Iterator<Esme> pendingchanges = pendingList.iterator();
-            while (pendingchanges.hasNext()) {
-                Esme esme = pendingchanges.next();
+
+            // Putting change requests into a queue
+            Iterator<ChangeRequest> newChanges = newSet.iterator();
+            while (newChanges.hasNext()) {
+                ChangeRequest changeRequest = newChanges.next();
+                futureSet.offer(changeRequest);
+            }
+
+            // Sending Enquire messages
+            Iterator<Esme> pendingChanges = pendingList.iterator();
+            while (pendingChanges.hasNext()) {
+                Esme esme = pendingChanges.next();
                 this.enquireLink(esme);
             }
 
