@@ -32,7 +32,7 @@
         <ch.smpp.version>5.1.0-113</ch.smpp.version> <!-- 5.0.13 -->
         <ch-commons-util.version>7.0.6</ch-commons-util.version> <!-- 7.0.5 -->
         <ch-commons-charset.version>7.0.6</ch-commons-charset.version> <!-- 3.0.2 -->
-        <jss7.restcomm.version>7.4.0-102</jss7.restcomm.version>
+        <jss7.restcomm.version>8.0.0-168</jss7.restcomm.version>
         <slf4j.version>1.5.5</slf4j.version>
         <junit.version>4.1</junit.version>
 
@@ -159,28 +159,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <groupId>org.mobicents.tools</groupId>
-                <version>
-                    ${restcomm.tools.mavenplugin.eclipse.version}
-                </version>
-                <inherited>false</inherited>
-                <executions />
-                <configuration>
-                    <classpathExcludes>
-                        <exclude>xml-apis:xml-apis</exclude>
-                        <exclude>jtidy:jtidy</exclude>
-                    </classpathExcludes>
-                    <resolveTransitiveDependencies>
-                        true
-                    </resolveTransitiveDependencies>
-                    <eclipseProjectName>
-                        restcomm-smpp-extensions
-                    </eclipseProjectName>
-                </configuration>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

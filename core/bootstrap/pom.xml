@@ -23,22 +23,22 @@
 		<!-- CLI sever staff -->
 		<dependency>
 			<artifactId>scheduler</artifactId>
-			<groupId>org.mobicents.protocols.ss7.scheduler</groupId>
+			<groupId>org.restcomm.protocols.ss7.scheduler</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>shell-server-api</artifactId>
-			<groupId>org.mobicents.protocols.ss7.management</groupId>
+			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>shell-server-impl</artifactId>
-			<groupId>org.mobicents.protocols.ss7.management</groupId>
+			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 		<dependency>
 			<artifactId>shell-transport</artifactId>
-			<groupId>org.mobicents.protocols.ss7.management</groupId>
+			<groupId>org.restcomm.protocols.ss7.management</groupId>
 			<version>${jss7.restcomm.version}</version>
 		</dependency>
 

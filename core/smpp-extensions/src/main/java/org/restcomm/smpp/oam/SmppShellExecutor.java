@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.mobicents.ss7.management.console.ShellExecutor;
+import org.restcomm.ss7.management.console.ShellExecutor;
 import org.restcomm.smpp.Esme;
 import org.restcomm.smpp.SmppEncodingWithDefault;
 import org.restcomm.smpp.SmppInterfaceVersionType;

@@ -16,10 +16,10 @@ Scroll down to the section for SmppManagement in the _jboss-beans.xml_ file and 
 [source,xml]
 ----
 
-	<bean name="SS7Clock" class="org.mobicents.protocols.ss7.scheduler.DefaultClock">
+	<bean name="SS7Clock" class="org.restcomm.protocols.ss7.scheduler.DefaultClock">
 	</bean>
 
-	<bean name="SS7Scheduler" class="org.mobicents.protocols.ss7.scheduler.Scheduler">
+	<bean name="SS7Scheduler" class="org.restcomm.protocols.ss7.scheduler.Scheduler">
 		<property name="clock">
 			<inject bean="SS7Clock" />
 		</property>
@@ -39,8 +39,8 @@ Scroll down to the section for SmppManagement in the _jboss-beans.xml_ file and 
     </bean>
 ----
 
-.[class]`org.mobicents.protocols.ss7.scheduler.DefaultClock`
-.[class]`org.mobicents.protocols.ss7.scheduler.Scheduler`
+.[class]`org.restcomm.protocols.ss7.scheduler.DefaultClock`
+.[class]`org.restcomm.protocols.ss7.scheduler.Scheduler`
 DefaultClock and Scheduler are service beans that are needed for SmppManagement service.
 
 .[class]`org.restcomm.smpp.SmppManagement`
@@ -70,7 +70,7 @@ Received commands are executed on local resources to  perform actions like  ESME
 				<inject bean="SS7Scheduler" />
 			</parameter>
 			<parameter>
-				<list class="javolution.util.FastList" elementClass="org.mobicents.ss7.management.console.ShellExecutor">
+				<list class="javolution.util.FastList" elementClass="org.restcomm.ss7.management.console.ShellExecutor">
 					<inject bean="SmppShellExecutor" />
 				</list>
 			</parameter>
@@ -100,10 +100,10 @@ NOTE: To understand JBoss bind options look at  http://docs.jboss.org/jbossas/do
 
 For working under a WildFly server we need to deploy:
 
-* `org.mobicents.ss7.commons` module that contains a base code for CLI interface 
+* `org.restcomm.ss7.commons` module that contains a base code for CLI interface 
 * `org.restcomm.smpp.bootstrap` module that contains SMPP server staff
 
-`org.mobicents.ss7.commons` module is used also for SS7 library. If you use SMPP library along with SS7 library you need to deploy this module only once.
+`org.restcomm.ss7.commons` module is used also for SS7 library. If you use SMPP library along with SS7 library you need to deploy this module only once.
 
 _$JBOSS_HOME/standalone/configuration/standalone.xml_ file (or other appropriate config if you use another profile) must contain a dscription of `org.restcomm:smpp-extensions` subsystem.
 

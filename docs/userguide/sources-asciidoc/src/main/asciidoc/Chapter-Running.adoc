@@ -55,8 +55,8 @@ Once installed, you can run the different Components as described in the section
 2018-01-04 17:43:04,483 INFO  [org.mobicents.slee.container.management.ResourceManagement] (main) Activated RA Entity SmppServerRA
 2018-01-04 17:43:04,756 INFO  [org.mobicents.slee.container.management.ResourceManagement] (main) Bound link between RA Entity SmppServerRA and Name SmppServerRA
 2018-01-04 17:43:05,019 INFO  [org.restcomm.smpp.oam.SmppShellExecutor] (main) Started SmppShellExecutor SmppManagement
-2018-01-04 17:43:05,023 INFO  [org.mobicents.ss7.management.console.ShellServer] (main) Starting SS7 management shell environment
-2018-01-04 17:43:05,027 INFO  [org.mobicents.ss7.management.console.ShellServer] (main) ShellExecutor listening at /127.0.0.1:3435
+2018-01-04 17:43:05,023 INFO  [org.restcomm.ss7.management.console.ShellServer] (main) Starting SS7 management shell environment
+2018-01-04 17:43:05,027 INFO  [org.restcomm.ss7.management.console.ShellServer] (main) ShellExecutor listening at /127.0.0.1:3435
 2018-01-04 17:43:05,058 INFO  [org.apache.coyote.http11.Http11Protocol] (main) Starting Coyote HTTP/1.1 on http-127.0.0.1-8080
 2018-01-04 17:43:05,069 INFO  [org.apache.coyote.ajp.AjpProtocol] (main) Starting Coyote AJP/1.3 on ajp-127.0.0.1-8009
 2018-01-04 17:43:05,075 INFO  [org.jboss.bootstrap.microcontainer.ServerImpl] (main) JBoss (Microcontainer) [5.1.0.GA (build: SVNTag=JBoss_5_1_0_GA date=200905221634)] Started in 45s:714ms

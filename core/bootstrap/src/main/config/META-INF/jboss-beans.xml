@@ -2,10 +2,10 @@
 <deployment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns="urn:jboss:bean-deployer:2.0">
 
-	<bean name="SS7Clock" class="org.mobicents.protocols.ss7.scheduler.DefaultClock">
+	<bean name="SS7Clock" class="org.restcomm.protocols.ss7.scheduler.DefaultClock">
 	</bean>
 
-	<bean name="SS7Scheduler" class="org.mobicents.protocols.ss7.scheduler.Scheduler">
+	<bean name="SS7Scheduler" class="org.restcomm.protocols.ss7.scheduler.Scheduler">
 		<property name="clock">
 			<inject bean="SS7Clock" />
 		</property>
@@ -15,14 +15,14 @@
 	<!-- Shell Service -->
 	<!-- ==================================================================== -->
 	<!-- Define Shell Executor -->
-	<bean name="ShellExecutor" class="org.mobicents.ss7.management.console.ShellServerJboss">
+	<bean name="ShellExecutor" class="org.restcomm.ss7.management.console.ShellServerJboss">
 		<constructor>
 			<parameter>
 				<inject bean="SS7Scheduler" />
 			</parameter>
 			<parameter>
 				<list class="javolution.util.FastList"
-					elementClass="org.mobicents.ss7.management.console.ShellExecutor">
+					elementClass="org.restcomm.ss7.management.console.ShellExecutor">
                     <inject bean="SmppShellExecutor" />
 				</list>
 			</parameter>

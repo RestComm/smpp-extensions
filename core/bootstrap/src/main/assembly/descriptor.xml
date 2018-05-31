@@ -16,10 +16,10 @@
 			<includes>
 				<include>org.restcomm.smpp:smpp-extensions</include>
 
-				<include>org.mobicents.protocols.ss7.scheduler:scheduler</include>
-				<include>org.mobicents.protocols.ss7.management:shell-transport</include>
-				<include>org.mobicents.protocols.ss7.management:shell-server-api</include>
-				<include>org.mobicents.protocols.ss7.management:shell-server-impl</include>
+				<include>org.restcomm.protocols.ss7.scheduler:scheduler</include>
+				<include>org.restcomm.protocols.ss7.management:shell-transport</include>
+				<include>org.restcomm.protocols.ss7.management:shell-server-api</include>
+				<include>org.restcomm.protocols.ss7.management:shell-server-impl</include>
 
 				<include>org.restcomm.smpp:ch-smpp</include>
 				<include>org.restcomm.smpp:ch-commons-charset</include>

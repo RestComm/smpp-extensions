@@ -7,11 +7,11 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.logging.Logger;
 import org.jboss.msc.service.*;
 import org.jboss.msc.value.InjectedValue;
-import org.mobicents.protocols.ss7.scheduler.DefaultClock;
-import org.mobicents.protocols.ss7.scheduler.Scheduler;
-import org.mobicents.ss7.management.console.ShellExecutor;
-import org.mobicents.ss7.management.console.ShellServer;
-import org.mobicents.ss7.management.console.ShellServerWildFly;
+import org.restcomm.protocols.ss7.scheduler.DefaultClock;
+import org.restcomm.protocols.ss7.scheduler.Scheduler;
+import org.restcomm.ss7.management.console.ShellExecutor;
+import org.restcomm.ss7.management.console.ShellServer;
+import org.restcomm.ss7.management.console.ShellServerWildFly;
 import org.restcomm.smpp.SmppManagement;
 import org.restcomm.smpp.oam.SmppShellExecutor;
 
