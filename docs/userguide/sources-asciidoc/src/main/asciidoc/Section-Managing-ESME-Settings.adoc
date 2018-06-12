@@ -59,6 +59,7 @@ SYNOPSIS
 	routing-npi <routing address npi> routing-range <routing address range>
 	smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7>
 	smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7> incomingdcsautodetect <false|true>
+	detrule <det rule name>
 	ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> 
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-single-shift <national-language-single-shift>
@@ -357,6 +358,10 @@ PARAMETERS
 	              if not - to 8.
 	              Default value is false, no auto detection is performed.
 
+	detRule             - A name of a rule for DLR error code translation
+	              "null" means that no rule is defined and no translation will
+	              be done.
+
     ratelimit_second    - This parameter is used to specify a maximum limit
     				of messages that the SMPP Server will accept from this ESME 
     				during any one second. 
@@ -498,6 +503,7 @@ SYNOPSIS
 	routing-npi <routing address npi> routing-range <routing address range>
 	smppencodingforgsm7 <ServerDefault|Utf8|Unicode|Gsm7>
 	smppencodingforucs2 <ServerDefault|Utf8|Unicode|Gsm7> incomingdcsautodetect <false|true>
+	detrule <det rule name>
 	ratelimit-second <ratelimitsecond> ratelimit-minute <ratelimitminute> 
 	ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
 	national-language-locking-shift <national-language-locking-shift> 
@@ -785,6 +791,10 @@ PARAMETERS
 	              a message belongs to GSM7 character set then DCS is set to 0,
 	              if not - to 8.
 	              Default value is false, no auto detection is performed.
+
+	detRule             - A name of a rule for DLR error code translation
+	              "null" means that no rule is defined and no translation will
+	              be done.
 
     ratelimit_second    - This parameter is used to specify a maximum limit
     				of messages that the SMPP Server will accept from this ESME 
