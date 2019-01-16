@@ -117,6 +117,10 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     private static final String OVERLOAD_THRESHOLD = "overloadThreshold";
     private static final String NORMAL_THRESHOLD = "normalThreshold";
 
+    private static final String RE_ASSEMBLE_SPLITTED_SMS = "reAssembleSplittedSms";
+
+    private static final String RE_ASSEMBLE_TIMER = "reAssembleTimer";
+
     private String name;
     private String clusterName;
     private String systemId;
@@ -216,6 +220,11 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
      */
     private long windowWaitTimeout;
 
+    /* Merge the already splitted SMS */
+    private boolean reAssembleSplittedSms;
+
+    private int reAssembleTimer = 1;
+
     /**
      * Set limits for message count received from ESME per a second, minute, hour or a day. Zero values means "no restrictions".
      */
@@ -313,7 +322,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             boolean splitLongMessages, long rateLimitPerSecond, long rateLimitPerMinute, long rateLimitPerHour,
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
             int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold,
-            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2, boolean incomingDcsAutoDetect
+            SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2, boolean incomingDcsAutoDetect,
+            boolean reAssembleSplittedSms, int reAssembleTimer
     ) {
         this.name = name;
 
@@ -387,6 +397,9 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
         this.overloadThreshold = overloadThreshold;
         this.normalThreshold = normalThreshold;
+
+        this.reAssembleSplittedSms = reAssembleSplittedSms;
+        this.reAssembleTimer = reAssembleTimer;
     }
 
     public AtomicBoolean getInConnectingQueue() {
@@ -505,6 +518,28 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
     @Override
     public void setSplitLongMessages(boolean splitLongMessages) {
         this.splitLongMessages = splitLongMessages;
+        this.store();
+    }
+
+    @Override
+    public boolean getReAssembleSplittedSms() {
+        return reAssembleSplittedSms;
+    }
+
+    @Override
+    public void setReAssembleSplittedSms(boolean reAssembleSplittedSms) {
+        this.reAssembleSplittedSms = reAssembleSplittedSms;
+        this.store();
+    }
+
+    @Override
+    public int getReAssembleTimer() {
+        return reAssembleTimer;
+    }
+
+    @Override
+    public void setReAssembleTimer(int reAssembleTimer) {
+        this.reAssembleTimer = reAssembleTimer;
         this.store();
     }
 
@@ -1194,6 +1229,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
             esme.maxMessageLength = xml.getAttribute(MAX_MESSAGE_LENGTH, -1);
             esme.overloadThreshold = xml.getAttribute(OVERLOAD_THRESHOLD, -1);
             esme.normalThreshold = xml.getAttribute(NORMAL_THRESHOLD, -1);
+            esme.reAssembleSplittedSms = xml.getAttribute(RE_ASSEMBLE_SPLITTED_SMS, false);
+            esme.reAssembleTimer = xml.getAttribute(RE_ASSEMBLE_TIMER, 1);
 
             // SSL
             esme.useSsl = xml.getAttribute(USE_SSL, false);
@@ -1291,6 +1328,8 @@ public class Esme extends SslConfigurationWrapper implements XMLSerializable, Es
 
             xml.setAttribute(OVERLOAD_THRESHOLD, esme.overloadThreshold);
             xml.setAttribute(NORMAL_THRESHOLD, esme.normalThreshold);
+            xml.setAttribute(RE_ASSEMBLE_SPLITTED_SMS, esme.reAssembleSplittedSms);
+            xml.setAttribute(RE_ASSEMBLE_TIMER, esme.reAssembleTimer);
 
             // SSl
             xml.setAttribute(USE_SSL, esme.useSsl);

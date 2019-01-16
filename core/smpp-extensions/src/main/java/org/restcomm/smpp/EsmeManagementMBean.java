@@ -47,7 +47,7 @@ public interface EsmeManagementMBean {
             long rateLimitPerDay, int nationalLanguageSingleShift, int nationalLanguageLockingShift, int destAddrSendLimit,
             int minMessageLength, int maxMessageLength, int overloadThreshold, int normalThreshold,
             SmppEncodingWithDefault smppEncodingForGsm7, SmppEncodingWithDefault smppEncodingForUCS2,
-            boolean incomingDcsAutoDetect) throws Exception;
+            boolean incomingDcsAutoDetect, boolean reAssembleSplittedSms, int reAssembleTimer) throws Exception;
 
 	Esme destroyEsme(String esmeName) throws Exception;
 

@@ -87,7 +87,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * ratelimit-minute <ratelimitminute> ratelimit-hour <ratelimithour> ratelimit-day <ratelimitday>
      * national-language-locking-shift <national-language-locking-shift> national-language-single-shift
      * <national-language-single-shift> dest-addr-send-limit <dest-addr-send-limit> min-message-length <min-message-length>
-     * max-message-length <max-message-length>
+     * max-message-length <max-message-length> reassemble-splitted-sms <false|true> reassemble-timer <1>
      * 
      * @param args
      * @return
@@ -246,6 +246,12 @@ public class SmppShellExecutor implements ShellExecutor {
             } else if (key.equals("normal-threshold")) {
                 int val = Integer.parseInt(args[count++]);
                 esme.setNormalThreshold(val);
+            } else if (key.equals("reassemble-splitted-sms")) {
+                boolean val = Boolean.parseBoolean(args[count++]);
+                esme.setReAssembleSplittedSms(val);
+            }  else if (key.equals("reassemble-timer")) {
+                int val = Integer.parseInt(args[count++]);
+                esme.setReAssembleTimer(val);
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -270,6 +276,7 @@ public class SmppShellExecutor implements ShellExecutor {
      * <ratelimithour> ratelimit-day <ratelimitday> national-language-locking-shift <national-language-locking-shift>
      * national-language-single-shift <national-language-single-shift> min-message-length <min-message-length>
      * max-message-length <max-message-length> overload-threshold <overload-threshold> normal-threshold <normal-threshold>
+     * reassemble-splitted-sms <false|true> reassemble-timer <1>
      * 
      * @param args
      * @return
@@ -366,6 +373,8 @@ public class SmppShellExecutor implements ShellExecutor {
 
         int overloadThreshold = -1;
         int normalThreshold = -1;
+        boolean reAssSms = false;
+        int reassembleTimer = 1;
 
         while (count < args.length) {
             // These are all optional parameters for a Tx/Rx/Trx binds
@@ -467,6 +476,10 @@ public class SmppShellExecutor implements ShellExecutor {
                 overloadThreshold = Integer.parseInt(args[count++]);
             } else if (key.equals("normal-threshold")) {
                 normalThreshold = Integer.parseInt(args[count++]);
+            } else if (key.equals("reassemble-splitted-sms")) {
+                reAssSms = Boolean.parseBoolean(args[count++]);
+            }  else if (key.equals("reassemble-timer")) {
+                reassembleTimer = Integer.parseInt(args[count++]);
             } else {
                 return SmppOamMessages.INVALID_COMMAND;
             }
@@ -480,7 +493,7 @@ public class SmppShellExecutor implements ShellExecutor {
                 sourceAddressRange, routinigTon, routingNpi, routingAddressRange, networkId, splitLongMessages,
                 rateLimitPerSecond, rateLimitPerMinute, rateLimitPerHour, rateLimitPerDay, nationalLanguageSingleShift,
                 nationalLanguageLockingShift, destAddrSendLimit, minMessageLength, maxMessageLength, overloadThreshold,
-                normalThreshold, smppEncodingForGsm7, smppEncodingForUCS2, incomingDcsAutoDetect);
+                normalThreshold, smppEncodingForGsm7, smppEncodingForUCS2, incomingDcsAutoDetect, reAssSms, reassembleTimer);
         return String.format(SmppOamMessages.CREATE_ESME_SUCCESSFULL, esme.getName());
     }
 

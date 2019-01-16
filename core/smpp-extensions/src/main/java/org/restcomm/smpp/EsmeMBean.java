@@ -391,4 +391,12 @@ public interface EsmeMBean extends DefaultSmppSessionMXBean, SslConfigurationWra
 
     void setOverloaded(boolean overloaded);
 
+    boolean getReAssembleSplittedSms();
+
+    void setReAssembleSplittedSms(boolean reAsSms);
+
+    int getReAssembleTimer();
+
+    void setReAssembleTimer(int reAssembleTimer);
+
 }

@@ -474,6 +474,21 @@
 						</select>
 					</span>
 				</div>
+				<div id="div-reAssembleSplittedSms" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="true: for all incoming splitted messages, the splitted message will be merged into one solid message">
+						<span class="add-on">ReAssemble Splitted SMS</span>
+						<select id="reAssembleSplittedSms" >
+							<option>false</option>
+							<option>true</option>
+						</select>
+					</span>
+				</div>
+				<div id="div-reAssembleTimer" class="control-group">
+					<span class="input-prepend" data-toggle="tooltip" data-placement="bottom" title="The timer for reassemble splitted SMS, default value is 1">
+						<span class="add-on">ReAssemble Splitted Timer</span>
+						<input id="reAssembleTimer" type="text" class="input-mini" style="width: 120px; margin-right: 12px; text-align: center;" placeholder="Reassemble Timer" value="-1"/>
+					</span>	
+				</div>
 
 				<button id="add-entity-button" class="btn btn btn-primary" onclick="createEsme()">Create</button>
 			</span>
@@ -636,6 +651,9 @@
 		var localType = response.value.LocalTypeName;
 		var state = response.value.StateName;
 		var overloadStatus = response.value.Overloaded;
+		var reAssembleSplittedSms = response.value.ReAssembleSplittedSms;
+		var reAssembleTimer = response.value.ReAssembleTimer;
+
 		
 		var systemType = response.value.SystemType;
 		var bindType = response.value.BindTypeName;
@@ -844,6 +862,8 @@
 					    '<dt>SmppEncodingForGsm7</dt> <dd>' + smppEncodingForGsm7 + ' </dd>' + 
 					    '<dt>SmppEncodingForUCS2</dt> <dd>' + smppEncodingForUCS2 + ' </dd>' + 
 					    '<dt>IncomingDcsAutoDetect</dt> <dd>' + incomingDcsAutoDetect + ' </dd>' + 
+					    '<dt>ReAssembleSplittedSms</dt> <dd>' + reAssembleSplittedSms + ' </dd>' + 
+					    '<dt>ReAssembleTimer</dt> <dd>' + reAssembleTimer + ' </dd>' + 
 						'</dl>'+
 		        '    </div>'+	
 		        '<hr style="margin: 5px 0;"/>' +
@@ -1531,7 +1551,37 @@
 												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"IncomingDcsAutoDetect"+']\').toggle(); $(\'input[id^='+name+"IncomingDcsAutoDetect"+']\').focus();"></i>' +
 												'</td>'+
 											'</tr>'+
-											
+											'<tr data-toggle="tooltip" title="true: for all incoming splitted messages, the splitted message will be merged into one solid message">'+
+												'<td style="font-size: 0.9em;">ReAssemble Splitted SMS</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'ReAssembleSplittedSms-input" class="control-group">'+
+													'<span id="' + name +'ReAssembleSplittedSms-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + reAssembleSplittedSms + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ReAssembleSplittedSms\', \'' + name+"ReAssembleSplittedSms" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ReAssembleSplittedSms"+']\').toggle(); $(\'input[id^='+name+"ReAssembleSplittedSms"+']\').focus();"></i>' + 
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'ReAssembleSplittedSms-text">' + reAssembleSplittedSms + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ReAssembleSplittedSms"+']\').toggle(); $(\'input[id^='+name+"ReAssembleSplittedSms"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
+											'<tr data-toggle="tooltip" title="true: The timer for reassemble splitted SMS">'+
+												'<td style="font-size: 0.9em;">Reassemble Spllited Timer</td>'+
+												'<td style="font-size: 0.9em; padding: 0;">'+
+													'<div id="div-' + name +'ReAssembleTimer-input" class="control-group">'+
+													'<span id="' + name +'ReAssembleTimer-input" style="display: none;">'+
+														'<input type="text" class="input-small" value="' + reAssembleTimer + '" /> ' +
+														'<i class="icon-ok" style="cursor: pointer;" onclick="onModifyEsmeOk(\'' + name+ '\', \'ReAssembleTimer\', \'' + name+"ReAssembleTimer" + '\')"></i> ' +
+														'<i class="icon-remove" style="cursor: pointer;" onclick="$(\'[id^='+name+"ReAssembleTimer"+']\').toggle(); $(\'input[id^='+name+"ReAssembleTimer"+']\').focus();"></i>' + 
+													'</span>'+
+													'</div>' +
+													'<span id="' +name + 'ReAssembleTimer-text">' + reAssembleTimer + '</span>'+
+												'</td>'+
+												'<td><i class="icon-pencil" data-toggle="tooltip" title="Edit" style="cursor: pointer;" onclick="$(\'[id^='+name+"ReAssembleTimer"+']\').toggle(); $(\'input[id^='+name+"ReAssembleTimer"+']\').focus();"></i>' +
+												'</td>'+
+											'</tr>'+
+
 										'</tbody>' +
 									'</table>' +															
 								'</div>'+
@@ -2197,6 +2247,14 @@
 		var e = document.getElementById("incomingDcsAutoDetect");
 		var incomingDcsAutoDetect = e.options[e.selectedIndex].text;
 
+		var e = document.getElementById("reAssembleSplittedSms");
+		var reAssembleSplittedSms = e.options[e.selectedIndex].text;
+
+		var reAssembleTimer = $("#reAssembleTimer").val();
+		if(reAssembleTimer == "") {
+			reAssembleTimer = "1";
+		}
+
 		var ipAddress = $("#ipAddress").val();
 		if(ipAddress.trim() == "") {
 			$("#div-ipAddress").addClass("error");		
@@ -2380,7 +2438,7 @@
 			$("#login-settings-error").hide();
 		}
 		
-		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold,smppEncodingForGsm7,smppEncodingForUCS2,incomingDcsAutoDetect, 
+		jolokia.execute("org.restcomm.smpp:layer=EsmeManagement,name=SmppManagement","createEsme", esmeName,systemId,password,ipAddress,ipPort,chargingEnabled,smppBindType,systemType,smppVersion,esmeTon,esmeNpi,esmeRange,smppSessionType,windowSize,connectTimeout,reqExpTimeout,clientBindTimeout,windowMonitorInterval,windowWaitTimeout,clusterName,countersEnabled,enqLinkDelay,enqLinkDelayServer,lnkDropServer,sourceTon,sourceNpi,sourceRange,routingTon,routingNpi,routingRange,networkId,splitLongMessages,rateLimitPerSecond,rateLimitPerMinute,rateLimitPerHour,rateLimitPerDay,nationalLanguageSingleShift,nationalLanguageLockingShift,destAddrSendLimit,minMessageLength,maxMessageLength,overloadThreshold,normalThreshold,smppEncodingForGsm7,smppEncodingForUCS2,incomingDcsAutoDetect, reAssembleSplittedSms, reAssembleTimer,
 				{
 					success: function(value) {
 						updateEsmes();
