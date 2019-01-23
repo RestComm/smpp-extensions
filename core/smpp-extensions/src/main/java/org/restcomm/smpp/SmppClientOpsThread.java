@@ -309,7 +309,13 @@ public class SmppClientOpsThread implements Runnable {
 			config0.setSystemId(esme.getSystemId());
 			config0.setPassword(esme.getPassword());
 			config0.setSystemType(esme.getSystemType());
-			config0.getLoggingOptions().setLogBytes(true);
+                        if (logger.isDebugEnabled()) {
+                            config0.getLoggingOptions().setLogBytes(true);
+                            config0.getLoggingOptions().setLogPdu(true);
+                        } else {
+                            config0.getLoggingOptions().setLogBytes(false);
+                            config0.getLoggingOptions().setLogPdu(false);                            
+                        }
 			// to enable monitoring (request expiration)
 			config0.setRequestExpiryTimeout(esme.getRequestExpiryTimeout());
 			config0.setWindowMonitorInterval(esme.getWindowMonitorInterval());

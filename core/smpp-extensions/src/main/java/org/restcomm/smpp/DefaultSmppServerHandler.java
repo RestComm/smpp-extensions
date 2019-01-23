@@ -197,10 +197,13 @@ public class DefaultSmppServerHandler implements SmppServerHandler {
             esme.nextLocalSessionId();
             esme.setSmppSession((DefaultSmppSession) session);
 
-            if (!logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
+                session.getConfiguration().getLoggingOptions().setLogBytes(true);
+                session.getConfiguration().getLoggingOptions().setLogPdu(true);
+            } else {
                 session.getConfiguration().getLoggingOptions().setLogBytes(false);
-                session.getConfiguration().getLoggingOptions().setLogPdu(false);
-            }
+                session.getConfiguration().getLoggingOptions().setLogPdu(false);                            
+            }            
 
             SmppSessionHandler smppSessionHandler = this.smppSessionHandlerInterface.createNewSmppSessionHandler(esme);
             // need to do something it now (flag we're ready)
